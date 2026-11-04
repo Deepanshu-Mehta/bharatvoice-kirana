@@ -168,7 +168,6 @@ data/                 catalog.yaml, customers, Haryanvi lexicon, scenarios, mine
 eval/                 runner, phone channel, scenario generator, alias mining, held-out check, results/
 infra/                Modal/vLLM deployment, smoke tests, voice-clone check, phrase pre-cache
 tests/                161 offline tests
-plan.md               build plan and status log
 ```
 
 ## Cost control

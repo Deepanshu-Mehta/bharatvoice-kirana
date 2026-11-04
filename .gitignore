@@ -13,3 +13,4 @@ traces/
 *.mp3
 !data/noise/README.md
 .gnani.lock
+plan.md
