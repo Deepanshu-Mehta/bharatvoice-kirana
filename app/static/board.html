@@ -8,14 +8,26 @@
 <body class="boardpage">
 <header><div class="brand">Sharma General Store <span>· live orders</span></div><div id="clock" class="controls"></div></header>
 <main class="board">
-  <section><h2>Live calls</h2><div id="live"></div></section>
+  <section><h2>Live calls</h2><div id="live"></div>
+    <h2 style="margin-top:18px">WhatsApp voice notes</h2>
+    <form id="vn" class="card vnform">
+      <select id="vncust"><option value="CUST-001">Sharma ji</option><option value="CUST-002">Tau ji</option><option value="CUST-003">Gupta ji</option></select>
+      <input type="file" id="vnfile" accept="audio/*,.ogg,.opus,.m4a,.mp3,.wav">
+      <button>Read order</button>
+      <div class="hint">Forward a customer's voice note (.ogg/.opus/.m4a). The same Gnani pipeline turns it into a draft order.</div>
+    </form>
+    <div id="drafts"></div>
+  </section>
   <section><h2>Orders</h2><div id="orders"></div></section>
-  <section><h2>Handoff queue</h2><div id="handoffs"></div></section>
+  <section><h2>Handoff queue</h2><div id="handoffs"></div>
+    <h2 style="margin-top:18px">Udhaar khata</h2>
+    <table class="card khata"><thead><tr><th>Customer</th><th class="r">Baaki</th><th class="r">Limit</th><th></th></tr></thead><tbody id="khata"></tbody></table>
+  </section>
 </main>
-<audio id="chime" src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA="></audio>
 <script>
 const live = {}, $ = (id) => document.getElementById(id);
-const fmt = (l) => `${(+l.qty)} ${({kg:"kg", l:"L", pkt:"pkt", pc:"pc"})[l.unit] || l.unit} · ${l.name}`;
+const U = {kg:"kg", l:"L", pkt:"pkt", pc:"pc"};
+const fmt = (l) => `${(+l.qty)} ${U[l.unit] || l.unit} · ${l.name}`;
 function card(cls, html) { const d = document.createElement("div"); d.className = "card " + cls; d.innerHTML = html; return d; }
 function renderLive() {
   $("live").innerHTML = "";
@@ -24,22 +36,61 @@ function renderLive() {
   }
 }
 function beep() { try { const a = new AudioContext(), o = a.createOscillator(), g = a.createGain(); o.frequency.value = 880; o.connect(g); g.connect(a.destination); g.gain.setValueAtTime(0.2, a.currentTime); g.gain.exponentialRampToValueAtTime(0.001, a.currentTime + 0.6); o.start(); o.stop(a.currentTime + 0.6); } catch (e) {} }
+
+async function loadKhata() {
+  const rows = await (await fetch("/api/khata")).json();
+  $("khata").innerHTML = rows.map(r => `<tr><td>${r.name} <i>${r.register}</i></td><td class="r">₹${r.balance.toFixed(0)}</td><td class="r">${r.limit ? "₹" + r.limit : "—"}</td>
+    <td>${r.balance > 0 ? `<button class="small" onclick="remind('${r.customer}', this)">Remind</button>` : ""}</td></tr>`).join("");
+}
+async function remind(cid, btn) {
+  btn.disabled = true; btn.textContent = "…";
+  const r = await fetch(`/api/remind/${cid}`, {method: "POST"});
+  if (r.ok) { const d = await r.json(); new Audio("data:audio/wav;base64," + d.audio).play(); btn.title = d.text; }
+  btn.disabled = false; btn.textContent = "Remind";
+}
+
+const drafts = {};
+function renderDraft(d) {
+  let el = drafts[d.draft_id];
+  if (!el) { el = card("draft", ""); drafts[d.draft_id] = el; $("drafts").prepend(el); }
+  const choices = (d.choices || []).map(c => `<button class="small" onclick="choose('${d.draft_id}','${c.sku}')">${c.name}</button>`).join(" ");
+  el.innerHTML = `<b>Voice note · ${d.customer}</b>${d.transcript ? `<div class="q">“${d.transcript}”</div>` : ""}
+    <ul>${d.cart.map(l => `<li>${fmt(l)} <span>₹${l.amount.toFixed(0)}</span></li>`).join("")}</ul>
+    ${d.question ? `<div class="pending">❓ ${d.question}</div><div>${choices}</div>` : ""}
+    <div class="t">₹${d.total.toFixed(0)}</div>
+    ${d.order ? `<div class="ok">✓ ${d.order.order_id} placed</div>` : (d.cart.length ? `<button onclick="confirmDraft('${d.draft_id}')">Confirm order</button>` : "")}`;
+}
+async function choose(did, sku) { const f = new FormData(); f.append("sku", sku); renderDraft(await (await fetch(`/api/voicenote/${did}/choose`, {method: "POST", body: f})).json()); }
+async function confirmDraft(did) { renderDraft(await (await fetch(`/api/voicenote/${did}/confirm`, {method: "POST"})).json()); }
+$("vn").onsubmit = async (e) => {
+  e.preventDefault();
+  const file = $("vnfile").files[0]; if (!file) return;
+  const f = new FormData(); f.append("file", file); f.append("customer", $("vncust").value);
+  const btn = e.target.querySelector("button"); btn.disabled = true; btn.textContent = "Listening…";
+  const r = await fetch("/api/voicenote", {method: "POST", body: f});
+  btn.disabled = false; btn.textContent = "Read order";
+  if (r.ok) renderDraft(await r.json()); else alert("Could not read voice note: " + (await r.text()));
+};
+
 const ws = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/ws/board`);
 ws.onmessage = (ev) => {
   const e = JSON.parse(ev.data);
   if (e.type === "call_started") { live[e.session] = { customer: e.customer, extractor: e.extractor, cart: [], total: 0 }; }
   else if (e.type === "cart_updated" && live[e.session]) { live[e.session].cart = e.cart; live[e.session].total = e.total; }
   else if (e.type === "call_ended") { delete live[e.session]; }
+  else if (e.type === "voicenote_draft") { renderDraft(e); }
+  else if (e.type === "khata_updated") { loadKhata(); }
   else if (e.type === "order_placed") {
     const o = e.order;
-    $("orders").prepend(card("order", `<b>${o.order_id}</b> · ${o.customer} <i>${o.register}</i><ul>${o.lines.map(l => `<li>${fmt(l)} <span>₹${l.amount.toFixed(0)}</span></li>`).join("")}</ul><div class="t">Total ₹${o.total.toFixed(0)}</div>`));
-    beep(); delete live[e.session];
+    $("orders").prepend(card("order", `<b>${o.order_id}</b> · ${o.customer} <i>${o.register}</i> <i>${o.payment}</i><ul>${o.lines.map(l => `<li>${fmt(l)} <span>₹${l.amount.toFixed(0)}</span></li>`).join("")}</ul><div class="t">Total ₹${o.total.toFixed(0)}</div>`));
+    beep(); delete live[e.session]; loadKhata();
   } else if (e.type === "handoff") {
     $("handoffs").prepend(card("handoff", `<b>${e.session}</b><div>${e.reason}</div><div class="q">“${e.transcript || ""}”</div><ul>${(e.cart || []).map(l => `<li>${fmt(l)}</li>`).join("")}</ul>`));
     beep();
   }
   renderLive();
 };
+loadKhata();
 setInterval(() => $("clock").textContent = new Date().toLocaleTimeString("en-IN"), 1000);
 </script>
 </body>

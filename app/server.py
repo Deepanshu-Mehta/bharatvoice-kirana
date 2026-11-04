@@ -16,15 +16,20 @@ import os
 import time
 from pathlib import Path
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+import subprocess
+import uuid
+
+import yaml
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 
-from app.brain.dm import Session
+from app.brain.dm import LEDGER, Session
+from app.brain.templates import render, speak_money
 from app.brain.extract_rules import extract as rules_extract
 from app.gnani_client import CreditGuardError, GnaniAPIError, get_client
 from app.stt_prisma import STTConfig, to_wav16k, transcribe
-from app.tts_timbre import synth_stream
+from app.tts_timbre import synth, synth_stream
 
 ROOT = Path(__file__).resolve().parent.parent
 STATIC = Path(__file__).resolve().parent / "static"
@@ -98,14 +103,14 @@ async def ws_board(ws: WebSocket):
         board_clients.discard(ws)
 
 
-async def speak(ws: WebSocket, text: str, timings: dict) -> None:
+async def speak(ws: WebSocket, text: str, timings: dict, speed: float = 1.0) -> None:
     """Stream the reply: reply_start (text) -> binary PCM16 16 kHz chunks -> reply_end."""
     loop = asyncio.get_running_loop()
     q: asyncio.Queue = asyncio.Queue()
 
     def produce():
         try:
-            for ch in synth_stream(text):
+            for ch in synth_stream(text, speed=speed):
                 loop.call_soon_threadsafe(q.put_nowait, ch)
         except Exception as e:  # CreditGuardError / GnaniAPIError / network
             loop.call_soon_threadsafe(q.put_nowait, e)
@@ -181,7 +186,7 @@ async def ws_call(ws: WebSocket):
                                 "register": session.register,
                                 "source": result.frame.source if result.frame else None})
             if result.reply:
-                await speak(ws, result.reply, timings)
+                await speak(ws, result.reply, timings, speed=0.85 if session.slow else 1.0)
             timings["turn_ms"] = round((time.perf_counter() - t_turn) * 1000)
             if "tts_first_ms" in timings:  # what the caller feels: end of speech -> first audio
                 timings["to_first_audio_ms"] = (timings.get("stt_ms", 0) + timings.get("brain_ms", 0)
@@ -196,3 +201,126 @@ async def ws_call(ws: WebSocket):
         pass
     finally:
         await broadcast({"type": "call_ended", "session": session.session_id})
+
+
+# ---------------------------------------------------------------- udhaar khata
+CUSTOMERS = yaml.safe_load((ROOT / "data" / "customers.yaml").read_text())
+SHOP = "Sharma General Store"
+
+
+@app.get("/api/khata")
+def khata():
+    return [{"customer": cid, "name": c.get("name", cid), "register": c.get("register", "hinglish"),
+             "limit": c.get("credit_limit", 0), "balance": LEDGER.get(cid, 0.0)} for cid, c in CUSTOMERS.items()]
+
+
+@app.post("/api/remind/{cid}")
+async def remind(cid: str):
+    c = CUSTOMERS.get(cid)
+    if c is None:
+        raise HTTPException(404, "unknown customer")
+    text = render("reminder", c.get("register", "hinglish"), name=c.get("name", ""), shop=SHOP,
+                  balance=speak_money(LEDGER.get(cid, 0.0)))
+    try:
+        audio = await asyncio.to_thread(synth, text)
+    except (CreditGuardError, GnaniAPIError) as e:
+        raise HTTPException(503, f"TTS: {e}")
+    return {"text": text, "audio": base64.b64encode(audio).decode()}
+
+
+# ---------------------------------------------------------------- WhatsApp voice-note inbox
+DRAFTS: dict[str, Session] = {}
+CHUNK_S = 20.0
+
+
+def _decode_any(raw: bytes) -> bytes:
+    """Any container WhatsApp/phones produce (ogg/opus, m4a, mp3, wav) -> 16 kHz mono PCM16 WAV via ffmpeg."""
+    return subprocess.run(["ffmpeg", "-loglevel", "error", "-i", "pipe:0", "-ar", "16000", "-ac", "1",
+                           "-c:a", "pcm_s16le", "-f", "wav", "pipe:1"], input=raw, capture_output=True, check=True).stdout
+
+
+def _chunks(wav: bytes) -> list[bytes]:
+    """Split at the quietest point near every 20 s (Prisma REST takes <= 30 s per request)."""
+    import io
+
+    import numpy as np
+    import soundfile as sf
+    x, sr = sf.read(io.BytesIO(wav), dtype="float32")
+    out, start, n = [], 0, len(x)
+    while start < n:
+        end = min(n, start + int(CHUNK_S * sr))
+        if end < n:  # look back up to 4 s for the quietest 100 ms window
+            lo = max(start + int(8 * sr), end - int(4 * sr))
+            win = int(0.1 * sr)
+            energies = [(float(np.mean(x[i:i + win] ** 2)), i) for i in range(lo, end - win, win)]
+            if energies:
+                end = min(energies)[1] + win // 2
+        buf = io.BytesIO()
+        sf.write(buf, x[start:end], sr, format="WAV", subtype="PCM_16")
+        out.append(buf.getvalue())
+        start = end
+    return out
+
+
+def _draft_view(did: str, s: Session, transcript: str) -> dict:
+    pend = s.pending
+    return {"draft_id": did, "customer": s.customer_id, "transcript": transcript, "cart": s.cart_snapshot(),
+            "total": s.total, "question": pend.question.removeprefix("ASK::") if pend else None,
+            "choices": [{"sku": p.id, "name": p.name} for p in (pend.candidates if pend else [])],
+            "pending": pend.kind if pend else None, "order": s.order}
+
+
+@app.post("/api/voicenote")
+async def voicenote(file: UploadFile = File(...), customer: str = Form("CUST-001")):
+    raw = await file.read()
+    if len(raw) > 15 * 1024 * 1024:
+        raise HTTPException(413, "voice note too large")
+    try:
+        wav = await asyncio.to_thread(_decode_any, raw)
+    except subprocess.CalledProcessError:
+        raise HTTPException(400, "could not decode audio")
+    session = Session(customer, extractor=get_extractor(os.environ.get("EXTRACTOR", "rules")))
+    session.greet()
+    cfg = STTConfig()
+    texts: list[str] = []
+    for chunk in _chunks(wav):
+        session.last_agent_prompt = " ".join(texts)[-600:] or session.last_agent_prompt  # previous_text chaining
+        try:
+            r = await asyncio.to_thread(transcribe, chunk, session, cfg)
+        except (CreditGuardError, GnaniAPIError) as e:
+            raise HTTPException(503, f"STT: {e}")
+        texts.append(r.get("transcript", ""))
+    transcript = " ".join(t for t in texts if t)
+    result = await asyncio.to_thread(session.handle, transcript)
+    did = uuid.uuid4().hex[:8]
+    DRAFTS[did] = session
+    view = _draft_view(did, session, transcript)
+    view["reply"] = result.reply
+    await broadcast({"type": "voicenote_draft", **view})
+    return view
+
+
+@app.post("/api/voicenote/{did}/choose")
+async def voicenote_choose(did: str, sku: str = Form(...)):
+    s = DRAFTS.get(did)
+    if s is None or s.pending is None:
+        raise HTTPException(404, "no open question")
+    pend = s.pending
+    s.pending = None
+    s._commit(s.cat.get(sku), pend.qty)
+    view = _draft_view(did, s, "")
+    await broadcast({"type": "voicenote_draft", **view})
+    return view
+
+
+@app.post("/api/voicenote/{did}/confirm")
+async def voicenote_confirm(did: str):
+    s = DRAFTS.get(did)
+    if s is None or not s.cart:
+        raise HTTPException(404, "no draft")
+    s.awaiting_confirm = True  # the shopkeeper's tap is the explicit confirmation for a voice-note order
+    s._events = []
+    s._place()
+    for e in s._events:
+        await broadcast(e)
+    return _draft_view(did, s, "")

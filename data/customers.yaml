@@ -1,16 +1,52 @@
-# Synthetic customers only (no real names or numbers).
+# Synthetic customers only (no real names or numbers). credit_limit/balance in INR (udhaar khata).
 CUST-001:
+  balance: 850
+  credit_limit: 3000
+  history:
+  - date: 2026-10-28
+    lines:
+    - qty: 5
+      sku: aashirvaad-atta
+      unit: kg
+    - qty: 2
+      sku: amul-taaza
+      unit: l
+    - qty: 1
+      sku: tata-tea-250
+      unit: pkt
+  - date: 2026-10-14
+    lines:
+    - qty: 5
+      sku: aashirvaad-atta
+      unit: kg
+    - qty: 2
+      sku: cheeni-loose
+      unit: kg
+    - qty: 1
+      sku: fortune-mustard-oil
+      unit: l
   name: Sharma ji
   register: hinglish
-  history:
-    - {date: 2026-10-28, lines: [{sku: aashirvaad-atta, qty: 5, unit: kg}, {sku: amul-taaza, qty: 2, unit: l}, {sku: tata-tea-250, qty: 1, unit: pkt}]}
-    - {date: 2026-10-14, lines: [{sku: aashirvaad-atta, qty: 5, unit: kg}, {sku: cheeni-loose, qty: 2, unit: kg}, {sku: fortune-mustard-oil, qty: 1, unit: l}]}
 CUST-002:
+  balance: 0
+  credit_limit: 2000
+  history:
+  - date: 2026-10-30
+    lines:
+    - qty: 1
+      sku: amul-taaza
+      unit: l
+    - qty: 4
+      sku: parle-g
+      unit: pkt
+    - qty: 2
+      sku: maggi-70
+      unit: pkt
   name: Tau ji
   register: haryanvi
-  history:
-    - {date: 2026-10-30, lines: [{sku: amul-taaza, qty: 1, unit: l}, {sku: parle-g, qty: 4, unit: pkt}, {sku: maggi-70, qty: 2, unit: pkt}]}
 CUST-003:
+  balance: 0
+  credit_limit: 0
+  history: []
   name: Gupta ji
   register: hindi
-  history: []

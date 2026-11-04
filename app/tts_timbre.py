@@ -20,19 +20,19 @@ def speaker_embedding() -> dict | None:
     return None
 
 
-def synth(text: str, client: GnaniClient | None = None) -> bytes:
+def synth(text: str, client: GnaniClient | None = None, speed: float = 1.0) -> bytes:
     client = client or get_client()
     emb = speaker_embedding()
     if emb is not None:
-        return client.tts(text, "", language=LANG, speaker_embedding=emb)
-    return client.tts(text, VOICE, model=MODEL, language=LANG)
+        return client.tts(text, "", language=LANG, speaker_embedding=emb, speed=speed)
+    return client.tts(text, VOICE, model=MODEL, language=LANG, speed=speed)
 
 
-def synth_stream(text: str, client: GnaniClient | None = None):
+def synth_stream(text: str, client: GnaniClient | None = None, speed: float = 1.0):
     """Yield raw PCM16 16 kHz chunks as Timbre streams them (SSE); cached phrases come back in one chunk."""
     client = client or get_client()
     emb = speaker_embedding()
     if emb is not None:
-        yield from client.tts_stream(text, "", language=LANG, speaker_embedding=emb)
+        yield from client.tts_stream(text, "", language=LANG, speaker_embedding=emb, speed=speed)
     else:
-        yield from client.tts_stream(text, VOICE, model=MODEL, language=LANG)
+        yield from client.tts_stream(text, VOICE, model=MODEL, language=LANG, speed=speed)

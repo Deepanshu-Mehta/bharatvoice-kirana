@@ -11,6 +11,7 @@ from pydantic import BaseModel, ConfigDict, Field
 ActionType = Literal[
     "add", "update", "remove", "replace", "choose", "done",
     "confirm_yes", "confirm_no", "cancel_all", "repeat_last_order", "ask_human", "store_question",
+    "price_query", "stock_query", "udhaar", "balance_query", "slow_down", "repeat",
 ]
 Register = Literal["hindi", "hinglish", "haryanvi", "en"]
 
@@ -61,16 +62,23 @@ class _Choose(BaseModel):
     choice_text: str
 
 
+class _Query(BaseModel):
+    type: Literal["price_query", "stock_query"]
+    product_phrase: str
+
+
 class _StoreQ(BaseModel):
     type: Literal["store_question"]
     text: str
 
 
 class _Simple(BaseModel):
-    type: Literal["done", "confirm_yes", "confirm_no", "cancel_all", "repeat_last_order", "ask_human"]
+    type: Literal["done", "confirm_yes", "confirm_no", "cancel_all", "repeat_last_order", "ask_human",
+                  "udhaar", "balance_query", "slow_down", "repeat"]
 
 
-StrictAction = Annotated[Union[_Add, _Update, _Remove, _Replace, _Choose, _StoreQ, _Simple], Field(discriminator="type")]
+StrictAction = Annotated[Union[_Add, _Update, _Remove, _Replace, _Choose, _Query, _StoreQ, _Simple],
+                         Field(discriminator="type")]
 
 
 class StrictFrame(BaseModel):

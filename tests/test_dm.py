@@ -203,3 +203,64 @@ def test_english_or_and_double_quantity_split():
 def test_self_repair_not_split():
     s, _ = talk(["do kilo nahi teen kilo aashirvaad atta"])
     assert cart(s) == [("aashirvaad-atta", 3, "kg")]
+
+
+# ---------------- v4: prices, stock, money quantities, udhaar, slow mode
+def test_price_query_then_quantity():
+    s, r = talk(["Aashirvaad atta kitne ka hai?", "do kilo"])
+    assert "baavan rupaye kilo" in r[0]
+    assert cart(s) == [("aashirvaad-atta", 2, "kg")]
+
+
+def test_price_query_ambiguous_lists_two_prices():
+    _, r = talk(["atta kitne ka hai?"])
+    assert "rupaye" in r[0] and ("Pillsbury" in r[0] or "Fortune" in r[0])
+
+
+def test_price_query_soft_followup():
+    s, r = talk(["Aashirvaad atta kitne ka hai?", "aur cheeni kitne ki hai?"])
+    assert "chhiyaalees rupaye kilo" in r[1] and s.handed_off is False
+
+
+def test_stock_query_yes_and_out_of_stock():
+    _, r = talk(["Amul Gold hai kya?"])
+    assert r[0].startswith("Haan")
+    _, r = talk(["Patanjali sarson ka tel milega?"])
+    assert "khatam" in r[0] and "chalega" in r[0]
+
+
+def test_money_quantity_loose_and_packets():
+    s, r = talk(["bees rupaye ka dhaniya", "pachaas rupaye ke lays"])
+    lines = {l["sku"]: l for l in s.cart_snapshot()}
+    assert abs(lines["dhaniya-powder"]["qty"] - 0.1) < 1e-6 and lines["dhaniya-powder"]["amount"] == 20
+    assert lines["lays"]["qty"] == 2  # floor(50 / 20)
+    assert "bees rupaye ka" in r[0]
+
+
+def test_udhaar_within_limit_updates_khata():
+    from app.brain.dm import LEDGER
+    before = LEDGER["CUST-001"]
+    s, r = talk(["do kilo aashirvaad atta", "bas", "haan, udhaar mein likh do"], cust="CUST-001")
+    assert s.order and s.order["payment"] == "udhaar"
+    assert LEDGER["CUST-001"] == before + 104
+    LEDGER["CUST-001"] = before
+
+
+def test_udhaar_refused_without_khata_and_over_limit():
+    s, r = talk(["ek kilo cheeni", "udhaar mein likh do"], cust="CUST-003")
+    assert "khaata nahi" in r[1] and s.payment is None
+    from app.brain.dm import LEDGER
+    LEDGER["CUST-001"], before = 2990, LEDGER["CUST-001"]
+    s, r = talk(["do kilo aashirvaad atta", "udhaar mein likh do"], cust="CUST-001")
+    assert "seema" in r[1]
+    LEDGER["CUST-001"] = before
+
+
+def test_balance_query():
+    _, r = talk(["mera kitna baaki hai?"], cust="CUST-001")
+    assert "aath sau pachaas rupaye" in r[0]
+
+
+def test_slow_down_repeats_and_flags():
+    s, r = talk(["do kilo atta", "thoda dheere boliye"])
+    assert s.slow and r[1] == r[0]

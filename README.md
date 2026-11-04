@@ -4,7 +4,7 @@
 
 > Entry for Gnani.ai's **Great Indian AI Internship Challenge** · solo build · `#GnaniAI` `#GreatIndianAIInternshipChallenge`
 >
-> 🎥 Demo video: *coming soon* · 📊 Results: [below](#results) · 🧪 161 tests, all offline
+> 🎥 Demo video: *coming soon* · 📊 Results: [below](#results) · 🧪 172 tests, all offline
 
 ---
 
@@ -42,6 +42,10 @@ Agent : Order confirm! Aadhe ghante mein pahunch jayega. Dhanyavaad!   → order
   - repeat orders ("pichli baar wala saaman")
   - a sanity check on implausible quantities
   - handoff to the shopkeeper
+- **Voice udhaar khata.** "Udhaar mein likh do" works at checkout: the code checks the caller's credit limit (re-checked at placement), updates the ledger and tells them the new balance. Callers can ask "mera kitna baaki hai?". The board shows every balance with a **Remind** button that speaks a polite dues reminder in the customer's own register.
+- **WhatsApp voice-note inbox.** Drop a customer's voice note (.ogg/.opus/.m4a) on the board. It is decoded and split at pauses into ≤20 s chunks, with `previous_text` chaining between them, then passed through the same agent logic to a **draft order**. Ambiguous items appear as one-tap choices and the shopkeeper confirms with a tap.
+- **Price and stock questions, and money quantities.** "Aashirvaad atta kitne ka hai?", "Amul Gold hai kya?" and "bees rupaye ka dhaniya" are all handled. The quantity is derived from the catalog price, and money lines are read back as money.
+- **"Dheere boliye".** The agent repeats itself more slowly (Timbre speed 0.85) for elderly callers.
 - **Safe by construction.** Prices, totals and stock come only from code. An order is placed only after a readback and an explicit yes, and placement is idempotent.
 - **Fast.** Streaming TTS and cached phrases give about **0.9 s** from the end of the caller's speech to the first agent audio (server side).
 - **Measured.** A self-testing harness replays scenarios through Timbre → phone channel (G.711, noise, packet loss) → Prisma → agent, and scores **Order Exact Match**.
@@ -123,7 +127,7 @@ All numbers come from `eval/` runs (`eval/results/<run_id>/summary.json`). Test 
 git clone https://github.com/Deepanshu-Mehta/bharatvoice-kirana.git && cd bharatvoice-kirana
 uv sync
 cp .env.example .env                # add GNANI_API_KEY (and HUGGING_FACE_TOKEN for Evon weights)
-uv run pytest -q                    # 161 tests, no API calls
+uv run pytest -q                    # 172 tests, no API calls
 uv run uvicorn app.server:app --port 8080
 ```
 Open **http://localhost:8080** (call page; use Chrome and headphones) and **http://localhost:8080/board** (shopkeeper board). You can type turns instead of speaking; that uses no speech-to-text credits.
@@ -167,7 +171,7 @@ app/
 data/                 catalog.yaml, customers, Haryanvi lexicon, scenarios, mined aliases, substitution rules
 eval/                 runner, phone channel, scenario generator, alias mining, held-out check, results/
 infra/                Modal/vLLM deployment, smoke tests, voice-clone check, phrase pre-cache
-tests/                161 offline tests
+tests/                172 offline tests
 ```
 
 ## Cost control
@@ -190,6 +194,12 @@ tests/                161 offline tests
 - There is one synthetic catalog (81 SKUs) and no real telephony (the browser microphone stands in for the phone).
 - Haryanvi resources (lexicon, reply templates, scenarios) are drafts until reviewed by native speakers.
 - Evon runs in a US region, which adds about 0.25 s per call from India.
+
+## Why these features (research notes)
+- **Udhaar:** industry estimates put more than 70% of kirana transactions partly on credit, and paper ledgers lose money, so the agent handles credit instead of handing it off.
+- **Voice notes:** WhatsApp voice notes are already a primary ordering channel; customers send rough spoken lists in mixed Hindi and English.
+- **Biasing plus a deterministic resolver instead of LLM post-correction:** recent work finds smaller fine-tuned models beat larger LLMs at Hindi post-ASR correction (Kumar et al., EACL 2026), and in a small practitioner test hotword boosting beat LLM correction. Our measurements agree: dialogue-conditioned biasing was the largest single gain.
+- **Haryanvi:** the only open Haryanvi speech corpus we found is Snow Mountain (Bible readings, one speaker), and there is no conversational ASR benchmark.
 
 ## Roadmap
 Real phone-call evaluation · native-speaker Haryanvi review · SIP telephony · Warp speech-to-speech for lower latency · more dialects (Bhojpuri, Bundeli).

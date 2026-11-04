@@ -1,0 +1,35 @@
+# Day-2 STT bake-off prompts (plan §3.2). Each speaker reads every prompt in their register(s); <= 20 s each.
+# Speakers MAY rephrase naturally (the page lets them edit the text before recording) as long as the items and
+# quantities stay the same. gold.items = (sku, qty, unit) in base units; corrections are scored by intent/qty/category.
+# Haryanvi lines are DRAFT phrasing: native speakers should say them the way they really would.
+prompts:
+  - {id: hg01, register: hinglish, text: "Bhaiya, do kilo Aashirvaad atta bhej dena", gold: {items: [[aashirvaad-atta, 2, kg]]}}
+  - {id: hg02, register: hinglish, text: "ek litre Amul Taaza doodh aur aadha kilo cheeni", gold: {items: [[amul-taaza, 1, l], [cheeni-loose, 0.5, kg]]}}
+  - {id: hg03, register: hinglish, text: "teen packet Parle-G aur do packet Good Day", gold: {items: [[parle-g, 3, pkt], [good-day, 2, pkt]]}}
+  - {id: hg04, register: hinglish, text: "paav kilo jeera aur dhai sau gram haldi", gold: {items: [[jeera, 0.25, kg], [haldi, 0.25, kg]]}}
+  - {id: hg05, register: hinglish, text: "ek packet Surf Excel aur do Lux sabun", gold: {items: [[surf-excel-1kg, 1, pkt], [lux, 2, pc]]}}
+  - {id: hg06, register: hinglish, text: "Fortune sarson ka tel do litre", gold: {items: [[fortune-mustard-oil, 2, l]]}}
+  - {id: hg07, register: hinglish, text: "Pillsbury atta paanch kilo chahiye", gold: {items: [[pillsbury-atta, 5, kg]]}}
+  - {id: hg08, register: hinglish, text: "ek darjan ande aur ek Britannia bread", gold: {items: [[eggs, 12, pc], [britannia-bread, 1, pkt]]}}
+  - {id: hg09, register: hinglish, text: "Tata namak ek packet aur ek Colgate", gold: {items: [[tata-salt, 1, pkt], [colgate-100, 1, pc]]}}
+  - {id: hg10, register: hinglish, text: "do packet chhota Maggi aur ek Kurkure", gold: {items: [[maggi-70, 2, pkt], [kurkure, 1, pkt]]}}
+  - {id: hr01, register: haryanvi, text: "Ram Ram bhai, do kilo Aashirvaad atta bhej diyo", gold: {items: [[aashirvaad-atta, 2, kg]]}}
+  - {id: hr02, register: haryanvi, text: "ek litre doodh Amul Taaza aala aur aadha kilo cheeni de diyo", gold: {items: [[amul-taaza, 1, l], [cheeni-loose, 0.5, kg]]}}
+  - {id: hr03, register: haryanvi, text: "teen packet Parle-G chahiye, ghana jaldi bhej diyo", gold: {items: [[parle-g, 3, pkt]]}}
+  - {id: hr04, register: haryanvi, text: "paav kilo jeera aur dhai sau gram haldi de diyo", gold: {items: [[jeera, 0.25, kg], [haldi, 0.25, kg]]}}
+  - {id: hr05, register: haryanvi, text: "Surf Excel ek packet aur Lux sabun do", gold: {items: [[surf-excel-1kg, 1, pkt], [lux, 2, pc]]}}
+  - {id: hr06, register: haryanvi, text: "sarson ka tel Fortune aala, do litre", gold: {items: [[fortune-mustard-oil, 2, l]]}}
+  - {id: hr07, register: haryanvi, text: "ande konya chahiye, bas do kilo cheeni bhej diyo", gold: {items: [[cheeni-loose, 2, kg]]}}
+  - {id: hr08, register: haryanvi, text: "ek darjan ande aur ek Britannia bread", gold: {items: [[eggs, 12, pc], [britannia-bread, 1, pkt]]}}
+  - {id: hr09, register: haryanvi, text: "bhai Tata namak ek packet aur ek Colgate de diyo", gold: {items: [[tata-salt, 1, pkt], [colgate-100, 1, pc]]}}
+  - {id: hr10, register: haryanvi, text: "do packet chhoti Maggi aur ek Kurkure", gold: {items: [[maggi-70, 2, pkt], [kurkure, 1, pkt]]}}
+  - {id: hi01, register: hindi, text: "भैया दो किलो आशीर्वाद आटा भेज दीजिए", gold: {items: [[aashirvaad-atta, 2, kg]]}}
+  - {id: hi02, register: hindi, text: "एक लीटर अमूल ताज़ा दूध और आधा किलो चीनी", gold: {items: [[amul-taaza, 1, l], [cheeni-loose, 0.5, kg]]}}
+  - {id: hi03, register: hindi, text: "पाव किलो जीरा और ढाई सौ ग्राम हल्दी", gold: {items: [[jeera, 0.25, kg], [haldi, 0.25, kg]]}}
+  - {id: hi04, register: hindi, text: "तीन पैकेट पारले जी और दो पैकेट गुड डे", gold: {items: [[parle-g, 3, pkt], [good-day, 2, pkt]]}}
+  - {id: hi05, register: hindi, text: "फॉर्च्यून सरसों का तेल दो लीटर", gold: {items: [[fortune-mustard-oil, 2, l]]}}
+  - {id: co01, register: hinglish, text: "nahi nahi, doodh do litre kar do", gold: {intent: update, qty: [2, l], cat: milk}}
+  - {id: co02, register: hinglish, text: "atta hata do", gold: {intent: remove, cat: atta}}
+  - {id: co03, register: hinglish, text: "Fortune ki jagah Saffola de do", gold: {intent: replace, sku: saffola-gold}}
+  - {id: co04, register: hinglish, text: "nahi, teen kilo", gold: {intent: update, qty: [3, kg]}}
+  - {id: co05, register: haryanvi, text: "na na, cheeni ek kilo kar do", gold: {intent: update, qty: [1, kg], cat: sugar}}

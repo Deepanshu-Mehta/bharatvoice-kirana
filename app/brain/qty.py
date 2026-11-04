@@ -52,6 +52,7 @@ for _u, _sp in {
     "pc": ("piece", "pieces", "pc", "pcs", "nag", "bottle", "bottles", "botal", "pouch", "bar", "tikki",
            "पीस", "बोतल", "नग", "टिक्की"),
     "dozen": ("darjan", "darjen", "dozen", "darzan", "दर्जन"),
+    "inr": ("rupaye", "rupay", "rupaiye", "rupaya", "rupees", "rupee", "rs", "रुपये", "रुपए", "रूपए", "रुपया"),
 }.items():
     for s in _sp:
         UNITS[key(s)] = _u
@@ -79,7 +80,7 @@ class Qty:
             return self.value / 1000.0, "l"
         if self.unit == "dozen":
             return self.value * 12.0, "pc"
-        return self.value, self.unit
+        return self.value, self.unit  # "inr" stays money; the DM converts with the catalog price
 
 
 def _num(tok: str) -> float | None:

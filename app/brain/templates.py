@@ -158,6 +158,56 @@ T: dict[str, dict[str, str]] = {
         "hindi": "Dukaan subah aath se raat das baje tak khuli rehti hai. Delivery aadhe ghante mein hoti hai.",
         "haryanvi": "Dukaan subah aath te raat das baje tak khuli se. Delivery aadhe ghante mein.",
     },
+    "price_info": {
+        "hinglish": "{name} {price} {unit} hai. Kitna bhejun?",
+        "hindi": "{name} {price} {unit} hai. Kitna chahiye?",
+        "haryanvi": "{name} {price} {unit} se. Kitna bhejun?",
+    },
+    "price_two": {
+        "hinglish": "{a} {pa}, {b} {pb} {unit}. Kaun sa bhejun?",
+        "hindi": "{a} {pa}, aur {b} {pb} {unit}. Kaun sa chahiye?",
+        "haryanvi": "{a} {pa}, {b} {pb} {unit}. Konsa bhejun?",
+    },
+    "stock_yes": {
+        "hinglish": "Haan, {name} hai. Kitna bhejun?",
+        "hindi": "Ji haan, {name} uplabdh hai. Kitna chahiye?",
+        "haryanvi": "Haan, {name} se. Kitna bhejun?",
+    },
+    "money_qty": {
+        "hinglish": "{money} ka {item}",
+        "hindi": "{money} ka {item}",
+        "haryanvi": "{money} ka {item}",
+    },
+    "udhaar_noted": {
+        "hinglish": "Theek hai, udhaar mein likh dunga.",
+        "hindi": "Theek hai, khaate mein likh denge.",
+        "haryanvi": "Theek se, udhaar mein likh dunga.",
+    },
+    "udhaar_over_limit": {
+        "hinglish": "Maaf kijiye, udhaar ki seema {limit} hai, abhi {balance} baaki hai. Cash ya UPI chalega?",
+        "hindi": "Kshama kijiye, udhaar ki seema {limit} hai aur {balance} pehle se baaki hai. Cash ya UPI se dena hoga.",
+        "haryanvi": "Maaf karna, udhaar ki had {limit} se, {balance} pehle te baaki se. Cash ya UPI chal jyaga?",
+    },
+    "udhaar_none": {
+        "hinglish": "Maaf kijiye, abhi aapka khaata nahi hai. Cash ya UPI chalega?",
+        "hindi": "Kshama kijiye, aapka khaata nahi hai. Cash ya UPI se dena hoga.",
+        "haryanvi": "Maaf karna, thara khaata konya se. Cash ya UPI chal jyaga?",
+    },
+    "balance_info": {
+        "hinglish": "Aapka {balance} baaki hai. Aur kuch?",
+        "hindi": "Aapke khaate mein {balance} baaki hain. Aur kuch?",
+        "haryanvi": "Thare {balance} baaki se. Aur ke chahiye?",
+    },
+    "placed_udhaar": {
+        "hinglish": "Order confirm! {total} udhaar mein likh diya, ab kul baaki {balance}. {eta} Dhanyavaad!",
+        "hindi": "Order pakka. {total} khaate mein likh diye, ab kul baaki {balance}. {eta} Dhanyavaad!",
+        "haryanvi": "Order pakka! {total} udhaar mein likh diya, ib kul baaki {balance}. {eta} Ram Ram!",
+    },
+    "reminder": {
+        "hinglish": "Namaste {name}, {shop} se yaad dila rahe hain, aapka {balance} baaki hai. Jab suvidha ho, UPI ya cash se de dijiye. Dhanyavaad!",
+        "hindi": "Namaste {name}, {shop} se vinamra nivedan hai, aapke khaate mein {balance} baaki hain. Suvidha anusaar chuka dijiye. Dhanyavaad!",
+        "haryanvi": "Ram Ram {name}, {shop} te yaad dila rahe san, thare {balance} baaki se. Jab time mile, UPI ya cash te de diyo. Ram Ram!",
+    },
     "filler": {"hinglish": "Haan ji.", "hindi": "Ji.", "haryanvi": "Haan ji."},
 }
 

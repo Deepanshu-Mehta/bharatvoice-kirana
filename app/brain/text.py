@@ -87,7 +87,7 @@ _PUNCT_RE = re.compile(r"[^\w\s.]", re.UNICODE)
 
 def to_roman(text: str) -> str:
     """Any mix of Devanagari / Roman -> lowercase Roman words, punctuation stripped (decimal points kept)."""
-    t = deva_to_roman(text).lower()
+    t = deva_to_roman(text.replace("₹", " rupaye ")).lower()
     t = t.replace("&", " and ").replace("-", " ").replace("।", " ").replace("'", "")
     t = _PUNCT_RE.sub(" ", t)
     t = re.sub(r"(?<!\d)\.|\.(?!\d)", " ", t)  # keep 0.5, drop sentence dots

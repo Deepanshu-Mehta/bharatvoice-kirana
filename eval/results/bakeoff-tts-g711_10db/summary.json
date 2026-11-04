@@ -1,0 +1,198 @@
+{
+ "A v2.5 hi-IN": {
+  "ALL": {
+   "n": 30,
+   "entity_acc": 0.75,
+   "exact": 0.7,
+   "cer": 0.24
+  },
+  "hinglish": {
+   "n": 14,
+   "entity_acc": 0.679,
+   "exact": 0.643,
+   "cer": 0.309
+  },
+  "haryanvi": {
+   "n": 11,
+   "entity_acc": 0.773,
+   "exact": 0.727,
+   "cer": 0.226
+  },
+  "hindi": {
+   "n": 5,
+   "entity_acc": 0.9,
+   "exact": 0.8,
+   "cer": 0.076
+  }
+ },
+ "B v2.5 en-IN +bias": {
+  "ALL": {
+   "n": 30,
+   "entity_acc": 0.75,
+   "exact": 0.667,
+   "cer": 0.168
+  },
+  "hinglish": {
+   "n": 14,
+   "entity_acc": 0.75,
+   "exact": 0.643,
+   "cer": 0.161
+  },
+  "haryanvi": {
+   "n": 11,
+   "entity_acc": 0.682,
+   "exact": 0.636,
+   "cer": 0.138
+  },
+  "hindi": {
+   "n": 5,
+   "entity_acc": 0.9,
+   "exact": 0.8,
+   "cer": 0.251
+  }
+ },
+ "C v3.0 codemix": {
+  "ALL": {
+   "n": 30,
+   "entity_acc": 0.8,
+   "exact": 0.667,
+   "cer": 0.168
+  },
+  "hinglish": {
+   "n": 14,
+   "entity_acc": 0.714,
+   "exact": 0.571,
+   "cer": 0.208
+  },
+  "haryanvi": {
+   "n": 11,
+   "entity_acc": 0.909,
+   "exact": 0.818,
+   "cer": 0.137
+  },
+  "hindi": {
+   "n": 5,
+   "entity_acc": 0.8,
+   "exact": 0.6,
+   "cer": 0.123
+  }
+ },
+ "D v3.0 translit": {
+  "ALL": {
+   "n": 30,
+   "entity_acc": 0.817,
+   "exact": 0.733,
+   "cer": 0.129
+  },
+  "hinglish": {
+   "n": 14,
+   "entity_acc": 0.75,
+   "exact": 0.643,
+   "cer": 0.13
+  },
+  "haryanvi": {
+   "n": 11,
+   "entity_acc": 0.864,
+   "exact": 0.818,
+   "cer": 0.065
+  },
+  "hindi": {
+   "n": 5,
+   "entity_acc": 0.9,
+   "exact": 0.8,
+   "cer": 0.271
+  }
+ },
+ "E C+keyterms+topic": {
+  "ALL": {
+   "n": 30,
+   "entity_acc": 0.917,
+   "exact": 0.867,
+   "cer": 0.13
+  },
+  "hinglish": {
+   "n": 14,
+   "entity_acc": 0.893,
+   "exact": 0.857,
+   "cer": 0.135
+  },
+  "haryanvi": {
+   "n": 11,
+   "entity_acc": 0.955,
+   "exact": 0.909,
+   "cer": 0.116
+  },
+  "hindi": {
+   "n": 5,
+   "entity_acc": 0.9,
+   "exact": 0.8,
+   "cer": 0.145
+  }
+ },
+ "F E+previous_text": {
+  "ALL": {
+   "n": 30,
+   "entity_acc": 0.933,
+   "exact": 0.867,
+   "cer": 0.122
+  },
+  "hinglish": {
+   "n": 14,
+   "entity_acc": 0.929,
+   "exact": 0.857,
+   "cer": 0.114
+  },
+  "haryanvi": {
+   "n": 11,
+   "entity_acc": 0.955,
+   "exact": 0.909,
+   "cer": 0.126
+  },
+  "hindi": {
+   "n": 5,
+   "entity_acc": 0.9,
+   "exact": 0.8,
+   "cer": 0.136
+  }
+ },
+ "G F+haryanvi ctx": {
+  "ALL": {
+   "n": 11,
+   "entity_acc": 0.955,
+   "exact": 0.909,
+   "cer": 0.101
+  },
+  "haryanvi": {
+   "n": 11,
+   "entity_acc": 0.955,
+   "exact": 0.909,
+   "cer": 0.101
+  }
+ },
+ "H F+mined subs": {
+  "ALL": {
+   "n": 30,
+   "entity_acc": 0.933,
+   "exact": 0.867,
+   "cer": 0.12
+  },
+  "hinglish": {
+   "n": 14,
+   "entity_acc": 0.929,
+   "exact": 0.857,
+   "cer": 0.106
+  },
+  "haryanvi": {
+   "n": 11,
+   "entity_acc": 0.955,
+   "exact": 0.909,
+   "cer": 0.126
+  },
+  "hindi": {
+   "n": 5,
+   "entity_acc": 0.9,
+   "exact": 0.8,
+   "cer": 0.145
+  }
+ }
+}

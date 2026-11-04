@@ -26,6 +26,15 @@ from app.brain.templates import render, speak_money, speak_qty
 from app.brain.text import key
 
 ROOT = Path(__file__).resolve().parents[2]
+UNIT_SPOKEN = {"kg": "kilo", "l": "litre", "pkt": "packet", "pc": "piece"}
+
+
+def _load_ledger() -> dict[str, float]:
+    d = yaml.safe_load((ROOT / "data" / "customers.yaml").read_text())
+    return {k: float(v.get("balance", 0)) for k, v in d.items()}
+
+
+LEDGER: dict[str, float] = _load_ledger()  # udhaar khata (synthetic), shared across calls in one server process
 TAU_HIGH = 0.85  # hand-set; replaced by risk-coverage thresholds after calibration
 TAU_LOW = 0.40
 HIGH_VALUE_HANDOFF = 5000.0
@@ -72,12 +81,15 @@ class Line:
     product: Product
     qty: float
     unit: str
+    money: float | None = None  # "bees rupaye ka dhaniya": spoken as money, quantity derived from the price
 
     @property
     def amount(self) -> float:
-        return round(self.qty * self.product.price, 2)
+        return round(self.money if self.money is not None else self.qty * self.product.price, 2)
 
     def spoken(self) -> str:
+        if self.money is not None:
+            return f"{speak_money(self.money)} ka {speak_name(self.product)}"
         return f"{speak_qty(self.qty, self.unit)} {speak_name(self.product)}"
 
     def as_dict(self) -> dict:
@@ -95,6 +107,7 @@ class Pending:
     attempts: int = 0
     original: Product | None = None  # for substitute_offer
     line_id: int | None = None  # for set_qty (correction whose number was lost)
+    soft: bool = False  # follow-up to a price/stock question: if unanswered, just handle the turn normally
     replaced: str | None = None  # name of the line a replace removed
 
 
@@ -123,6 +136,8 @@ class Session:
         self.register = self.customer.get("register", "hinglish")
         self.stock = {p.id: p.stock for p in self.cat.products}  # per-session view; catalog stays immutable
         self.cart: list[Line] = []
+        self.payment: str | None = None  # None | "udhaar"
+        self.slow = False  # "dheere boliye": TTS speed 0.85
         self._next_line = 1
         self.last_line_id: int | None = None
         self.pending: Pending | None = None
@@ -174,6 +189,11 @@ class Session:
         if q is None:
             return 1.0 if p.unit in ("pkt", "pc") else None
         v, u = q.normalized()
+        if u == "inr":  # "bees rupaye ka dhaniya" -> quantity from the catalog price (code decides)
+            if p.unit in ("kg", "l"):
+                return round(v / p.price, 3)
+            n = int(v // p.price)
+            return float(n) if n >= 1 else None
         if p.unit in ("kg", "l"):
             if u in (p.unit, None):
                 return v
@@ -220,19 +240,22 @@ class Session:
                 return self._ask(self.r("substitute", a=speak_name(p), b=speak_name(sub), diff=diff))
             self._emit("stockout", sku=p.id)
             return self.r("substitute_declined", a=speak_name(p))
+        money = q.value if (q is not None and q.unit == "inr" and p.unit in ("kg", "l")) else None
         existing = next((l for l in self.cart if l.product.id == p.id), None)
+        if money is not None:
+            existing = None  # keep money lines separate so they are read back as "bees rupaye ka ..."
         if existing:
             existing.qty = round(existing.qty + qty, 3)
             line = existing
         else:
-            line = Line(self._next_line, p, round(qty, 3), p.unit)
+            line = Line(self._next_line, p, round(qty, 3), p.unit, money)
             self._next_line += 1
             self.cart.append(line)
         self.last_line_id = line.id
         self._emit("cart_updated", cart=self.cart_snapshot(), total=self.total)
         if replaced:
             return self.r("replaced", old=replaced, item=line.spoken())
-        return f"ADDED::{Line(line.id, p, round(qty, 3), p.unit).spoken()}"
+        return f"ADDED::{Line(line.id, p, round(qty, 3), p.unit, money).spoken()}"
 
     def _ask(self, text: str) -> str:
         if self.pending:
@@ -377,6 +400,11 @@ class Session:
             return self.r("updated", item=line.spoken())
         if pend.kind in ("qty", "unit"):
             q = parse_qty(text)
+            if q is None and pend.soft:  # caller moved on ("aur Pillsbury kitne ka?"): treat as a fresh turn
+                self.pending = None
+                f = self.extractor(text, Context(cart_phrases=[l.spoken() for l in self.cart]))
+                outs = [self._dispatch(x) for x in f.actions[:1]]
+                return outs[0] if outs else self.r("not_heard")
             if q is None:
                 return self._retry(pend)
             self.pending = None
@@ -423,21 +451,44 @@ class Session:
         self._emit("readback", cart=self.cart_snapshot(), total=self.total)
         return f"ASK::{text}"
 
+    def _credit_check(self, amount: float) -> str | None:
+        """Code decides credit: returns a refusal message, or None if udhaar is allowed."""
+        limit = float(self.customer.get("credit_limit", 0) or 0)
+        bal = LEDGER.get(self.customer_id, 0.0)
+        if limit <= 0:
+            return self.r("udhaar_none")
+        if bal + amount > limit:
+            return self.r("udhaar_over_limit", limit=speak_money(limit), balance=speak_money(bal))
+        return None
+
     def _place(self) -> str:
         assert self.awaiting_confirm and self.cart, "hard rule: readback + confirm required"
+        if self.payment == "udhaar":
+            refusal = self._credit_check(self.total)  # re-checked at placement, not just when asked
+            if refusal:
+                self.payment = None
+                return f"ASK::{refusal}"
         snap = self.cart_snapshot()
         idem = hashlib.sha1(f"{self.session_id}|{sorted((l['sku'], l['qty']) for l in snap)}".encode()).hexdigest()[:12]
         order = self.placed_orders.get(idem)
         if order is None:
             order = {"order_id": f"ORD-{idem}", "customer": self.customer_id, "lines": snap, "total": self.total,
-                     "ts": time.time(), "register": self.register}
+                     "ts": time.time(), "register": self.register, "payment": self.payment or "cash/upi"}
             self.placed_orders[idem] = order
             for l in self.cart:
                 self.stock[l.product.id] -= l.qty
+            if self.payment == "udhaar":
+                LEDGER[self.customer_id] = LEDGER.get(self.customer_id, 0.0) + order["total"]
+                order["balance_after"] = LEDGER[self.customer_id]
+                self._emit("khata_updated", customer=self.customer_id, balance=LEDGER[self.customer_id])
             self._emit("order_placed", order=order)
         self.order = order
         self.awaiting_confirm = False
-        return self.r("placed", total=speak_money(order["total"]), eta="Aadhe ghante mein pahunch jayega.")
+        eta = "Aadhe ghante mein pahunch jayega."
+        if order.get("payment") == "udhaar":
+            return self.r("placed_udhaar", total=speak_money(order["total"]),
+                          balance=speak_money(order.get("balance_after", LEDGER.get(self.customer_id, 0))), eta=eta)
+        return self.r("placed", total=speak_money(order["total"]), eta=eta)
 
     def _handoff(self, reason: str) -> str:
         self.handed_off = True
@@ -499,6 +550,8 @@ class Session:
                 parts.append(out.split("::", 1)[1])
                 return " ".join(parts)
             parts.append(out)
+        if self.awaiting_confirm and not self.order and actions and actions[-1].type == "udhaar":
+            parts.append("Confirm karun?")
         if was_awaiting and not self.order and [(l.product.id, l.qty) for l in self.cart] != cart_before:
             return self._readback().split("::", 1)[1]  # corrections during readback -> read back again
         if added:
@@ -545,7 +598,53 @@ class Session:
             return self._handoff("customer asked for a person")
         if t == "store_question":
             return self.r("store_info")
+        if t in ("price_query", "stock_query"):
+            return self._query(t, a.product_phrase or "")
+        if t == "udhaar":
+            refusal = self._credit_check(self.total)
+            if refusal:
+                return f"ASK::{refusal}"
+            self.payment = "udhaar"
+            if self.awaiting_confirm and self.cart:
+                return self.r("udhaar_noted")  # plain: a following confirm_yes in the same turn still runs
+            return self.r("udhaar_noted") + " " + ("Aur kuch?" if self.cart else "Kya bhejna hai?")
+        if t == "balance_query":
+            return self.r("balance_info", balance=speak_money(LEDGER.get(self.customer_id, 0.0)))
+        if t in ("slow_down", "repeat"):
+            if t == "slow_down":
+                self.slow = True
+            return f"ASK::{self.last_agent_prompt}" if self.last_agent_prompt else self.r("not_heard")
         return ""
+
+    def _query(self, kind: str, phrase: str) -> str:
+        res = self.resolver.resolve(phrase, history=dict(self.history_counts))
+        self._trace.setdefault("resolutions", []).append(self._res_trace(res))
+        if not res.candidates:
+            return self._ask(self.r("not_understood_item", phrase=phrase))
+        top = [c.product for c in res.candidates]
+        p = top[0]
+        if kind == "stock_query" and self.stock[p.id] <= 0:
+            sub = self._substitute_for(p, 1)
+            if sub is None:
+                return self.r("substitute_declined", a=speak_name(p))
+            diff_amt = round(sub.price - p.price)
+            diff = ("Daam same hai." if diff_amt == 0 else
+                    f"{speak_money(abs(diff_amt))} {'zyada' if diff_amt > 0 else 'kam'} hai.")
+            self.pending = Pending("substitute_offer", [sub], None, speak_name(p), original=p)
+            return self._ask(self.r("substitute", a=speak_name(p), b=speak_name(sub), diff=diff))
+        if res.p_correct >= TAU_HIGH or len(top) == 1:
+            self.pending = Pending("qty", [p], None, speak_name(p), soft=True)
+            if kind == "stock_query":
+                return self._ask(self.r("stock_yes", name=speak_name(p)))
+            return self._ask(self.r("price_info", name=speak_name(p), price=speak_money(p.price),
+                                    unit=UNIT_SPOKEN.get(p.unit, p.unit)))
+        a, b = top[0], top[1]
+        na, nb = short_names([a, b])
+        self.pending = Pending("brand_choice", [a, b], None, phrase)
+        if kind == "price_query" and a.unit == b.unit:
+            return self._ask(self.r("price_two", a=na, pa=speak_money(a.price), b=nb, pb=speak_money(b.price),
+                                    unit=UNIT_SPOKEN.get(a.unit, a.unit)))
+        return self._ask(self.r("ask_two", a=na, b=nb))
 
     def _finish(self, reply: str, frame: Frame | None) -> TurnResult:
         self.last_agent_prompt = reply

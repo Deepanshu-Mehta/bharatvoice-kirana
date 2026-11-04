@@ -53,6 +53,20 @@ FILLER = _kset("bhaiya", "bhai", "ji", "please", "plz", "ek", "aur", "bhi", "cha
                "uski", "uske", "iski", "iske", "jagah", "badle", "instead", "bajaye", "nahi", "nahin", "matlab",
                "sorry", "galti", "se", "bhi", "laga", "lagao", "rakh", "rakhna", "add", "plus", "ram", "tau",
                "suniye", "suno", "diyo", "de diyo", "dijiye", "deejiye", "dena ji", "namaste", "bhej diyo")
+PRICE_Q = ["kitne ka", "kitne ki", "kitne ke", "kitne mein", "kya rate", "rate kya", "kya daam", "daam kya", "kya bhav",
+           "bhav kya", "price kya", "kya price", "kitne ka hai", "kitne ki hai", "kitne rupaye ka", "kitne rupaye ki"]
+STOCK_Q = ["hai kya", "hain kya", "milega", "milegi", "mil jayega", "mil jaayega", "available", "rakhte ho", "hoga kya",
+           "aata hai kya", "se kya"]
+UDHAAR = ["udhaar", "udhar", "khate mein", "khaate mein", "khata mein", "baad mein de dunga", "baad mein dunga",
+          "hisaab mein likh", "khate me", "udhaar mein"]
+BALANCE_Q = ["kitna baaki", "kitne baaki", "baaki kitna", "kitna udhaar", "mera hisaab", "kitna dena hai", "mera khaata",
+             "mera khata", "hisaab batao", "kitna bakaya", "thare kitne", "kitne baaki se"]
+SLOW = ["dheere", "dhire", "aaram se", "slowly", "slow"]
+REPEAT_REQ = ["phir se boliye", "phir se bolo", "fir se boliye", "fir se bolo", "dobara boliye", "dobara bolo", "kya bola",
+              "kya kaha", "repeat", "samajh nahi aaya", "ek baar aur"]
+QUERY_FILLER = _kset("kitne", "kitna", "rate", "daam", "bhav", "price", "kya", "hai", "hain", "milega", "milegi",
+                     "mil", "jayega", "jaayega", "available", "rakhte", "ho", "hoga", "aapke", "paas", "se")
+QUERY_FILLER -= {key("atta")}  # never drop the product word itself ("aata hai kya" vs "atta")
 SPLIT_RE = re.compile(r"\s*(?:,|\baur\b|\bor\b|\band\b|\bphir\b|\bsaath mein\b|\bsath me\b|\bplus\b)\s*")
 KONYA_RE = re.compile(r"^ko(i)?n(i)?y?an?$")  # konya / koina / koniya / कौनियाँ (koniyan) after key()
 
@@ -232,6 +246,29 @@ def extract(transcript: str, ctx: Context | None = None) -> Frame:
     if _contains(roman, STORE_Q):
         f.actions.append(Action(type="store_question", text=transcript))
         return f
+    if _contains(roman, SLOW):
+        f.actions.append(Action(type="slow_down"))
+        return f
+    if _contains(roman, REPEAT_REQ) and not ctx.pending:
+        f.actions.append(Action(type="repeat"))
+        return f
+    if _contains(roman, BALANCE_Q):
+        f.actions.append(Action(type="balance_query"))
+        return f
+    if _contains(roman, UDHAAR):
+        f.actions.append(Action(type="udhaar"))
+        if ctx.awaiting_confirm and keys and keys[0] in YES:
+            f.actions.append(Action(type="confirm_yes"))
+        return f
+    qs_all = find_quantities(keys)
+    if not ctx.pending and (_contains(roman, PRICE_Q) or (_contains(roman, STOCK_Q) and not qs_all)):
+        toks = roman.split()
+        tk = [_k(t) for t in toks]
+        phrase = " ".join(t for t, k in zip(toks, tk) if k not in QUERY_FILLER and k not in FILLER)
+        if phrase:
+            f.actions.append(Action(type="price_query" if _contains(roman, PRICE_Q) else "stock_query",
+                                    product_phrase=phrase))
+            return f
 
     has_qty = bool(find_quantities(keys))
     short = len(keys) <= 4
