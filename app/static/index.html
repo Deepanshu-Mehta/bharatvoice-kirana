@@ -27,6 +27,10 @@
     <button id="stop" disabled>End</button>
   </div>
 </header>
+<div id="demo" class="demo" hidden>Public demo · synthetic shop &amp; prices · your audio is sent to Gnani.ai for
+  transcription and is not stored · limits apply · please don't share personal details.
+  Try: <i>"do kilo atta aur ek litre doodh"</i>, <i>"Aashirvaad atta kitne ka hai?"</i>, <i>"nahi nahi, teen kilo kar do"</i>,
+  <i>"udhaar mein likh do"</i> (as Sharma ji). <a href="/board" target="_blank">Shopkeeper board ↗</a></div>
 <main>
   <section class="call">
     <div id="status" class="status">idle</div>
@@ -130,6 +134,7 @@ async function startCall() {
 }
 function stopCall() { if (myvad) myvad.destroy(); myvad = null; if (ws) ws.close(); ws = null; $("start").disabled = false; $("stop").disabled = true; }
 $("start").onclick = startCall; $("stop").onclick = stopCall;
+fetch("/api/config").then(r => r.json()).then(c => { if (c.public_demo) { $("demo").hidden = false; $("extractor").style.display = "none"; } });
 $("typed").onsubmit = (e) => { e.preventDefault(); const t = $("typedText").value.trim(); if (t && ws) { ws.send(JSON.stringify({ type: "text", text: t })); $("typedText").value = ""; } };
 </script>
 </body>

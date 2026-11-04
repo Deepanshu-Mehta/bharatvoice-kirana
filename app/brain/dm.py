@@ -35,6 +35,8 @@ def _load_ledger() -> dict[str, float]:
 
 
 LEDGER: dict[str, float] = _load_ledger()  # udhaar khata (synthetic), shared across calls in one server process
+import os
+PUBLIC_DEMO = os.environ.get("PUBLIC_DEMO") == "1"  # never speak a stranger's words back in the public demo
 TAU_HIGH = 0.85  # hand-set; replaced by risk-coverage thresholds after calibration
 TAU_LOW = 0.40
 HIGH_VALUE_HANDOFF = 5000.0
@@ -286,7 +288,7 @@ class Session:
             self.unresolved_streak += 1
             if self.unresolved_streak >= 2:
                 return self._handoff(f"item not in catalog twice: {phrase}")
-            return self._ask(self.r("not_understood_item", phrase=phrase))
+            return self._ask(self.r("not_understood_item", phrase="yeh" if PUBLIC_DEMO else phrase))
         self.unresolved_streak = 0
         top = [c.product for c in res.candidates]
         if res.p_correct >= TAU_HIGH or len(top) == 1 and res.p_correct >= TAU_LOW:

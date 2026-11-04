@@ -4,7 +4,8 @@
 
 > Entry for Gnani.ai's **Great Indian AI Internship Challenge** · solo build · `#GnaniAI` `#GreatIndianAIInternshipChallenge`
 >
-> 🎥 Demo video: *coming soon* · 📊 Results: [below](#results) · 🧪 172 tests, all offline
+> 📞 **Try it live:** [call the kirana yourself](https://deepanshu-m23csai--bharatvoice-demo-web.us-east.modal.run) (Chrome + headphones; [shopkeeper board](https://deepanshu-m23csai--bharatvoice-demo-web.us-east.modal.run/board))
+> · 🎥 Demo video: *coming soon* · 📊 Results: [below](#results) · 🧪 172 tests, all offline
 
 ---
 
@@ -173,6 +174,16 @@ eval/                 runner, phone channel, scenario generator, alias mining, h
 infra/                Modal/vLLM deployment, smoke tests, voice-clone check, phrase pre-cache
 tests/                172 offline tests
 ```
+
+## Public demo
+The live demo runs on Modal (CPU only) in `PUBLIC_DEMO` mode:
+- **Spending:** daily Gnani credit cap of 60 on a persistent ledger.
+- **Per-IP hourly limits:** calls, voice notes and reminders, plus 25 turns and 6 minutes per call.
+- **No Evon:** the rules extractor only, so strangers never wake a GPU.
+- **No echoing:** the agent never speaks a caller's words back, and the board hides transcripts.
+- **Nothing stored:** no audio or transcripts are kept.
+
+Deploy your own with `uv run modal deploy infra/modal_app.py`.
 
 ## Cost control
 - Every Gnani call goes through one guarded client:

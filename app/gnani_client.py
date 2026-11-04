@@ -103,7 +103,7 @@ class GnaniClient:
     ):
         self.api_key = api_key or os.environ.get("GNANI_API_KEY", "")
         self.root = root
-        self.cache_dir = cache_dir or root / "eval" / "cache"
+        self.cache_dir = cache_dir or Path(os.environ.get("GNANI_CACHE_DIR", root / "eval" / "cache"))
         self.kill_switch = root / "STOP_CREDITS"
         self.costs = Costs.load(root / "app" / "credit_costs.yaml")
         self.daily_cap = daily_cap if daily_cap is not None else float(os.environ.get("GNANI_DAILY_CAP", 150))
@@ -115,7 +115,8 @@ class GnaniClient:
         )
         self.offline = offline or os.environ.get("GNANI_OFFLINE") == "1"  # cache-only mode
         self.rate_mode = rate_mode
-        self._db = sqlite3.connect(ledger_path or root / "credits.db")
+        self._db = sqlite3.connect(ledger_path or os.environ.get("GNANI_LEDGER_PATH", root / "credits.db"),
+                                   check_same_thread=False)
         self._db.execute(
             """CREATE TABLE IF NOT EXISTS ledger(
                 ts REAL, day TEXT, api TEXT, model TEXT, units REAL, est_credits REAL,
@@ -126,7 +127,7 @@ class GnaniClient:
         self._run_budget: float | None = None
         self._fail_streak: dict[str, int] = {}
         self._http = httpx.Client(base_url=BASE_URL, timeout=60.0, transport=transport)
-        self._lock_path = root / ".gnani.lock"
+        self._lock_path = Path(os.environ.get("GNANI_LOCK_PATH", root / ".gnani.lock"))
 
     # ------------------------------------------------------------------ guard
     @contextlib.contextmanager

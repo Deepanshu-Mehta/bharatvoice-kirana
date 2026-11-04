@@ -39,3 +39,5 @@ button.small { padding: 4px 9px; font-size: 12px; }
 .card .ok { color: var(--ok); font-weight: 600; }
 .card .pending { color: var(--warn); font-size: 13px; margin: 4px 0; }
 table.khata { width: 100%; padding: 6px 10px; } table.khata td i { font-style: normal; font-size: 10px; color: var(--muted); }
+.demo { background: #fff7ed; border-bottom: 1px solid #fed7aa; color: #7c2d12; font-size: 13px; padding: 8px 22px; }
+.demo i { color: #9a3412; } .demo a { color: #c2410c; }

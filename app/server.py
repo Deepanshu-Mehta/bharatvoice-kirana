@@ -20,7 +20,7 @@ import subprocess
 import uuid
 
 import yaml
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -37,6 +37,32 @@ TRACES = ROOT / "traces"
 TRACES.mkdir(exist_ok=True)
 
 app = FastAPI(title="BharatVoice")
+
+# ---------------------------------------------------------------- public demo guard rails
+PUBLIC_DEMO = os.environ.get("PUBLIC_DEMO") == "1"
+LIMITS = {"calls_per_ip_hour": 6, "turns_per_call": 25, "call_seconds": 360, "voicenotes_per_ip_hour": 3,
+          "reminds_per_ip_hour": 6, "concurrent_calls": 3}
+_hits: dict[tuple[str, str], list[float]] = {}
+_active_calls = 0
+
+
+def client_ip(headers, client) -> str:
+    fwd = headers.get("x-forwarded-for", "")
+    return fwd.split(",")[0].strip() if fwd else (client.host if client else "?")
+
+
+def allow(ip: str, kind: str, per_hour: int) -> bool:
+    if not PUBLIC_DEMO:
+        return True
+    now = time.time()
+    key = (ip, kind)
+    hits = [t for t in _hits.get(key, []) if now - t < 3600]
+    if len(hits) >= per_hour:
+        _hits[key] = hits
+        return False
+    hits.append(now)
+    _hits[key] = hits
+    return True
 app.mount("/static", StaticFiles(directory=STATIC), name="static")
 
 board_clients: set[WebSocket] = set()
@@ -49,6 +75,8 @@ _hybrid = None
 
 def get_extractor(name: str):
     global _evon, _hybrid
+    if PUBLIC_DEMO:
+        name = "rules"  # strangers never wake the Evon GPU
     if name == "hybrid":
         if _hybrid is None:
             from app.brain.extract_hybrid import HybridExtractor
@@ -63,6 +91,8 @@ def get_extractor(name: str):
 
 
 async def broadcast(event: dict) -> None:
+    if PUBLIC_DEMO and "transcript" in event:
+        event = {**event, "transcript": ""}  # public board never shows strangers' words
     board_log.append(event)
     del board_log[:-200]
     dead = []
@@ -88,6 +118,11 @@ def board():
 @app.get("/api/ledger", response_class=PlainTextResponse)
 def ledger():
     return get_client().report()
+
+
+@app.get("/api/config")
+def config():
+    return {"public_demo": PUBLIC_DEMO, "limits": LIMITS if PUBLIC_DEMO else None}
 
 
 @app.websocket("/ws/board")
@@ -135,7 +170,14 @@ async def speak(ws: WebSocket, text: str, timings: dict, speed: float = 1.0) -> 
 
 @app.websocket("/ws/call")
 async def ws_call(ws: WebSocket):
+    global _active_calls
     await ws.accept()
+    ip = client_ip(ws.headers, ws.client)
+    if PUBLIC_DEMO and (_active_calls >= LIMITS["concurrent_calls"] or
+                        not allow(ip, "call", LIMITS["calls_per_ip_hour"])):
+        await ws.send_json({"type": "error", "text": "Demo is busy or you've hit the hourly limit. Please try again later."})
+        await ws.close()
+        return
     customer = ws.query_params.get("customer", "CUST-001")
     extractor_name = ws.query_params.get("extractor", os.environ.get("EXTRACTOR", "rules"))
     session = Session(customer, extractor=get_extractor(extractor_name))
@@ -146,12 +188,17 @@ async def ws_call(ws: WebSocket):
     greet = session.greet()
     await speak(ws, greet, {})
     turn = 0
+    _active_calls += 1
+    started = time.time()
     try:
         while True:
             msg = await ws.receive()
             if msg.get("type") == "websocket.disconnect":
                 break
             turn += 1
+            if PUBLIC_DEMO and (turn > LIMITS["turns_per_call"] or time.time() - started > LIMITS["call_seconds"]):
+                await ws.send_json({"type": "error", "text": "Demo call limit reached. Start a new call to try again."})
+                break
             timings: dict = {}
             t_turn = time.perf_counter()
             stt_info: dict = {}
@@ -170,8 +217,9 @@ async def ws_call(ws: WebSocket):
                 text = r.get("transcript", "")
                 stt_info = {k: r.get(k) for k in ("model", "detected_language_code", "processing_time", "_config",
                                                    "_context", "_cached")}
-                (TRACES / "audio").mkdir(exist_ok=True)
-                (TRACES / "audio" / f"{session.session_id}-{turn:02d}.wav").write_bytes(wav)
+                if not PUBLIC_DEMO:  # the public demo stores no caller audio
+                    (TRACES / "audio").mkdir(exist_ok=True)
+                    (TRACES / "audio" / f"{session.session_id}-{turn:02d}.wav").write_bytes(wav)
             else:
                 data = json.loads(msg.get("text") or "{}")
                 text = data.get("text", "")
@@ -191,15 +239,17 @@ async def ws_call(ws: WebSocket):
             if "tts_first_ms" in timings:  # what the caller feels: end of speech -> first audio
                 timings["to_first_audio_ms"] = (timings.get("stt_ms", 0) + timings.get("brain_ms", 0)
                                                 + timings["tts_first_ms"])
-            with trace_path.open("a") as f:
-                f.write(json.dumps({"turn": turn, "stt": stt_info, "timings": timings, **result.trace},
-                                   ensure_ascii=False) + "\n")
+            if not PUBLIC_DEMO:  # ...and no transcripts
+                with trace_path.open("a") as f:
+                    f.write(json.dumps({"turn": turn, "stt": stt_info, "timings": timings, **result.trace},
+                                       ensure_ascii=False) + "\n")
             await ws.send_json({"type": "timings", **timings})
             if session.order or session.handed_off:
                 await ws.send_json({"type": "end", "order": session.order, "handoff": session.handed_off})
     except WebSocketDisconnect:
         pass
     finally:
+        _active_calls -= 1
         await broadcast({"type": "call_ended", "session": session.session_id})
 
 
@@ -215,7 +265,9 @@ def khata():
 
 
 @app.post("/api/remind/{cid}")
-async def remind(cid: str):
+async def remind(cid: str, request: Request):
+    if not allow(client_ip(request.headers, request.client), "remind", LIMITS["reminds_per_ip_hour"]):
+        raise HTTPException(429, "hourly demo limit reached")
     c = CUSTOMERS.get(cid)
     if c is None:
         raise HTTPException(404, "unknown customer")
@@ -271,7 +323,9 @@ def _draft_view(did: str, s: Session, transcript: str) -> dict:
 
 
 @app.post("/api/voicenote")
-async def voicenote(file: UploadFile = File(...), customer: str = Form("CUST-001")):
+async def voicenote(request: Request, file: UploadFile = File(...), customer: str = Form("CUST-001")):
+    if not allow(client_ip(request.headers, request.client), "voicenote", LIMITS["voicenotes_per_ip_hour"]):
+        raise HTTPException(429, "hourly demo limit reached")
     raw = await file.read()
     if len(raw) > 15 * 1024 * 1024:
         raise HTTPException(413, "voice note too large")
