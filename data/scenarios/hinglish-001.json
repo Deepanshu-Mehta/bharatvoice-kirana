@@ -1,0 +1,37 @@
+{
+ "id": "hinglish-001",
+ "register": "hinglish",
+ "customer": "CUST-003",
+ "voice": "Kaveri",
+ "tts_language": "hi-en",
+ "tags": [
+  "simple"
+ ],
+ "turns": [
+  "Suniye, sau gram jeera bhej dena"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, confirm kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna hi"
+  ]
+ },
+ "gold": [
+  [
+   "jeera",
+   0.1,
+   "kg"
+  ]
+ ],
+ "draft": false
+}

@@ -1,0 +1,47 @@
+{
+ "id": "hinglish-012",
+ "register": "hinglish",
+ "customer": "CUST-003",
+ "voice": "Devika",
+ "tts_language": "hi-en",
+ "tags": [
+  "multi"
+ ],
+ "turns": [
+  "Bhaiya, ek packet Lifebuoy sabun aur teen packet chhota Maggi aur do litre Amul Taaza doodh bhej dena"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, confirm kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna hi"
+  ]
+ },
+ "gold": [
+  [
+   "amul-taaza",
+   2,
+   "l"
+  ],
+  [
+   "lifebuoy",
+   1,
+   "pc"
+  ],
+  [
+   "maggi-70",
+   3,
+   "pkt"
+  ]
+ ],
+ "draft": false
+}

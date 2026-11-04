@@ -1,0 +1,45 @@
+{
+ "id": "haryanvi-029",
+ "register": "haryanvi",
+ "customer": "CUST-003",
+ "voice": "Omkar",
+ "tts_language": "hi-en",
+ "tags": [
+  "descriptor",
+  "needs_clarification"
+ ],
+ "turns": [
+  "Bhai, do litre sarson ka tel aur do packet Amul butter de diyo"
+ ],
+ "answers": {
+  "brand_choice": [
+   "Fortune wala"
+  ],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, pakka kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna e"
+  ]
+ },
+ "gold": [
+  [
+   "amul-butter-100",
+   2,
+   "pkt"
+  ],
+  [
+   "fortune-mustard-oil",
+   2,
+   "l"
+  ]
+ ],
+ "draft": true
+}

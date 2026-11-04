@@ -1,0 +1,7 @@
+[
+ {"patterns": ["type powder", "taid powder"], "replacement": "Tide"},
+ {"patterns": ["rind", "reend"], "replacement": "Rin"},
+ {"patterns": ["broke bond", "group bonded", "broke bonded", "brook bond"], "replacement": "Red Label"},
+ {"patterns": ["klinik"], "replacement": "Clinic Plus"},
+ {"patterns": ["traffic chana", "traffic chanaa", "kaabulee chanaa", "kaboolee chanaa"], "replacement": "Kabuli Chana"}
+]

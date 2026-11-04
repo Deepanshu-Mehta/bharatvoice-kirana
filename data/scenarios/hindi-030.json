@@ -1,0 +1,47 @@
+{
+ "id": "hindi-030",
+ "register": "hindi",
+ "customer": "CUST-003",
+ "voice": "Deepak",
+ "tts_language": "hi-IN",
+ "tags": [
+  "multi"
+ ],
+ "turns": [
+  "नमस्ते, आधा किलो पिल्सबरी आटा और एक पैकेट घड़ी डिटर्जेंट और दो पैकेट अमूल बटर भेज दीजिए"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "हाँ, कर दीजिए"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "बस इतना ही"
+  ]
+ },
+ "gold": [
+  [
+   "amul-butter-100",
+   2,
+   "pkt"
+  ],
+  [
+   "ghadi-1kg",
+   1,
+   "pkt"
+  ],
+  [
+   "pillsbury-atta",
+   0.5,
+   "kg"
+  ]
+ ],
+ "draft": false
+}

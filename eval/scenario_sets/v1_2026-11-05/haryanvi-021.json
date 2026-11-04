@@ -1,0 +1,37 @@
+{
+ "id": "haryanvi-021",
+ "register": "haryanvi",
+ "customer": "CUST-003",
+ "voice": "Vikrant",
+ "tts_language": "hi-en",
+ "tags": [
+  "simple"
+ ],
+ "turns": [
+  "Bhai, teen kilo moong dal de diyo"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, pakka kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna e"
+  ]
+ },
+ "gold": [
+  [
+   "moong-dal",
+   3,
+   "kg"
+  ]
+ ],
+ "draft": true
+}

@@ -1,0 +1,47 @@
+{
+ "id": "haryanvi-020",
+ "register": "haryanvi",
+ "customer": "CUST-003",
+ "voice": "Roopesh",
+ "tts_language": "hi-en",
+ "tags": [
+  "multi"
+ ],
+ "turns": [
+  "Bhai, chaar packet Britannia bread aur teen packet Ghadi detergent aur ek litre Amul Taaza doodh chahiye"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, pakka kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna e"
+  ]
+ },
+ "gold": [
+  [
+   "amul-taaza",
+   1,
+   "l"
+  ],
+  [
+   "britannia-bread",
+   4,
+   "pkt"
+  ],
+  [
+   "ghadi-1kg",
+   3,
+   "pkt"
+  ]
+ ],
+ "draft": true
+}

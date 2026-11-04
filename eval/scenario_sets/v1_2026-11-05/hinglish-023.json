@@ -1,0 +1,45 @@
+{
+ "id": "hinglish-023",
+ "register": "hinglish",
+ "customer": "CUST-003",
+ "voice": "Shlok",
+ "tts_language": "hi-en",
+ "tags": [
+  "brand_clash",
+  "needs_clarification"
+ ],
+ "turns": [
+  "Bhaiya, ek packet bread aur do litre Fortune sarson ka tel bhej dena"
+ ],
+ "answers": {
+  "brand_choice": [
+   "Britannia wala"
+  ],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, confirm kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna hi"
+  ]
+ },
+ "gold": [
+  [
+   "britannia-bread",
+   1,
+   "pkt"
+  ],
+  [
+   "fortune-mustard-oil",
+   2,
+   "l"
+  ]
+ ],
+ "draft": false
+}

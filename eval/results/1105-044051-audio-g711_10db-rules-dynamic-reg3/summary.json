@@ -1,0 +1,44 @@
+{
+ "haryanvi": {
+  "n": 34,
+  "OEM": 0.765,
+  "item_F1": 0.922,
+  "questions_per_call": 0.88,
+  "handoff_rate": 0.147,
+  "hallucinated_price_rate": 0.0,
+  "unconfirmed_order_rate": 0.0,
+  "stt_p50_ms": 622,
+  "stt_p95_ms": 1455
+ },
+ "ALL": {
+  "n": 34,
+  "OEM": 0.765,
+  "item_F1": 0.922,
+  "questions_per_call": 0.88,
+  "handoff_rate": 0.147,
+  "hallucinated_price_rate": 0.0,
+  "unconfirmed_order_rate": 0.0,
+  "stt_p50_ms": 622,
+  "stt_p95_ms": 1455
+ },
+ "_meta": {
+  "run_id": "1105-044051-audio-g711_10db-rules-dynamic-reg3",
+  "args": {
+   "mode": "audio",
+   "condition": "g711_10db",
+   "registers": [
+    "haryanvi"
+   ],
+   "ids": null,
+   "limit": null,
+   "extractor": "rules",
+   "biasing": "dynamic",
+   "stt_format": "codemix",
+   "budget": 15.0,
+   "dry_run": false,
+   "tag": "reg3"
+  },
+  "stt_config": "prisma-v3.0|hi-IN,en-IN|codemix|dynamic|sub=1",
+  "spent_credits": 3.0963760000000002
+ }
+}

@@ -1,0 +1,45 @@
+{
+ "id": "hinglish-009",
+ "register": "hinglish",
+ "customer": "CUST-003",
+ "voice": "Kaveri",
+ "tts_language": "hi-en",
+ "tags": [
+  "descriptor",
+  "needs_clarification"
+ ],
+ "turns": [
+  "do litre sarson ka tel aur chaar packet Surf Excel bhej dena"
+ ],
+ "answers": {
+  "brand_choice": [
+   "Fortune wala"
+  ],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, confirm kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna hi"
+  ]
+ },
+ "gold": [
+  [
+   "fortune-mustard-oil",
+   2,
+   "l"
+  ],
+  [
+   "surf-excel-1kg",
+   4,
+   "pkt"
+  ]
+ ],
+ "draft": false
+}

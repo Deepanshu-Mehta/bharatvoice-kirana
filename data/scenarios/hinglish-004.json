@@ -1,0 +1,43 @@
+{
+ "id": "hinglish-004",
+ "register": "hinglish",
+ "customer": "CUST-003",
+ "voice": "Shlok",
+ "tts_language": "hi-en",
+ "tags": [
+  "correction"
+ ],
+ "turns": [
+  "Bhaiya, ek packet Colgate aur chaar packet Lifebuoy sabun de dena",
+  "nahi nahi, Colgate do packet kar do"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, confirm kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna hi"
+  ]
+ },
+ "gold": [
+  [
+   "colgate-100",
+   2,
+   "pc"
+  ],
+  [
+   "lifebuoy",
+   4,
+   "pc"
+  ]
+ ],
+ "draft": false
+}

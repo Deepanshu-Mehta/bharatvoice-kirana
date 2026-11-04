@@ -1,0 +1,46 @@
+{
+ "id": "haryanvi-007",
+ "register": "haryanvi",
+ "customer": "CUST-003",
+ "voice": "Ambuja",
+ "tts_language": "hi-en",
+ "tags": [
+  "replace"
+ ],
+ "turns": [
+  "Ram Ram, ek packet Good Day biscuit aur do kilo cheeni de diyo",
+  "cheeni ki jagah jeera de diyo"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, pakka kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna e"
+  ],
+  "qty": [
+   "do kilo"
+  ]
+ },
+ "gold": [
+  [
+   "good-day",
+   1,
+   "pkt"
+  ],
+  [
+   "jeera",
+   2,
+   "kg"
+  ]
+ ],
+ "draft": true
+}

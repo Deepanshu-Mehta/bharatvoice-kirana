@@ -1,0 +1,46 @@
+{
+ "id": "haryanvi-027",
+ "register": "haryanvi",
+ "customer": "CUST-003",
+ "voice": "Vikrant",
+ "tts_language": "hi-en",
+ "tags": [
+  "replace"
+ ],
+ "turns": [
+  "Ram Ram bhai, teen packet Ghadi detergent aur chaar packet chhota Maggi chahiye",
+  "chhota Maggi ki jagah Parle-G biscuit de diyo"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, pakka kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna e"
+  ],
+  "qty": [
+   "chaar packet"
+  ]
+ },
+ "gold": [
+  [
+   "ghadi-1kg",
+   3,
+   "pkt"
+  ],
+  [
+   "parle-g",
+   4,
+   "pkt"
+  ]
+ ],
+ "draft": true
+}

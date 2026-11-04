@@ -1,0 +1,43 @@
+{
+ "id": "hindi-014",
+ "register": "hindi",
+ "customer": "CUST-003",
+ "voice": "Nalini",
+ "tts_language": "hi-IN",
+ "tags": [
+  "correction"
+ ],
+ "turns": [
+  "भैया, डेढ़ किलो मूंग दाल और एक किलो अरहर दाल दे दीजिए",
+  "नहीं नहीं, मूंग दाल आधा किलो कर दीजिए"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "हाँ, कर दीजिए"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "बस इतना ही"
+  ]
+ },
+ "gold": [
+  [
+   "moong-dal",
+   0.5,
+   "kg"
+  ],
+  [
+   "toor-dal-loose",
+   1,
+   "kg"
+  ]
+ ],
+ "draft": false
+}

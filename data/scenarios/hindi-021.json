@@ -1,0 +1,37 @@
+{
+ "id": "hindi-021",
+ "register": "hindi",
+ "customer": "CUST-003",
+ "voice": "Bhavna",
+ "tts_language": "hi-IN",
+ "tags": [
+  "simple"
+ ],
+ "turns": [
+  "चार पैकेट अमूल बटर चाहिए"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "हाँ, कर दीजिए"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "बस इतना ही"
+  ]
+ },
+ "gold": [
+  [
+   "amul-butter-100",
+   4,
+   "pkt"
+  ]
+ ],
+ "draft": false
+}

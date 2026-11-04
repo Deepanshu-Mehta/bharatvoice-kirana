@@ -1,0 +1,44 @@
+{
+ "hinglish": {
+  "n": 10,
+  "OEM": 1.0,
+  "item_F1": 1.0,
+  "questions_per_call": 0.4,
+  "handoff_rate": 0.0,
+  "hallucinated_price_rate": 0.0,
+  "unconfirmed_order_rate": 0.0,
+  "stt_p50_ms": 180,
+  "stt_p95_ms": 293
+ },
+ "ALL": {
+  "n": 10,
+  "OEM": 1.0,
+  "item_F1": 1.0,
+  "questions_per_call": 0.4,
+  "handoff_rate": 0.0,
+  "hallucinated_price_rate": 0.0,
+  "unconfirmed_order_rate": 0.0,
+  "stt_p50_ms": 180,
+  "stt_p95_ms": 293
+ },
+ "_meta": {
+  "run_id": "1105-041315-audio-clean-rules-static-abl",
+  "args": {
+   "mode": "audio",
+   "condition": "clean",
+   "registers": [
+    "hinglish"
+   ],
+   "ids": null,
+   "limit": 10,
+   "extractor": "rules",
+   "biasing": "static",
+   "stt_format": "codemix",
+   "budget": 1.0,
+   "dry_run": false,
+   "tag": "abl"
+  },
+  "stt_config": "prisma-v3.0|hi-IN,en-IN|codemix|static|sub=1",
+  "spent_credits": 0.329728
+ }
+}

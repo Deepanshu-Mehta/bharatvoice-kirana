@@ -1,0 +1,43 @@
+{
+ "id": "haryanvi-024",
+ "register": "haryanvi",
+ "customer": "CUST-003",
+ "voice": "Ambuja",
+ "tts_language": "hi-en",
+ "tags": [
+  "correction"
+ ],
+ "turns": [
+  "Ram Ram, ek packet Surf Excel aur aadha kilo chana dal de diyo",
+  "na na, Surf teen packet kar do"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, pakka kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna e"
+  ]
+ },
+ "gold": [
+  [
+   "chana-dal",
+   0.5,
+   "kg"
+  ],
+  [
+   "surf-excel-1kg",
+   3,
+   "pkt"
+  ]
+ ],
+ "draft": true
+}

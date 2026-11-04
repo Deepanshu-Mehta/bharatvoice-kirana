@@ -1,0 +1,33 @@
+{
+ "id": "hinglish-free02",
+ "register": "hinglish",
+ "customer": "CUST-003",
+ "voice": "Girish",
+ "tts_language": "hi-en",
+ "tags": [
+  "freeform"
+ ],
+ "turns": [
+  "ek kilo woh peeli wali dal jo roz banti hai, arhar wali"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "confirm": [
+   "haan, confirm kar do"
+  ],
+  "done": [
+   "bas itna hi"
+  ],
+  "substitute_offer": [
+   "haan chalega"
+  ]
+ },
+ "gold": [
+  [
+   "toor-dal-loose",
+   1,
+   "kg"
+  ]
+ ],
+ "draft": true
+}

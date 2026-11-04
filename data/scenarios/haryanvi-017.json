@@ -1,0 +1,46 @@
+{
+ "id": "haryanvi-017",
+ "register": "haryanvi",
+ "customer": "CUST-003",
+ "voice": "Omkar",
+ "tts_language": "hi-en",
+ "tags": [
+  "replace"
+ ],
+ "turns": [
+  "Ram Ram, ek litre Amul Taaza doodh aur paanch kilo Aashirvaad atta de diyo",
+  "Aashirvaad atta ki jagah Pillsbury atta de diyo"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, pakka kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna e"
+  ],
+  "qty": [
+   "paanch kilo"
+  ]
+ },
+ "gold": [
+  [
+   "amul-taaza",
+   1,
+   "l"
+  ],
+  [
+   "pillsbury-atta",
+   5,
+   "kg"
+  ]
+ ],
+ "draft": true
+}

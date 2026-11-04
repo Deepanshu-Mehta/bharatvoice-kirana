@@ -1,0 +1,47 @@
+{
+ "id": "haryanvi-030",
+ "register": "haryanvi",
+ "customer": "CUST-003",
+ "voice": "Omkar",
+ "tts_language": "hi-en",
+ "tags": [
+  "multi"
+ ],
+ "turns": [
+  "Ram Ram, teen kilo Aashirvaad atta aur paav kilo cheeni aur teen packet Surf Excel chahiye"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, pakka kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna e"
+  ]
+ },
+ "gold": [
+  [
+   "aashirvaad-atta",
+   3,
+   "kg"
+  ],
+  [
+   "cheeni-loose",
+   0.25,
+   "kg"
+  ],
+  [
+   "surf-excel-1kg",
+   3,
+   "pkt"
+  ]
+ ],
+ "draft": true
+}

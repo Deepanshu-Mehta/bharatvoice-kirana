@@ -1,0 +1,47 @@
+{
+ "id": "hindi-030",
+ "register": "hindi",
+ "customer": "CUST-003",
+ "voice": "Nalini",
+ "tts_language": "hi-IN",
+ "tags": [
+  "multi"
+ ],
+ "turns": [
+  "भैया, एक किलो चना दाल और दो पैकेट टाटा नमक और एक लीटर फॉर्च्यून सरसों का तेल चाहिए"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "हाँ, कर दीजिए"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "बस इतना ही"
+  ]
+ },
+ "gold": [
+  [
+   "chana-dal",
+   1,
+   "kg"
+  ],
+  [
+   "fortune-mustard-oil",
+   1,
+   "l"
+  ],
+  [
+   "tata-salt",
+   2,
+   "pkt"
+  ]
+ ],
+ "draft": false
+}

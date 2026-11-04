@@ -1,0 +1,45 @@
+{
+ "id": "hindi-029",
+ "register": "hindi",
+ "customer": "CUST-003",
+ "voice": "Hemraj",
+ "tts_language": "hi-IN",
+ "tags": [
+  "descriptor",
+  "needs_clarification"
+ ],
+ "turns": [
+  "भैया, एक लीटर sarson ka tel और तीन किलो चना दाल चाहिए"
+ ],
+ "answers": {
+  "brand_choice": [
+   "Fortune wala"
+  ],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "हाँ, कर दीजिए"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "बस इतना ही"
+  ]
+ },
+ "gold": [
+  [
+   "chana-dal",
+   3,
+   "kg"
+  ],
+  [
+   "fortune-mustard-oil",
+   1,
+   "l"
+  ]
+ ],
+ "draft": false
+}

@@ -1,0 +1,38 @@
+{
+ "id": "hinglish-006",
+ "register": "hinglish",
+ "customer": "CUST-003",
+ "voice": "Kaveri",
+ "tts_language": "hi-en",
+ "tags": [
+  "remove"
+ ],
+ "turns": [
+  "aadha litre Mother Dairy toned doodh aur do packet Lifebuoy sabun bhej dena",
+  "Lifebuoy sabun rehne do"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, confirm kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna hi"
+  ]
+ },
+ "gold": [
+  [
+   "mother-dairy-toned",
+   0.5,
+   "l"
+  ]
+ ],
+ "draft": false
+}

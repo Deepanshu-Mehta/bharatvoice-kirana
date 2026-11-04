@@ -1,0 +1,47 @@
+{
+ "id": "haryanvi-012",
+ "register": "haryanvi",
+ "customer": "CUST-003",
+ "voice": "Vikrant",
+ "tts_language": "hi-en",
+ "tags": [
+  "multi"
+ ],
+ "turns": [
+  "Ram Ram bhai, do kilo moong dal aur teen packet Ghadi detergent aur do kilo Aashirvaad atta de diyo"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, pakka kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna e"
+  ]
+ },
+ "gold": [
+  [
+   "aashirvaad-atta",
+   2,
+   "kg"
+  ],
+  [
+   "ghadi-1kg",
+   3,
+   "pkt"
+  ],
+  [
+   "moong-dal",
+   2,
+   "kg"
+  ]
+ ],
+ "draft": true
+}

@@ -1,0 +1,47 @@
+{
+ "id": "hindi-020",
+ "register": "hindi",
+ "customer": "CUST-003",
+ "voice": "Deepak",
+ "tts_language": "hi-IN",
+ "tags": [
+  "multi"
+ ],
+ "turns": [
+  "नमस्ते, आधा किलो चना दाल और आधा लीटर फॉर्च्यून सरसों का तेल और एक पैकेट छोटा मैगी चाहिए"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "हाँ, कर दीजिए"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "बस इतना ही"
+  ]
+ },
+ "gold": [
+  [
+   "chana-dal",
+   0.5,
+   "kg"
+  ],
+  [
+   "fortune-mustard-oil",
+   0.5,
+   "l"
+  ],
+  [
+   "maggi-70",
+   1,
+   "pkt"
+  ]
+ ],
+ "draft": false
+}

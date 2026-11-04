@@ -1,0 +1,47 @@
+{
+ "id": "haryanvi-022",
+ "register": "haryanvi",
+ "customer": "CUST-003",
+ "voice": "Ambuja",
+ "tts_language": "hi-en",
+ "tags": [
+  "multi"
+ ],
+ "turns": [
+  "Ram Ram, ek packet Surf Excel aur do packet Britannia bread aur dhai sau gram haldi chahiye"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, pakka kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna e"
+  ]
+ },
+ "gold": [
+  [
+   "britannia-bread",
+   2,
+   "pkt"
+  ],
+  [
+   "haldi",
+   0.25,
+   "kg"
+  ],
+  [
+   "surf-excel-1kg",
+   1,
+   "pkt"
+  ]
+ ],
+ "draft": true
+}

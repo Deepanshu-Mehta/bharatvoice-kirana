@@ -1,0 +1,78 @@
+{
+ "haryanvi": {
+  "n": 3,
+  "OEM": 1.0,
+  "item_F1": 1.0,
+  "questions_per_call": 0,
+  "handoff_rate": 0.0,
+  "hallucinated_price_rate": 0.0,
+  "unconfirmed_order_rate": 0.0,
+  "stt_p50_ms": null,
+  "stt_p95_ms": null
+ },
+ "ALL": {
+  "n": 9,
+  "OEM": 1.0,
+  "item_F1": 1.0,
+  "questions_per_call": 0,
+  "handoff_rate": 0.0,
+  "hallucinated_price_rate": 0.0,
+  "unconfirmed_order_rate": 0.0,
+  "stt_p50_ms": null,
+  "stt_p95_ms": null
+ },
+ "hindi": {
+  "n": 3,
+  "OEM": 1.0,
+  "item_F1": 1.0,
+  "questions_per_call": 0,
+  "handoff_rate": 0.0,
+  "hallucinated_price_rate": 0.0,
+  "unconfirmed_order_rate": 0.0,
+  "stt_p50_ms": null,
+  "stt_p95_ms": null
+ },
+ "hinglish": {
+  "n": 3,
+  "OEM": 1.0,
+  "item_F1": 1.0,
+  "questions_per_call": 0,
+  "handoff_rate": 0.0,
+  "hallucinated_price_rate": 0.0,
+  "unconfirmed_order_rate": 0.0,
+  "stt_p50_ms": null,
+  "stt_p95_ms": null
+ },
+ "_extractor_stats": {
+  "turns": 27,
+  "escalated": 7
+ },
+ "_meta": {
+  "run_id": "1105-044246-text-clean-hybrid-dynamic-free2",
+  "args": {
+   "mode": "text",
+   "condition": "clean",
+   "registers": null,
+   "ids": [
+    "hinglish-free01",
+    "hinglish-free02",
+    "hinglish-free03",
+    "hindi-free04",
+    "hindi-free05",
+    "hindi-free06",
+    "haryanvi-free07",
+    "haryanvi-free08",
+    "haryanvi-free09"
+   ],
+   "limit": null,
+   "extractor": "hybrid",
+   "biasing": "dynamic",
+   "stt_format": "codemix",
+   "budget": null,
+   "dry_run": false,
+   "tag": "free2"
+  },
+  "stt_config": "prisma-v3.0|hi-IN,en-IN|codemix|dynamic|sub=1",
+  "spent_credits": 0.0
+ }
+}

@@ -1,0 +1,38 @@
+{
+ "id": "haryanvi-005",
+ "register": "haryanvi",
+ "customer": "CUST-003",
+ "voice": "Roopesh",
+ "tts_language": "hi-en",
+ "tags": [
+  "fraction",
+  "fraction_qty"
+ ],
+ "turns": [
+  "Bhai, sau gram jeera chahiye"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, pakka kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna e"
+  ]
+ },
+ "gold": [
+  [
+   "jeera",
+   0.1,
+   "kg"
+  ]
+ ],
+ "draft": true
+}

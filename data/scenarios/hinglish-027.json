@@ -1,0 +1,46 @@
+{
+ "id": "hinglish-027",
+ "register": "hinglish",
+ "customer": "CUST-003",
+ "voice": "Kaveri",
+ "tts_language": "hi-en",
+ "tags": [
+  "replace"
+ ],
+ "turns": [
+  "ek packet Amul butter aur aadha kilo cheeni de dena",
+  "cheeni ki jagah haldi de do"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, confirm kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna hi"
+  ],
+  "qty": [
+   "aadha kilo"
+  ]
+ },
+ "gold": [
+  [
+   "amul-butter-100",
+   1,
+   "pkt"
+  ],
+  [
+   "haldi",
+   0.5,
+   "kg"
+  ]
+ ],
+ "draft": false
+}

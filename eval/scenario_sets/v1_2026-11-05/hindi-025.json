@@ -1,0 +1,38 @@
+{
+ "id": "hindi-025",
+ "register": "hindi",
+ "customer": "CUST-003",
+ "voice": "Deepak",
+ "tts_language": "hi-IN",
+ "tags": [
+  "fraction",
+  "fraction_qty"
+ ],
+ "turns": [
+  "भैया, पाँच किलो चीनी चाहिए"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "हाँ, कर दीजिए"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "बस इतना ही"
+  ]
+ },
+ "gold": [
+  [
+   "cheeni-loose",
+   5,
+   "kg"
+  ]
+ ],
+ "draft": false
+}

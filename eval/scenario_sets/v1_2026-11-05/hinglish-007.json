@@ -1,0 +1,46 @@
+{
+ "id": "hinglish-007",
+ "register": "hinglish",
+ "customer": "CUST-003",
+ "voice": "Girish",
+ "tts_language": "hi-en",
+ "tags": [
+  "replace"
+ ],
+ "turns": [
+  "Suniye, do packet Lifebuoy sabun aur teen kilo Pillsbury atta chahiye",
+  "Pillsbury atta ki jagah moong dal de do"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, confirm kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna hi"
+  ],
+  "qty": [
+   "teen kilo"
+  ]
+ },
+ "gold": [
+  [
+   "lifebuoy",
+   2,
+   "pc"
+  ],
+  [
+   "moong-dal",
+   3,
+   "kg"
+  ]
+ ],
+ "draft": false
+}

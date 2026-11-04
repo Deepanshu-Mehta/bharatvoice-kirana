@@ -1,0 +1,47 @@
+{
+ "id": "haryanvi-002",
+ "register": "haryanvi",
+ "customer": "CUST-003",
+ "voice": "Ambuja",
+ "tts_language": "hi-en",
+ "tags": [
+  "multi"
+ ],
+ "turns": [
+  "Bhai, chaar packet Ghadi detergent aur paanch kilo arhar dal aur aadha kilo haldi chahiye"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, pakka kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna e"
+  ]
+ },
+ "gold": [
+  [
+   "ghadi-1kg",
+   4,
+   "pkt"
+  ],
+  [
+   "haldi",
+   0.5,
+   "kg"
+  ],
+  [
+   "toor-dal-loose",
+   5,
+   "kg"
+  ]
+ ],
+ "draft": true
+}

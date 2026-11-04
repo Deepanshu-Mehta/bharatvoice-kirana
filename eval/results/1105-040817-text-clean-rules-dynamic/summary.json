@@ -1,0 +1,64 @@
+{
+ "haryanvi": {
+  "n": 31,
+  "OEM": 0.903,
+  "item_F1": 0.903,
+  "questions_per_call": -0.48,
+  "handoff_rate": 0.097,
+  "hallucinated_price_rate": 0.0,
+  "unconfirmed_order_rate": 0.0,
+  "stt_p50_ms": null,
+  "stt_p95_ms": null
+ },
+ "ALL": {
+  "n": 93,
+  "OEM": 0.892,
+  "item_F1": 0.892,
+  "questions_per_call": -0.47,
+  "handoff_rate": 0.108,
+  "hallucinated_price_rate": 0.0,
+  "unconfirmed_order_rate": 0.0,
+  "stt_p50_ms": null,
+  "stt_p95_ms": null
+ },
+ "hindi": {
+  "n": 31,
+  "OEM": 0.871,
+  "item_F1": 0.871,
+  "questions_per_call": -0.45,
+  "handoff_rate": 0.129,
+  "hallucinated_price_rate": 0.0,
+  "unconfirmed_order_rate": 0.0,
+  "stt_p50_ms": null,
+  "stt_p95_ms": null
+ },
+ "hinglish": {
+  "n": 31,
+  "OEM": 0.903,
+  "item_F1": 0.903,
+  "questions_per_call": -0.48,
+  "handoff_rate": 0.097,
+  "hallucinated_price_rate": 0.0,
+  "unconfirmed_order_rate": 0.0,
+  "stt_p50_ms": null,
+  "stt_p95_ms": null
+ },
+ "_meta": {
+  "run_id": "1105-040817-text-clean-rules-dynamic",
+  "args": {
+   "mode": "text",
+   "condition": "clean",
+   "registers": null,
+   "ids": null,
+   "limit": null,
+   "extractor": "rules",
+   "biasing": "dynamic",
+   "stt_format": "codemix",
+   "budget": null,
+   "dry_run": false,
+   "tag": ""
+  },
+  "stt_config": "prisma-v3.0|hi-IN,en-IN|codemix|dynamic|sub=1",
+  "spent_credits": 0.0
+ }
+}

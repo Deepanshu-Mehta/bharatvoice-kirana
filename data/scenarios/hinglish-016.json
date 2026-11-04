@@ -1,0 +1,38 @@
+{
+ "id": "hinglish-016",
+ "register": "hinglish",
+ "customer": "CUST-003",
+ "voice": "Girish",
+ "tts_language": "hi-en",
+ "tags": [
+  "remove"
+ ],
+ "turns": [
+  "Suniye, teen packet chhota Maggi aur do packet Parle-G biscuit chahiye",
+  "Parle-G biscuit rehne do"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, confirm kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna hi"
+  ]
+ },
+ "gold": [
+  [
+   "maggi-70",
+   3,
+   "pkt"
+  ]
+ ],
+ "draft": false
+}

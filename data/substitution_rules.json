@@ -1,0 +1,4 @@
+[
+  {"patterns": ["pillsberry", "pilsberry", "pills berry"], "replacement": "Pillsbury"},
+  {"patterns": ["F Excel", "सर्फ एक्सेल", "सर्फ़ एक्सेल"], "replacement": "Surf Excel"}
+]

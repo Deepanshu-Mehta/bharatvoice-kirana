@@ -1,0 +1,33 @@
+{
+ "id": "haryanvi-free07",
+ "register": "haryanvi",
+ "customer": "CUST-003",
+ "voice": "Omkar",
+ "tts_language": "hi-en",
+ "tags": [
+  "freeform"
+ ],
+ "turns": [
+  "Ram Ram bhai, ek kilo woh meetha safed jo chai mein ghalein, cheeni bhej diyo"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "confirm": [
+   "haan, pakka kar do"
+  ],
+  "done": [
+   "bas itna e"
+  ],
+  "substitute_offer": [
+   "haan chalega"
+  ]
+ },
+ "gold": [
+  [
+   "cheeni-loose",
+   1,
+   "kg"
+  ]
+ ],
+ "draft": true
+}

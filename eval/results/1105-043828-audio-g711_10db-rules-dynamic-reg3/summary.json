@@ -1,0 +1,44 @@
+{
+ "hindi": {
+  "n": 31,
+  "OEM": 0.968,
+  "item_F1": 0.968,
+  "questions_per_call": 0.74,
+  "handoff_rate": 0.0,
+  "hallucinated_price_rate": 0.0,
+  "unconfirmed_order_rate": 0.0,
+  "stt_p50_ms": 475,
+  "stt_p95_ms": 2143
+ },
+ "ALL": {
+  "n": 31,
+  "OEM": 0.968,
+  "item_F1": 0.968,
+  "questions_per_call": 0.74,
+  "handoff_rate": 0.0,
+  "hallucinated_price_rate": 0.0,
+  "unconfirmed_order_rate": 0.0,
+  "stt_p50_ms": 475,
+  "stt_p95_ms": 2143
+ },
+ "_meta": {
+  "run_id": "1105-043828-audio-g711_10db-rules-dynamic-reg3",
+  "args": {
+   "mode": "audio",
+   "condition": "g711_10db",
+   "registers": [
+    "hindi"
+   ],
+   "ids": null,
+   "limit": null,
+   "extractor": "rules",
+   "biasing": "dynamic",
+   "stt_format": "codemix",
+   "budget": 15.0,
+   "dry_run": false,
+   "tag": "reg3"
+  },
+  "stt_config": "prisma-v3.0|hi-IN,en-IN|codemix|dynamic|sub=1",
+  "spent_credits": 1.768944
+ }
+}

@@ -1,0 +1,85 @@
+[
+ {
+  "patterns": [
+   "kaabulee chanaa",
+   "saffron chanaa",
+   "traffic chanaa",
+   "saffron",
+   "kaboolee chanaa"
+  ],
+  "replacement": "Kabuli Chana"
+ },
+ {
+  "patterns": [
+   "tata tea",
+   "tata tea den"
+  ],
+  "replacement": "Tata Tea"
+ },
+ {
+  "patterns": [
+   "red label",
+   "red label dinner",
+   "broke bond",
+   "broke bonded enough",
+   "broke bonded naa",
+   "group bonded"
+  ],
+  "replacement": "Red Label"
+ },
+ {
+  "patterns": [
+   "maggi",
+   "vada maggi",
+   "maggi dee"
+  ],
+  "replacement": "Maggi"
+ },
+ {
+  "patterns": [
+   "clinic"
+  ],
+  "replacement": "Clinic Plus"
+ },
+ {
+  "patterns": [
+   "ring",
+   "rain",
+   "rind",
+   "in the dinner",
+   "reend"
+  ],
+  "replacement": "Rin"
+ },
+ {
+  "patterns": [
+   "hide",
+   "take packet hide"
+  ],
+  "replacement": "Parle"
+ },
+ {
+  "patterns": [
+   "tight",
+   "take packet type powder there",
+   "type powder denge",
+   "take packet tight dinner"
+  ],
+  "replacement": "Tide"
+ },
+ {
+  "patterns": [
+   "tata tor"
+  ],
+  "replacement": "Tata Sampann"
+ },
+ {
+  "patterns": [
+   "of tea",
+   "diyaa dee",
+   "daad",
+   "daad jaanaa"
+  ],
+  "replacement": "Dove"
+ }
+]

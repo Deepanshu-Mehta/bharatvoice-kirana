@@ -1,0 +1,49 @@
+{
+ "id": "hindi-028",
+ "register": "hindi",
+ "customer": "CUST-003",
+ "voice": "Deepak",
+ "tts_language": "hi-IN",
+ "tags": [
+  "stockout",
+  "stockout"
+ ],
+ "turns": [
+  "एक लीटर पतंजलि सरसों का तेल",
+  "नमस्ते, एक लीटर अमूल ताज़ा दूध और दो किलो चना दाल भेज दीजिए"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "हाँ, कर दीजिए"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "बस इतना ही"
+  ]
+ },
+ "gold": [
+  [
+   "amul-taaza",
+   1,
+   "l"
+  ],
+  [
+   "chana-dal",
+   2,
+   "kg"
+  ],
+  [
+   "fortune-mustard-oil",
+   1,
+   "l"
+  ]
+ ],
+ "draft": false
+}

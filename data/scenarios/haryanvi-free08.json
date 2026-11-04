@@ -1,0 +1,33 @@
+{
+ "id": "haryanvi-free08",
+ "register": "haryanvi",
+ "customer": "CUST-003",
+ "voice": "Omkar",
+ "tts_language": "hi-en",
+ "tags": [
+  "freeform"
+ ],
+ "turns": [
+  "bhai do packet woh biscuit jo chai gail khawein, Parle aala"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "confirm": [
+   "haan, pakka kar do"
+  ],
+  "done": [
+   "bas itna e"
+  ],
+  "substitute_offer": [
+   "haan chalega"
+  ]
+ },
+ "gold": [
+  [
+   "parle-g",
+   2,
+   "pkt"
+  ]
+ ],
+ "draft": true
+}

@@ -1,0 +1,38 @@
+{
+ "id": "hindi-006",
+ "register": "hindi",
+ "customer": "CUST-003",
+ "voice": "Deepak",
+ "tts_language": "hi-IN",
+ "tags": [
+  "remove"
+ ],
+ "turns": [
+  "एक किलो चीनी और एक लीटर फॉर्च्यून सरसों का तेल चाहिए",
+  "फॉर्च्यून सरसों का तेल हटा दीजिए"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "हाँ, कर दीजिए"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "बस इतना ही"
+  ]
+ },
+ "gold": [
+  [
+   "cheeni-loose",
+   1,
+   "kg"
+  ]
+ ],
+ "draft": false
+}

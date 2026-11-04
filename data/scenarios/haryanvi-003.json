@@ -1,0 +1,45 @@
+{
+ "id": "haryanvi-003",
+ "register": "haryanvi",
+ "customer": "CUST-003",
+ "voice": "Vikrant",
+ "tts_language": "hi-en",
+ "tags": [
+  "brand_clash",
+  "needs_clarification"
+ ],
+ "turns": [
+  "Ram Ram bhai, do packet bread aur chaar packet Ghadi detergent de diyo"
+ ],
+ "answers": {
+  "brand_choice": [
+   "Britannia wala"
+  ],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, pakka kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna e"
+  ]
+ },
+ "gold": [
+  [
+   "britannia-bread",
+   2,
+   "pkt"
+  ],
+  [
+   "ghadi-1kg",
+   4,
+   "pkt"
+  ]
+ ],
+ "draft": true
+}

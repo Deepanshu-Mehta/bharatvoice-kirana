@@ -1,0 +1,227 @@
+# BharatVoice synthetic kirana catalog v1 (prices are synthetic, INR per base unit).
+# unit: kg | l  -> sold loose / by weight or volume, any quantity, price per kg or litre
+#       pkt | pc -> counted items; `pack` optionally maps a weight/volume to one packet
+# generic terms live at category level; aliases are brand/product specific.
+# stt_aliases: mis-transcriptions mined from Prisma (seeded from the Day-1 loopback test).
+# aliases_haryanvi: to be filled ONLY after native-speaker review.
+
+categories:
+  atta:      {generic: [atta, aata, gehun ka atta, chakki atta, आटा, गेहूं का आटा], stt: [आता, अतः]}
+  maida:     {generic: [maida, मैदा]}
+  besan:     {generic: [besan, बेसन]}
+  sooji:     {generic: [sooji, suji, rava, rawa, सूजी, रवा]}
+  rice:      {generic: [chawal, chaval, rice, चावल]}
+  dal:       {generic: [dal, daal, दाल]}
+  oil:       {generic: [tel, oil, तेल]}
+  ghee:      {generic: [ghee, ghi, घी]}
+  sugar:     {generic: [cheeni, chini, shakkar, sugar, चीनी, शक्कर]}
+  salt:      {generic: [namak, salt, नमक]}
+  spices:    {generic: [masala, मसाला]}
+  tea:       {generic: [chai patti, chai, tea, patti, चाय पत्ती, चाय, पत्ती], stt: [चाय पट्टी]}
+  coffee:    {generic: [coffee, kaafi, कॉफी]}
+  milk:      {generic: [doodh, dudh, milk, दूध]}
+  dairy:     {generic: []}
+  eggs:      {generic: [anda, ande, egg, eggs, अंडा, अंडे]}
+  bread:     {generic: [bread, double roti, ब्रेड, डबल रोटी]}
+  biscuits:  {generic: [biscuit, biskut, बिस्किट]}
+  noodles:   {generic: [noodles, नूडल्स]}
+  snacks:    {generic: [namkeen, chips, नमकीन, चिप्स]}
+  drinks:    {generic: [cold drink, thanda, कोल्ड ड्रिंक, ठंडा]}
+  detergent: {generic: [washing powder, surf, sarf, detergent, वाशिंग पाउडर, सर्फ]}
+  dishwash:  {generic: [bartan sabun, bartan wala, बर्तन साबुन]}
+  soap:      {generic: [sabun, soap, nahane ka sabun, साबुन]}
+  toothpaste: {generic: [toothpaste, manjan, paste, टूथपेस्ट, मंजन]}
+  shampoo:   {generic: [shampoo, शैम्पू]}
+  household: {generic: []}
+
+products:
+  # ---------------- atta & flours (kg) — brand clash: Aashirvaad / Pillsbury / Fortune
+  - {id: aashirvaad-atta, name: Aashirvaad Atta, brand: Aashirvaad, cat: atta, unit: kg, price: 52, stock: 60, pop: 0.95,
+     aliases: [aashirvaad, ashirvad, aashirwad, ashirwad, ashirvaad], deva: [आशीर्वाद], stt_aliases: []}
+  - {id: pillsbury-atta, name: Pillsbury Chakki Fresh Atta, brand: Pillsbury, cat: atta, unit: kg, price: 50, stock: 40, pop: 0.7,
+     aliases: [pillsbury, pilsbury, pillsberry, chakki fresh], deva: [पिल्सबरी], stt_aliases: [pillsberry]}
+  - {id: fortune-atta, name: Fortune Chakki Fresh Atta, brand: Fortune, cat: atta, unit: kg, price: 48, stock: 30, pop: 0.6,
+     aliases: [fortune atta, fortune], deva: [फॉर्च्यून], stt_aliases: [फॉरच्यून]}
+  - {id: maida-loose, name: Maida, brand: "", cat: maida, unit: kg, price: 40, stock: 25, pop: 0.4, aliases: [], deva: []}
+  - {id: rajdhani-besan, name: Rajdhani Besan, brand: Rajdhani, cat: besan, unit: kg, price: 110, stock: 20, pop: 0.5,
+     aliases: [rajdhani], deva: [राजधानी]}
+  - {id: sooji-loose, name: Sooji, brand: "", cat: sooji, unit: kg, price: 45, stock: 20, pop: 0.4, aliases: [], deva: []}
+
+  # ---------------- rice (kg)
+  - {id: india-gate-basmati, name: India Gate Basmati Rice, brand: India Gate, cat: rice, unit: kg, price: 140, stock: 30, pop: 0.6,
+     aliases: [india gate, india gate basmati], deva: [इंडिया गेट], desc: [basmati, बासमती]}
+  - {id: daawat-basmati, name: Daawat Basmati Rice, brand: Daawat, cat: rice, unit: kg, price: 150, stock: 25, pop: 0.5,
+     aliases: [daawat, dawat], deva: [दावत], desc: [basmati, बासमती]}
+  - {id: chawal-loose, name: Regular Chawal, brand: "", cat: rice, unit: kg, price: 60, stock: 80, pop: 0.8,
+     aliases: [mota chawal, normal chawal, sada chawal], deva: [मोटा चावल]}
+
+  # ---------------- dal (kg) — descriptor-only items
+  - {id: tata-toor-dal, name: Tata Sampann Toor Dal, brand: Tata Sampann, cat: dal, unit: kg, price: 175, stock: 20, pop: 0.5,
+     aliases: [tata sampann, tata dal, tata toor], deva: [टाटा संपन्न]}
+  - {id: toor-dal-loose, name: Toor Dal, brand: "", cat: dal, unit: kg, price: 150, stock: 40, pop: 0.8,
+     aliases: [toor, tuar, arhar, arhar dal, toor dal], deva: [तूर, अरहर, तुअर]}
+  - {id: moong-dal, name: Moong Dal, brand: "", cat: dal, unit: kg, price: 130, stock: 30, pop: 0.6,
+     aliases: [moong, mung, moong dal, peeli moong], deva: [मूंग]}
+  - {id: chana-dal, name: Chana Dal, brand: "", cat: dal, unit: kg, price: 95, stock: 30, pop: 0.5,
+     aliases: [chana dal, chane ki dal], deva: [चना दाल]}
+  - {id: masoor-dal, name: Masoor Dal, brand: "", cat: dal, unit: kg, price: 110, stock: 25, pop: 0.5,
+     aliases: [masoor, masur, lal dal], deva: [मसूर]}
+  - {id: urad-dal, name: Urad Dal, brand: "", cat: dal, unit: kg, price: 140, stock: 20, pop: 0.4,
+     aliases: [urad, udad, maa ki dal], deva: [उड़द, उड़द]}
+  - {id: rajma, name: Rajma, brand: "", cat: dal, unit: kg, price: 160, stock: 20, pop: 0.5, aliases: [rajma, rajmah], deva: [राजमा]}
+  - {id: kabuli-chana, name: Kabuli Chana, brand: "", cat: dal, unit: kg, price: 140, stock: 20, pop: 0.4,
+     aliases: [kabuli chana, chhole, chole, safed chana], deva: [छोले, काबुली चना]}
+
+  # ---------------- oils (l) — brand clash + descriptor (sarson vs refined)
+  - {id: fortune-mustard-oil, name: Fortune Kachi Ghani Mustard Oil, brand: Fortune, cat: oil, unit: l, price: 175, stock: 30, pop: 0.8,
+     aliases: [fortune sarson, fortune kachi ghani, fortune mustard], deva: [फॉर्च्यून सरसों],
+     desc: [sarson ka tel, sarson tel, sarson, mustard oil, mustard, kachi ghani, सरसों का तेल, सरसों, कच्ची घानी]}
+  - {id: fortune-refined-oil, name: Fortune Sunflower Refined Oil, brand: Fortune, cat: oil, unit: l, price: 155, stock: 30, pop: 0.6,
+     aliases: [fortune refined, fortune sunflower], deva: [फॉर्च्यून रिफाइंड],
+     desc: [refined, refined oil, sunflower, sunflower oil, रिफाइंड, रिफाइंड तेल]}
+  - {id: saffola-gold, name: Saffola Gold Oil, brand: Saffola, cat: oil, unit: l, price: 210, stock: 15, pop: 0.5,
+     aliases: [saffola, safola, saffola gold], deva: [सफोला], desc: [refined, refined oil, sunflower, sunflower oil, रिफाइंड, रिफाइंड तेल]}
+  - {id: dhara-mustard-oil, name: Dhara Mustard Oil, brand: Dhara, cat: oil, unit: l, price: 170, stock: 20, pop: 0.4,
+     aliases: [dhara, dhara sarson], deva: [धारा],
+     desc: [sarson ka tel, sarson tel, sarson, mustard oil, mustard, kachi ghani, सरसों का तेल, सरसों, कच्ची घानी]}
+  - {id: patanjali-mustard-oil, name: Patanjali Mustard Oil, brand: Patanjali, cat: oil, unit: l, price: 165, stock: 0, pop: 0.3,
+     aliases: [patanjali, patanjali sarson], deva: [पतंजलि],
+     desc: [sarson ka tel, sarson tel, sarson, mustard oil, mustard, kachi ghani, सरसों का तेल, सरसों, कच्ची घानी]}
+  - {id: amul-ghee, name: Amul Ghee, brand: Amul, cat: ghee, unit: l, price: 650, stock: 10, pop: 0.5,
+     aliases: [amul ghee, desi ghee], deva: [अमूल घी, देसी घी]}
+
+  # ---------------- sugar & salt
+  - {id: cheeni-loose, name: Cheeni, brand: "", cat: sugar, unit: kg, price: 46, stock: 80, pop: 0.9, aliases: [], deva: []}
+  - {id: tata-salt, name: Tata Salt 1 kg, brand: Tata, cat: salt, unit: pkt, pack: {qty: 1, unit: kg}, price: 28, stock: 40, pop: 0.8,
+     aliases: [tata namak, tata salt], deva: [टाटा नमक]}
+
+  # ---------------- spices (loose kg + packets)
+  - {id: haldi, name: Haldi Powder, brand: "", cat: spices, unit: kg, price: 220, stock: 10, pop: 0.7,
+     aliases: [haldi, turmeric, haldi powder], deva: [हल्दी]}
+  - {id: lal-mirch, name: Lal Mirch Powder, brand: "", cat: spices, unit: kg, price: 280, stock: 10, pop: 0.7,
+     aliases: [lal mirch, mirchi, red chilli, mirch], deva: [लाल मिर्च, मिर्च]}
+  - {id: dhaniya-powder, name: Dhaniya Powder, brand: "", cat: spices, unit: kg, price: 200, stock: 10, pop: 0.5,
+     aliases: [dhaniya, dhania, coriander], deva: [धनिया]}
+  - {id: jeera, name: Jeera, brand: "", cat: spices, unit: kg, price: 450, stock: 8, pop: 0.6,
+     aliases: [jeera, zeera, jira, cumin], deva: [जीरा]}
+  - {id: mdh-garam-masala, name: MDH Garam Masala 100 g, brand: MDH, cat: spices, unit: pkt, pack: {qty: 0.1, unit: kg}, price: 85, stock: 20, pop: 0.5,
+     aliases: [mdh, garam masala, mdh garam masala], deva: [एमडीएच, गरम मसाला]}
+  - {id: everest-kitchen-king, name: Everest Kitchen King 100 g, brand: Everest, cat: spices, unit: pkt, price: 80, stock: 15, pop: 0.4,
+     aliases: [everest, kitchen king], deva: [एवरेस्ट, किचन किंग]}
+  - {id: mdh-chana-masala, name: MDH Chana Masala 100 g, brand: MDH, cat: spices, unit: pkt, price: 75, stock: 15, pop: 0.3,
+     aliases: [chana masala, chole masala], deva: [चना मसाला]}
+
+  # ---------------- tea & coffee (pkt) — brand clash + size variants (bada / chhota)
+  - {id: tata-tea-250, name: Tata Tea Premium 250 g, brand: Tata Tea, cat: tea, unit: pkt, pack: {qty: 0.25, unit: kg}, size: small, price: 140, stock: 20, pop: 0.7,
+     aliases: [tata tea, tata chai, tata premium], deva: [टाटा चाय, टाटा टी]}
+  - {id: tata-tea-1kg, name: Tata Tea Premium 1 kg, brand: Tata Tea, cat: tea, unit: pkt, pack: {qty: 1, unit: kg}, size: large, price: 520, stock: 8, pop: 0.4,
+     aliases: [tata tea, tata chai, tata premium], deva: [टाटा चाय, टाटा टी]}
+  - {id: red-label-250, name: Red Label Tea 250 g, brand: Red Label, cat: tea, unit: pkt, pack: {qty: 0.25, unit: kg}, size: small, price: 145, stock: 15, pop: 0.6,
+     aliases: [red label, brooke bond, redlabel], deva: [रेड लेबल]}
+  - {id: red-label-1kg, name: Red Label Tea 1 kg, brand: Red Label, cat: tea, unit: pkt, pack: {qty: 1, unit: kg}, size: large, price: 540, stock: 5, pop: 0.3,
+     aliases: [red label, brooke bond, redlabel], deva: [रेड लेबल]}
+  - {id: wagh-bakri-250, name: Wagh Bakri Tea 250 g, brand: Wagh Bakri, cat: tea, unit: pkt, pack: {qty: 0.25, unit: kg}, price: 140, stock: 10, pop: 0.4,
+     aliases: [wagh bakri, waagh bakri, bagh bakri], deva: [वाघ बकरी]}
+  - {id: nescafe-50, name: Nescafe Classic 50 g, brand: Nescafe, cat: coffee, unit: pkt, price: 190, stock: 10, pop: 0.4,
+     aliases: [nescafe, nescafe classic], deva: [नेस्कैफे]}
+
+  # ---------------- milk & dairy — brand clash Amul / Mother Dairy, variants Taaza / Gold
+  - {id: amul-taaza, name: Amul Taaza Milk, brand: Amul, cat: milk, unit: l, price: 56, stock: 40, pop: 0.9,
+     aliases: [amul taaza, amul taza, taaza, amul doodh, amul milk], deva: [अमूल ताज़ा, अमूल ताजा], desc: [toned, टोंड]}
+  - {id: amul-gold, name: Amul Gold Milk, brand: Amul, cat: milk, unit: l, price: 68, stock: 30, pop: 0.6,
+     aliases: [amul gold, full cream amul], deva: [अमूल गोल्ड], desc: [full cream, फुल क्रीम]}
+  - {id: mother-dairy-toned, name: Mother Dairy Toned Milk, brand: Mother Dairy, cat: milk, unit: l, price: 56, stock: 40, pop: 0.8,
+     aliases: [mother dairy toned, madar dairy], deva: [मदर डेयरी, मदर डेरी], desc: [toned, टोंड]}
+  - {id: mother-dairy-full-cream, name: Mother Dairy Full Cream Milk, brand: Mother Dairy, cat: milk, unit: l, price: 68, stock: 20, pop: 0.5,
+     aliases: [mother dairy full cream], deva: [], desc: [full cream, फुल क्रीम]}
+  - {id: amul-butter-100, name: Amul Butter 100 g, brand: Amul, cat: dairy, unit: pkt, price: 58, stock: 20, pop: 0.6,
+     aliases: [amul butter, butter, makhan, makkhan], deva: [मक्खन, बटर, अमूल बटर]}
+  - {id: amul-paneer-200, name: Amul Paneer 200 g, brand: Amul, cat: dairy, unit: pkt, price: 90, stock: 10, pop: 0.5,
+     aliases: [paneer, amul paneer], deva: [पनीर]}
+  - {id: md-dahi-400, name: Mother Dairy Dahi 400 g, brand: Mother Dairy, cat: dairy, unit: pkt, price: 50, stock: 15, pop: 0.6,
+     aliases: [dahi, curd, mother dairy dahi], deva: [दही]}
+
+  # ---------------- eggs & bread
+  - {id: eggs, name: Ande, brand: "", cat: eggs, unit: pc, price: 7, stock: 120, pop: 0.8, aliases: [], deva: []}
+  - {id: britannia-bread, name: Britannia Bread, brand: Britannia, cat: bread, unit: pkt, price: 45, stock: 15, pop: 0.6,
+     aliases: [britannia, britania], deva: [ब्रिटानिया]}
+  - {id: harvest-gold-bread, name: Harvest Gold Bread, brand: Harvest Gold, cat: bread, unit: pkt, price: 45, stock: 15, pop: 0.6,
+     aliases: [harvest gold, harvest], deva: [हार्वेस्ट गोल्ड]}
+
+  # ---------------- biscuits (pkt) — near-homophones Parle-G / Good Day
+  - {id: parle-g, name: Parle-G, brand: Parle, cat: biscuits, unit: pkt, price: 10, stock: 100, pop: 0.9,
+     aliases: [parle g, parle ji, parleg, parle], deva: [पारले जी, पारलेजी, पार्ले जी]}
+  - {id: good-day, name: Britannia Good Day, brand: Britannia, cat: biscuits, unit: pkt, price: 30, stock: 40, pop: 0.6,
+     aliases: [good day, gud day, goodday], deva: [गुड डे]}
+  - {id: marie-gold, name: Britannia Marie Gold, brand: Britannia, cat: biscuits, unit: pkt, price: 35, stock: 30, pop: 0.5,
+     aliases: [marie gold, mari gold, marie], deva: [मैरी गोल्ड]}
+  - {id: bourbon, name: Britannia Bourbon, brand: Britannia, cat: biscuits, unit: pkt, price: 35, stock: 30, pop: 0.5,
+     aliases: [bourbon, borbon, burbon], deva: [बॉर्बन, बोरबॉन]}
+  - {id: hide-and-seek, name: Parle Hide & Seek, brand: Parle, cat: biscuits, unit: pkt, price: 35, stock: 25, pop: 0.4,
+     aliases: [hide and seek, hide & seek, hide n seek], deva: [हाइड एंड सीक]}
+  - {id: monaco, name: Parle Monaco, brand: Parle, cat: biscuits, unit: pkt, price: 20, stock: 30, pop: 0.4,
+     aliases: [monaco, monako], deva: [मोनाको]}
+
+  # ---------------- noodles & snacks — size variants (Maggi small / family)
+  - {id: maggi-70, name: Maggi Noodles 70 g, brand: Maggi, cat: noodles, unit: pkt, size: small, price: 14, stock: 80, pop: 0.9,
+     aliases: [maggi, maggie, magi, chhota maggi], deva: [मैगी, मैगी नूडल्स]}
+  - {id: maggi-280, name: Maggi Noodles 4-pack 280 g, brand: Maggi, cat: noodles, unit: pkt, size: large, price: 56, stock: 20, pop: 0.5,
+     aliases: [maggi, maggie, bada maggi, maggi family pack, char wala maggi], deva: [मैगी, बड़ा मैगी]}
+  - {id: kurkure, name: Kurkure Masala Munch, brand: Kurkure, cat: snacks, unit: pkt, price: 20, stock: 40, pop: 0.6,
+     aliases: [kurkure, kurkurey], deva: [कुरकुरे]}
+  - {id: lays, name: Lay's Classic Salted, brand: Lays, cat: snacks, unit: pkt, price: 20, stock: 40, pop: 0.6,
+     aliases: [lays, lay's, lays chips, les], deva: [लेज़, लेज]}
+  - {id: haldiram-bhujia, name: Haldiram's Aloo Bhujia 400 g, brand: Haldiram, cat: snacks, unit: pkt, price: 110, stock: 15, pop: 0.5,
+     aliases: [haldiram, haldirams, bhujia, aloo bhujia], deva: [हल्दीराम, भुजिया]}
+
+  # ---------------- drinks (pc)
+  - {id: coca-cola-750, name: Coca-Cola 750 ml, brand: Coca-Cola, cat: drinks, unit: pc, price: 40, stock: 24, pop: 0.5,
+     aliases: [coca cola, coke, cola], deva: [कोका कोला, कोक]}
+  - {id: thums-up-750, name: Thums Up 750 ml, brand: Thums Up, cat: drinks, unit: pc, price: 40, stock: 24, pop: 0.6,
+     aliases: [thums up, thumbs up, thamsup], deva: [थम्स अप]}
+  - {id: frooti, name: Frooti 600 ml, brand: Frooti, cat: drinks, unit: pc, price: 35, stock: 20, pop: 0.4,
+     aliases: [frooti, fruity, mango frooti], deva: [फ्रूटी]}
+
+  # ---------------- detergent (pkt 1 kg) — generic "surf" ambiguity
+  - {id: surf-excel-1kg, name: Surf Excel 1 kg, brand: Surf Excel, cat: detergent, unit: pkt, pack: {qty: 1, unit: kg}, price: 140, stock: 20, pop: 0.7,
+     aliases: [surf excel, surf exel, sarf excel, excel], deva: [सर्फ एक्सेल, सर्फ़ एक्सेल], stt_aliases: [f excel, सर f excel]}
+  - {id: tide-1kg, name: Tide 1 kg, brand: Tide, cat: detergent, unit: pkt, pack: {qty: 1, unit: kg}, price: 120, stock: 20, pop: 0.6,
+     aliases: [tide, taid, tide powder], deva: [टाइड]}
+  - {id: rin-1kg, name: Rin 1 kg, brand: Rin, cat: detergent, unit: pkt, pack: {qty: 1, unit: kg}, price: 100, stock: 15, pop: 0.5,
+     aliases: [rin, reen], deva: [रिन]}
+  - {id: ghadi-1kg, name: Ghadi 1 kg, brand: Ghadi, cat: detergent, unit: pkt, pack: {qty: 1, unit: kg}, price: 75, stock: 25, pop: 0.6,
+     aliases: [ghadi, ghari, ghadi detergent], deva: [घड़ी, घडी]}
+  - {id: vim-bar, name: Vim Bar, brand: Vim, cat: dishwash, unit: pc, price: 10, stock: 50, pop: 0.6,
+     aliases: [vim, vim bar, wim], deva: [विम]}
+
+  # ---------------- soap (pc) — near-homophones Lux / Lifebuoy
+  - {id: lux, name: Lux Soap, brand: Lux, cat: soap, unit: pc, price: 40, stock: 30, pop: 0.6, aliases: [lux, laks], deva: [लक्स]}
+  - {id: lifebuoy, name: Lifebuoy Soap, brand: Lifebuoy, cat: soap, unit: pc, price: 35, stock: 30, pop: 0.6,
+     aliases: [lifebuoy, lifeboy, laifboy], deva: [लाइफबॉय, लाइफबॉय]}
+  - {id: dettol-soap, name: Dettol Soap, brand: Dettol, cat: soap, unit: pc, price: 45, stock: 20, pop: 0.5,
+     aliases: [dettol, detol], deva: [डेटॉल]}
+  - {id: santoor, name: Santoor Soap, brand: Santoor, cat: soap, unit: pc, price: 38, stock: 20, pop: 0.5,
+     aliases: [santoor, santur], deva: [संतूर]}
+  - {id: dove-soap, name: Dove Soap, brand: Dove, cat: soap, unit: pc, price: 60, stock: 10, pop: 0.3, aliases: [dove, dav], deva: [डव]}
+
+  # ---------------- toothpaste & shampoo
+  - {id: colgate-100, name: Colgate Strong Teeth 100 g, brand: Colgate, cat: toothpaste, unit: pc, price: 60, stock: 20, pop: 0.7,
+     aliases: [colgate, colget, kolgate], deva: [कोलगेट]}
+  - {id: pepsodent-100, name: Pepsodent 100 g, brand: Pepsodent, cat: toothpaste, unit: pc, price: 55, stock: 15, pop: 0.4,
+     aliases: [pepsodent, pepsodant], deva: [पेप्सोडेंट]}
+  - {id: dabur-red-100, name: Dabur Red Paste 100 g, brand: Dabur, cat: toothpaste, unit: pc, price: 60, stock: 15, pop: 0.4,
+     aliases: [dabur red, dabur, lal dant manjan], deva: [डाबर रेड, डाबर]}
+  - {id: clinic-plus-175, name: Clinic Plus Shampoo 175 ml, brand: Clinic Plus, cat: shampoo, unit: pc, price: 120, stock: 10, pop: 0.4,
+     aliases: [clinic plus, klinik plus], deva: [क्लिनिक प्लस]}
+  - {id: head-shoulders-180, name: Head & Shoulders 180 ml, brand: Head & Shoulders, cat: shampoo, unit: pc, price: 220, stock: 8, pop: 0.3,
+     aliases: [head and shoulders, head & shoulders, head shoulder], deva: [हेड एंड शोल्डर्स]}
+
+  # ---------------- household
+  - {id: maachis, name: Maachis (10 boxes), brand: "", cat: household, unit: pkt, price: 20, stock: 30, pop: 0.5,
+     aliases: [maachis, machis, matchbox, tili], deva: [माचिस]}
+  - {id: cycle-agarbatti, name: Cycle Agarbatti, brand: Cycle, cat: household, unit: pkt, price: 50, stock: 20, pop: 0.4,
+     aliases: [agarbatti, cycle agarbatti, agarbati], deva: [अगरबत्ती, साइकिल अगरबत्ती]}
+  - {id: harpic-500, name: Harpic 500 ml, brand: Harpic, cat: household, unit: pc, price: 100, stock: 10, pop: 0.4,
+     aliases: [harpic, harpik, toilet cleaner], deva: [हार्पिक]}
+  - {id: parachute-250, name: Parachute Coconut Oil 250 ml, brand: Parachute, cat: household, unit: pc, price: 110, stock: 12, pop: 0.5,
+     aliases: [parachute, nariyal tel, coconut oil], deva: [पैराशूट, नारियल तेल]}

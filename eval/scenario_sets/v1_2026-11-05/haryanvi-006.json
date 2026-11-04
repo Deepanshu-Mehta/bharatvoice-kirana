@@ -1,0 +1,39 @@
+{
+ "id": "haryanvi-006",
+ "register": "haryanvi",
+ "customer": "CUST-003",
+ "voice": "Ambuja",
+ "tts_language": "hi-en",
+ "tags": [
+  "remove",
+  "haryanvi_negation"
+ ],
+ "turns": [
+  "Ram Ram bhai, ek packet Parle-G biscuit aur ek darjan ande chahiye",
+  "ande konya chahiye"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, pakka kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna e"
+  ]
+ },
+ "gold": [
+  [
+   "parle-g",
+   1,
+   "pkt"
+  ]
+ ],
+ "draft": true
+}

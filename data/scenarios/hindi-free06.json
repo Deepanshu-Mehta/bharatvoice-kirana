@@ -1,0 +1,33 @@
+{
+ "id": "hindi-free06",
+ "register": "hindi",
+ "customer": "CUST-003",
+ "voice": "Bhavna",
+ "tts_language": "hi-IN",
+ "tags": [
+  "freeform"
+ ],
+ "turns": [
+  "बच्चों के लिए दो पैकेट वो दो मिनट वाली नूडल्स, छोटी वाली"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "confirm": [
+   "हाँ, कर दीजिए"
+  ],
+  "done": [
+   "बस इतना ही"
+  ],
+  "substitute_offer": [
+   "haan chalega"
+  ]
+ },
+ "gold": [
+  [
+   "maggi-70",
+   2,
+   "pkt"
+  ]
+ ],
+ "draft": true
+}

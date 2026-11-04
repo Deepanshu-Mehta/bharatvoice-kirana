@@ -1,0 +1,49 @@
+{
+ "id": "hinglish-008",
+ "register": "hinglish",
+ "customer": "CUST-003",
+ "voice": "Devika",
+ "tts_language": "hi-en",
+ "tags": [
+  "stockout",
+  "stockout"
+ ],
+ "turns": [
+  "ek litre Patanjali sarson ka tel",
+  "Haan bhaiya, ek darjan ande aur sau gram haldi bhej dena"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, confirm kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna hi"
+  ]
+ },
+ "gold": [
+  [
+   "eggs",
+   12,
+   "pc"
+  ],
+  [
+   "fortune-mustard-oil",
+   1,
+   "l"
+  ],
+  [
+   "haldi",
+   0.1,
+   "kg"
+  ]
+ ],
+ "draft": false
+}

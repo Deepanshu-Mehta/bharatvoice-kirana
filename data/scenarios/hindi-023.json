@@ -1,0 +1,45 @@
+{
+ "id": "hindi-023",
+ "register": "hindi",
+ "customer": "CUST-003",
+ "voice": "Bhavna",
+ "tts_language": "hi-IN",
+ "tags": [
+  "brand_clash",
+  "needs_clarification"
+ ],
+ "turns": [
+  "पाव किलो atta और तीन पैकेट अमूल बटर दे दीजिए"
+ ],
+ "answers": {
+  "brand_choice": [
+   "Aashirvaad wala"
+  ],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "हाँ, कर दीजिए"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "बस इतना ही"
+  ]
+ },
+ "gold": [
+  [
+   "aashirvaad-atta",
+   0.25,
+   "kg"
+  ],
+  [
+   "amul-butter-100",
+   3,
+   "pkt"
+  ]
+ ],
+ "draft": false
+}

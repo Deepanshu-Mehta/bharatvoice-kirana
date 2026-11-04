@@ -1,0 +1,39 @@
+{
+ "id": "hindi-repeat",
+ "register": "hindi",
+ "customer": "CUST-001",
+ "voice": "Nalini",
+ "tts_language": "hi-IN",
+ "tags": [
+  "repeat_order"
+ ],
+ "turns": [
+  "पिछली बार वाला सामान भेज दीजिए"
+ ],
+ "answers": {
+  "confirm": [
+   "हाँ, कर दीजिए"
+  ],
+  "done": [
+   "बस इतना ही"
+  ]
+ },
+ "gold": [
+  [
+   "aashirvaad-atta",
+   5,
+   "kg"
+  ],
+  [
+   "amul-taaza",
+   2,
+   "l"
+  ],
+  [
+   "tata-tea-250",
+   1,
+   "pkt"
+  ]
+ ],
+ "draft": false
+}

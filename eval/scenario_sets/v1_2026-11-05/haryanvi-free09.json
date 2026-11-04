@@ -1,0 +1,38 @@
+{
+ "id": "haryanvi-free09",
+ "register": "haryanvi",
+ "customer": "CUST-003",
+ "voice": "Omkar",
+ "tts_language": "hi-en",
+ "tags": [
+  "freeform"
+ ],
+ "turns": [
+  "ek darjan ande aur ek kilo dhoven aala powder, Ghadi"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "confirm": [
+   "haan, pakka kar do"
+  ],
+  "done": [
+   "bas itna e"
+  ],
+  "substitute_offer": [
+   "haan chalega"
+  ]
+ },
+ "gold": [
+  [
+   "eggs",
+   12,
+   "pc"
+  ],
+  [
+   "ghadi-1kg",
+   1,
+   "pkt"
+  ]
+ ],
+ "draft": true
+}

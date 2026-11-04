@@ -1,0 +1,42 @@
+{
+ "id": "haryanvi-003",
+ "register": "haryanvi",
+ "customer": "CUST-003",
+ "voice": "Vikrant",
+ "tts_language": "hi-en",
+ "tags": [
+  "brand_clash",
+  "needs_clarification",
+  "needs_clarification"
+ ],
+ "turns": [
+  "Ram Ram bhai, aadha kilo atta aur teen kilo atta de diyo"
+ ],
+ "answers": {
+  "brand_choice": [
+   "Aashirvaad wala",
+   "Aashirvaad wala"
+  ],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, pakka kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna e"
+  ]
+ },
+ "gold": [
+  [
+   "aashirvaad-atta",
+   3.5,
+   "kg"
+  ]
+ ],
+ "draft": true
+}

@@ -1,0 +1,47 @@
+{
+ "id": "hindi-020",
+ "register": "hindi",
+ "customer": "CUST-003",
+ "voice": "Deepak",
+ "tts_language": "hi-IN",
+ "tags": [
+  "multi"
+ ],
+ "turns": [
+  "चार पैकेट छोटा मैगी और तीन किलो मूंग दाल और एक लीटर मदर डेयरी दूध भेज दीजिए"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "हाँ, कर दीजिए"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "बस इतना ही"
+  ]
+ },
+ "gold": [
+  [
+   "maggi-70",
+   4,
+   "pkt"
+  ],
+  [
+   "moong-dal",
+   3,
+   "kg"
+  ],
+  [
+   "mother-dairy-toned",
+   1,
+   "l"
+  ]
+ ],
+ "draft": false
+}

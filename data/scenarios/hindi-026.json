@@ -1,0 +1,38 @@
+{
+ "id": "hindi-026",
+ "register": "hindi",
+ "customer": "CUST-003",
+ "voice": "Bhavna",
+ "tts_language": "hi-IN",
+ "tags": [
+  "remove"
+ ],
+ "turns": [
+  "नमस्ते, चार पैकेट पारले जी बिस्किट और आधा लीटर फॉर्च्यून सरसों का तेल भेज दीजिए",
+  "फॉर्च्यून सरसों का तेल हटा दीजिए"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "हाँ, कर दीजिए"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "बस इतना ही"
+  ]
+ },
+ "gold": [
+  [
+   "parle-g",
+   4,
+   "pkt"
+  ]
+ ],
+ "draft": false
+}

@@ -1,0 +1,43 @@
+{
+ "id": "haryanvi-004",
+ "register": "haryanvi",
+ "customer": "CUST-003",
+ "voice": "Ambuja",
+ "tts_language": "hi-en",
+ "tags": [
+  "correction"
+ ],
+ "turns": [
+  "Ram Ram, chaar packet Britannia bread aur chaar packet Colgate de diyo",
+  "na na, Britannia teen packet kar do"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, pakka kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna e"
+  ]
+ },
+ "gold": [
+  [
+   "britannia-bread",
+   3,
+   "pkt"
+  ],
+  [
+   "colgate-100",
+   4,
+   "pc"
+  ]
+ ],
+ "draft": true
+}

@@ -1,0 +1,9 @@
+# Gnani credit cost per unit, MEASURED 2026-11-05 from the dashboard:
+#   23 billed requests (12 STT, 11 TTS) = 1.13 credits (~₹0.05/request); the 504 timeout was not billed.
+#   Remaining 4,998 credits shown as "~15k min of STT" and "~27.8 lakh chars of TTS".
+#   => STT 4998 / (15000*60 s) = 0.00555 /s ; TTS 4998 / 2,780,000 = 0.0018 /char
+# Cross-check: 32.8 s * 0.00555 + 450 chars * 0.0018 = 0.99 (+ per-request rounding) ~ 1.13 billed.
+measured: true
+stt_per_sec: 0.0056
+tts_per_char: 0.0018
+clone_per_call: 0.05   # not yet measured (no clone call made)

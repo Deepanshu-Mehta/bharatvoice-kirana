@@ -1,0 +1,49 @@
+{
+ "id": "hinglish-018",
+ "register": "hinglish",
+ "customer": "CUST-003",
+ "voice": "Devika",
+ "tts_language": "hi-en",
+ "tags": [
+  "stockout",
+  "stockout"
+ ],
+ "turns": [
+  "ek litre Patanjali sarson ka tel",
+  "Suniye, aadha kilo moong dal aur ek packet Britannia bread de dena"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, confirm kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna hi"
+  ]
+ },
+ "gold": [
+  [
+   "britannia-bread",
+   1,
+   "pkt"
+  ],
+  [
+   "fortune-mustard-oil",
+   1,
+   "l"
+  ],
+  [
+   "moong-dal",
+   0.5,
+   "kg"
+  ]
+ ],
+ "draft": false
+}

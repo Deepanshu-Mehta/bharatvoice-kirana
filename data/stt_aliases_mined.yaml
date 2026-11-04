@@ -1,0 +1,13 @@
+_note: >-
+  Found by eval/mine_aliases.py (Timbre -> phone channel -> Prisma loopback, 632 transcriptions, 14.6% name-resolution
+  errors). Raw output in stt_aliases_mined_raw.yaml. Most raw "errors" were size variants (a dialogue question, not an
+  ASR error) or garbage; automated cleaning still kept unsafe entries ("dad"->Dove, "le"->Lays), so the genuine Prisma
+  confusions below were CURATED BY HAND (plan rule: every alias is checked by a human).
+aliases:
+  tide-1kg: [type powder, taid powder, tide powder]
+  rin-1kg: [rind, reend, ring powder]
+  red-label-250: [broke bond, group bonded, brook bond, broke bonded]
+  red-label-1kg: [broke bond, group bonded, brook bond, broke bonded]
+  clinic-plus-175: [klinik, klinik plus]
+  kabuli-chana: [kaabulee chanaa, kaboolee chanaa, traffic chana, kabooli chana]
+  maachis: [machchi, maachi]

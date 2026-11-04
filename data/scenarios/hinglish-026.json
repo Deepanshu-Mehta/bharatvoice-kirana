@@ -1,0 +1,38 @@
+{
+ "id": "hinglish-026",
+ "register": "hinglish",
+ "customer": "CUST-003",
+ "voice": "Girish",
+ "tts_language": "hi-en",
+ "tags": [
+  "remove"
+ ],
+ "turns": [
+  "ek litre Amul Taaza doodh aur aadha litre Fortune sarson ka tel chahiye",
+  "Fortune sarson ka tel rehne do"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, confirm kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna hi"
+  ]
+ },
+ "gold": [
+  [
+   "amul-taaza",
+   1,
+   "l"
+  ]
+ ],
+ "draft": false
+}

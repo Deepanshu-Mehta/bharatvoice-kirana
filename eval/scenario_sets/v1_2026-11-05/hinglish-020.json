@@ -1,0 +1,47 @@
+{
+ "id": "hinglish-020",
+ "register": "hinglish",
+ "customer": "CUST-003",
+ "voice": "Girish",
+ "tts_language": "hi-en",
+ "tags": [
+  "multi"
+ ],
+ "turns": [
+  "Suniye, ek packet Amul butter aur chaar packet Ghadi detergent aur chaar packet Tata namak"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, confirm kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna hi"
+  ]
+ },
+ "gold": [
+  [
+   "amul-butter-100",
+   1,
+   "pkt"
+  ],
+  [
+   "ghadi-1kg",
+   4,
+   "pkt"
+  ],
+  [
+   "tata-salt",
+   4,
+   "pkt"
+  ]
+ ],
+ "draft": false
+}

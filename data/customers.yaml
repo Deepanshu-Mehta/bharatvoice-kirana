@@ -1,0 +1,16 @@
+# Synthetic customers only (no real names or numbers).
+CUST-001:
+  name: Sharma ji
+  register: hinglish
+  history:
+    - {date: 2026-10-28, lines: [{sku: aashirvaad-atta, qty: 5, unit: kg}, {sku: amul-taaza, qty: 2, unit: l}, {sku: tata-tea-250, qty: 1, unit: pkt}]}
+    - {date: 2026-10-14, lines: [{sku: aashirvaad-atta, qty: 5, unit: kg}, {sku: cheeni-loose, qty: 2, unit: kg}, {sku: fortune-mustard-oil, qty: 1, unit: l}]}
+CUST-002:
+  name: Tau ji
+  register: haryanvi
+  history:
+    - {date: 2026-10-30, lines: [{sku: amul-taaza, qty: 1, unit: l}, {sku: parle-g, qty: 4, unit: pkt}, {sku: maggi-70, qty: 2, unit: pkt}]}
+CUST-003:
+  name: Gupta ji
+  register: hindi
+  history: []

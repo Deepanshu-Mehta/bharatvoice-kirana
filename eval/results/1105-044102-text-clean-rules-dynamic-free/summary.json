@@ -1,0 +1,22 @@
+{
+ "_meta": {
+  "run_id": "1105-044102-text-clean-rules-dynamic-free",
+  "args": {
+   "mode": "text",
+   "condition": "clean",
+   "registers": null,
+   "ids": [
+    "hinglish-free01 hinglish-free02 hinglish-free03 hindi-free04 hindi-free05 hindi-free06 haryanvi-free07 haryanvi-free08 haryanvi-free09"
+   ],
+   "limit": null,
+   "extractor": "rules",
+   "biasing": "dynamic",
+   "stt_format": "codemix",
+   "budget": null,
+   "dry_run": false,
+   "tag": "free"
+  },
+  "stt_config": "prisma-v3.0|hi-IN,en-IN|codemix|dynamic|sub=1",
+  "spent_credits": 0.0
+ }
+}

@@ -1,0 +1,43 @@
+{
+ "id": "haryanvi-014",
+ "register": "haryanvi",
+ "customer": "CUST-003",
+ "voice": "Ambuja",
+ "tts_language": "hi-en",
+ "tags": [
+  "correction"
+ ],
+ "turns": [
+  "Ram Ram, chaar packet Britannia bread aur teen packet Amul butter de diyo",
+  "na na, Britannia ek packet kar do"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, pakka kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna e"
+  ]
+ },
+ "gold": [
+  [
+   "amul-butter-100",
+   3,
+   "pkt"
+  ],
+  [
+   "britannia-bread",
+   1,
+   "pkt"
+  ]
+ ],
+ "draft": true
+}

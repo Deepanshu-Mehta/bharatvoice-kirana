@@ -1,0 +1,39 @@
+{
+ "id": "haryanvi-026",
+ "register": "haryanvi",
+ "customer": "CUST-003",
+ "voice": "Vikrant",
+ "tts_language": "hi-en",
+ "tags": [
+  "remove",
+  "haryanvi_negation"
+ ],
+ "turns": [
+  "Bhai, paav kilo haldi aur ek litre Amul Taaza doodh de diyo",
+  "Amul Taaza doodh konya chahiye"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, pakka kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna e"
+  ]
+ },
+ "gold": [
+  [
+   "haldi",
+   0.25,
+   "kg"
+  ]
+ ],
+ "draft": true
+}

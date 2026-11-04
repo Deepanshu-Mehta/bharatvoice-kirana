@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BharatVoice · call</title>
+<link rel="stylesheet" href="/static/style.css">
+<script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/ort.wasm.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@ricky0123/vad-web@0.0.31/dist/bundle.min.js"></script>
+</head>
+<body>
+<header>
+  <div class="brand">BharatVoice <span>· Sharma General Store</span></div>
+  <div class="controls">
+    <select id="customer">
+      <option value="CUST-001">Sharma ji · Hinglish</option>
+      <option value="CUST-002">Tau ji · Haryanvi</option>
+      <option value="CUST-003">Gupta ji · Hindi</option>
+    </select>
+    <select id="extractor">
+      <option value="rules">Rules extractor</option>
+      <option value="hybrid">Hybrid (rules + Evon)</option>
+      <option value="evon">Evon v3.3 only</option>
+    </select>
+    <label class="chk"><input type="checkbox" id="bargein"> barge-in (headphones)</label>
+    <button id="start">Start call</button>
+    <button id="stop" disabled>End</button>
+  </div>
+</header>
+<main>
+  <section class="call">
+    <div id="status" class="status">idle</div>
+    <div id="log" class="log"></div>
+    <form id="typed" class="typed">
+      <input id="typedText" placeholder="Type a turn instead of speaking (no STT credits)…" autocomplete="off">
+      <button>Send</button>
+    </form>
+  </section>
+  <aside class="cart">
+    <h2>Order <span id="badges"></span></h2>
+    <table><thead><tr><th>Item</th><th>Qty</th><th class="r">₹</th></tr></thead><tbody id="lines"></tbody></table>
+    <div class="total">Total <span id="total">₹0</span></div>
+    <div id="pending" class="pending"></div>
+    <div id="timings" class="timings"></div>
+    <div class="foot">Prisma (STT) · Timbre (TTS) · Evon v3.3 (understanding) — all Gnani.ai</div>
+  </aside>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+let ws = null, myvad = null, speaking = false;
+let actx = null, nextTime = 0, sources = [], replyDone = true, carry = null;
+
+function bubble(who, text, extra) {
+  const d = document.createElement("div");
+  d.className = "bubble " + who;
+  d.textContent = text;
+  if (extra) { const s = document.createElement("small"); s.textContent = extra; d.appendChild(s); }
+  $("log").appendChild(d); $("log").scrollTop = 1e9;
+}
+function setStatus(t, cls) { $("status").textContent = t; $("status").className = "status " + (cls || ""); }
+
+function unitLabel(q, u) { return (+q).toString() + " " + ({kg:"kg", l:"L", pkt:"pkt", pc:"pc"}[u] || u); }
+function renderCart(m) {
+  $("lines").innerHTML = m.cart.map(l => `<tr><td>${l.name}</td><td>${unitLabel(l.qty, l.unit)}</td><td class="r">${l.amount.toFixed(0)}</td></tr>`).join("");
+  $("total").textContent = "₹" + m.total.toFixed(0);
+  $("pending").textContent = m.pending ? "waiting for answer: " + m.pending.replace("_", " ") : "";
+  $("badges").innerHTML = `<i>${m.register}</i>` + (m.source ? `<i>${m.source}</i>` : "");
+}
+
+function encodeWAV(samples, sr = 16000) {
+  const buf = new ArrayBuffer(44 + samples.length * 2), v = new DataView(buf);
+  const w = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+  w(0, "RIFF"); v.setUint32(4, 36 + samples.length * 2, true); w(8, "WAVE"); w(12, "fmt ");
+  v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true); v.setUint32(24, sr, true);
+  v.setUint32(28, sr * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true); w(36, "data");
+  v.setUint32(40, samples.length * 2, true);
+  for (let i = 0; i < samples.length; i++) { const s = Math.max(-1, Math.min(1, samples[i])); v.setInt16(44 + i * 2, s < 0 ? s * 0x8000 : s * 0x7fff, true); }
+  return new Blob([buf], { type: "audio/wav" });
+}
+
+function stopAudio() { sources.forEach(s => { try { s.stop(); } catch (e) {} }); sources = []; nextTime = 0; speaking = false; }
+function maybeDone() {
+  if (replyDone && sources.length === 0) { speaking = false; if (myvad && ws) { myvad.start(); setStatus("listening…", "live"); } }
+}
+function playChunk(buf) {
+  let bytes = new Uint8Array(buf);
+  if (carry) { const m = new Uint8Array(carry.length + bytes.length); m.set(carry); m.set(bytes, carry.length); bytes = m; carry = null; }
+  if (bytes.length % 2) { carry = bytes.slice(-1); bytes = bytes.slice(0, -1); }
+  const pcm = new Int16Array(bytes.buffer, bytes.byteOffset, bytes.length / 2);
+  if (!pcm.length) return;
+  const ab = actx.createBuffer(1, pcm.length, 16000), ch = ab.getChannelData(0);
+  for (let i = 0; i < pcm.length; i++) ch[i] = pcm[i] / 32768;
+  const src = actx.createBufferSource(); src.buffer = ab; src.connect(actx.destination);
+  nextTime = Math.max(nextTime, actx.currentTime + 0.03);
+  src.start(nextTime); nextTime += ab.duration;
+  sources.push(src);
+  src.onended = () => { sources = sources.filter(x => x !== src); maybeDone(); };
+}
+
+async function startCall() {
+  const url = `${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/ws/call?customer=${$("customer").value}&extractor=${$("extractor").value}`;
+  ws = new WebSocket(url);
+  ws.binaryType = "arraybuffer";
+  actx = actx || new AudioContext(); await actx.resume();
+  $("log").innerHTML = ""; $("lines").innerHTML = ""; $("total").textContent = "₹0";
+  ws.onmessage = (ev) => {
+    if (ev.data instanceof ArrayBuffer) { playChunk(ev.data); return; }
+    const m = JSON.parse(ev.data);
+    if (m.type === "transcript") bubble("me", m.text || "(silence)");
+    else if (m.type === "reply_start") {
+      bubble("agent", m.text); replyDone = false; speaking = true;
+      if (myvad && !$("bargein").checked) myvad.pause();
+      setStatus("agent speaking…", "agent");
+    }
+    else if (m.type === "reply_end") { replyDone = true; maybeDone(); }
+    else if (m.type === "cart") renderCart(m);
+    else if (m.type === "timings") $("timings").textContent = Object.entries(m).filter(([k]) => k !== "type").map(([k, v]) => `${k} ${v}`).join(" · ");
+    else if (m.type === "error") bubble("err", m.text);
+    else if (m.type === "end") { setStatus(m.order ? `order ${m.order.order_id} placed` : "handed off to shopkeeper", "done"); if (myvad) myvad.pause(); }
+  };
+  ws.onclose = () => setStatus("call ended");
+  myvad = await vad.MicVAD.new({
+    baseAssetPath: "https://cdn.jsdelivr.net/npm/@ricky0123/vad-web@0.0.31/dist/",
+    onnxWASMBasePath: "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/",
+    positiveSpeechThreshold: 0.6, redemptionMs: 450, minSpeechMs: 250,
+    onSpeechStart: () => { if (speaking && $("bargein").checked) stopAudio(); setStatus("hearing you…", "live"); },
+    onSpeechEnd: (audio) => { if (ws && ws.readyState === 1) { ws.send(encodeWAV(audio)); setStatus("thinking…"); } },
+  });
+  $("start").disabled = true; $("stop").disabled = false;
+}
+function stopCall() { if (myvad) myvad.destroy(); myvad = null; if (ws) ws.close(); ws = null; $("start").disabled = false; $("stop").disabled = true; }
+$("start").onclick = startCall; $("stop").onclick = stopCall;
+$("typed").onsubmit = (e) => { e.preventDefault(); const t = $("typedText").value.trim(); if (t && ws) { ws.send(JSON.stringify({ type: "text", text: t })); $("typedText").value = ""; } };
+</script>
+</body>
+</html>

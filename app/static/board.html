@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>BharatVoice · shopkeeper board</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="boardpage">
+<header><div class="brand">Sharma General Store <span>· live orders</span></div><div id="clock" class="controls"></div></header>
+<main class="board">
+  <section><h2>Live calls</h2><div id="live"></div></section>
+  <section><h2>Orders</h2><div id="orders"></div></section>
+  <section><h2>Handoff queue</h2><div id="handoffs"></div></section>
+</main>
+<audio id="chime" src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA="></audio>
+<script>
+const live = {}, $ = (id) => document.getElementById(id);
+const fmt = (l) => `${(+l.qty)} ${({kg:"kg", l:"L", pkt:"pkt", pc:"pc"})[l.unit] || l.unit} · ${l.name}`;
+function card(cls, html) { const d = document.createElement("div"); d.className = "card " + cls; d.innerHTML = html; return d; }
+function renderLive() {
+  $("live").innerHTML = "";
+  for (const [sid, c] of Object.entries(live)) {
+    $("live").appendChild(card("live", `<b>${c.customer || sid}</b> <i>${c.extractor || ""}</i><ul>${(c.cart || []).map(l => `<li>${fmt(l)}</li>`).join("")}</ul><div class="t">₹${(c.total || 0).toFixed(0)}</div>`));
+  }
+}
+function beep() { try { const a = new AudioContext(), o = a.createOscillator(), g = a.createGain(); o.frequency.value = 880; o.connect(g); g.connect(a.destination); g.gain.setValueAtTime(0.2, a.currentTime); g.gain.exponentialRampToValueAtTime(0.001, a.currentTime + 0.6); o.start(); o.stop(a.currentTime + 0.6); } catch (e) {} }
+const ws = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/ws/board`);
+ws.onmessage = (ev) => {
+  const e = JSON.parse(ev.data);
+  if (e.type === "call_started") { live[e.session] = { customer: e.customer, extractor: e.extractor, cart: [], total: 0 }; }
+  else if (e.type === "cart_updated" && live[e.session]) { live[e.session].cart = e.cart; live[e.session].total = e.total; }
+  else if (e.type === "call_ended") { delete live[e.session]; }
+  else if (e.type === "order_placed") {
+    const o = e.order;
+    $("orders").prepend(card("order", `<b>${o.order_id}</b> · ${o.customer} <i>${o.register}</i><ul>${o.lines.map(l => `<li>${fmt(l)} <span>₹${l.amount.toFixed(0)}</span></li>`).join("")}</ul><div class="t">Total ₹${o.total.toFixed(0)}</div>`));
+    beep(); delete live[e.session];
+  } else if (e.type === "handoff") {
+    $("handoffs").prepend(card("handoff", `<b>${e.session}</b><div>${e.reason}</div><div class="q">“${e.transcript || ""}”</div><ul>${(e.cart || []).map(l => `<li>${fmt(l)}</li>`).join("")}</ul>`));
+    beep();
+  }
+  renderLive();
+};
+setInterval(() => $("clock").textContent = new Date().toLocaleTimeString("en-IN"), 1000);
+</script>
+</body>
+</html>

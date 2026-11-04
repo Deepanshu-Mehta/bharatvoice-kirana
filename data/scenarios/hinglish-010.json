@@ -1,0 +1,47 @@
+{
+ "id": "hinglish-010",
+ "register": "hinglish",
+ "customer": "CUST-003",
+ "voice": "Kaveri",
+ "tts_language": "hi-en",
+ "tags": [
+  "multi"
+ ],
+ "turns": [
+  "Suniye, teen packet Ghadi detergent aur do packet Good Day biscuit aur teen kilo cheeni bhej dena"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, confirm kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna hi"
+  ]
+ },
+ "gold": [
+  [
+   "cheeni-loose",
+   3,
+   "kg"
+  ],
+  [
+   "ghadi-1kg",
+   3,
+   "pkt"
+  ],
+  [
+   "good-day",
+   2,
+   "pkt"
+  ]
+ ],
+ "draft": false
+}

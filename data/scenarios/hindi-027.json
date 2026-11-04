@@ -1,0 +1,46 @@
+{
+ "id": "hindi-027",
+ "register": "hindi",
+ "customer": "CUST-003",
+ "voice": "Nalini",
+ "tts_language": "hi-IN",
+ "tags": [
+  "replace"
+ ],
+ "turns": [
+  "भैया, पाँच किलो पिल्सबरी आटा और चार पैकेट अमूल बटर चाहिए",
+  "अमूल बटर की जगह पारले जी बिस्किट दे दीजिए"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "हाँ, कर दीजिए"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "बस इतना ही"
+  ],
+  "qty": [
+   "चार पैकेट"
+  ]
+ },
+ "gold": [
+  [
+   "parle-g",
+   4,
+   "pkt"
+  ],
+  [
+   "pillsbury-atta",
+   5,
+   "kg"
+  ]
+ ],
+ "draft": false
+}

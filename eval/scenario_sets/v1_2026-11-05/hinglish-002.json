@@ -1,0 +1,47 @@
+{
+ "id": "hinglish-002",
+ "register": "hinglish",
+ "customer": "CUST-003",
+ "voice": "Girish",
+ "tts_language": "hi-en",
+ "tags": [
+  "multi"
+ ],
+ "turns": [
+  "Bhaiya, ek packet Lux sabun aur aadha litre Mother Dairy toned doodh aur ek darjan ande bhej dena"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, confirm kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna hi"
+  ]
+ },
+ "gold": [
+  [
+   "eggs",
+   12,
+   "pc"
+  ],
+  [
+   "lux",
+   1,
+   "pc"
+  ],
+  [
+   "mother-dairy-toned",
+   0.5,
+   "l"
+  ]
+ ],
+ "draft": false
+}

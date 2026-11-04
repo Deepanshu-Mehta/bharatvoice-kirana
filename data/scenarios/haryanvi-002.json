@@ -1,0 +1,47 @@
+{
+ "id": "haryanvi-002",
+ "register": "haryanvi",
+ "customer": "CUST-003",
+ "voice": "Vikrant",
+ "tts_language": "hi-en",
+ "tags": [
+  "multi"
+ ],
+ "turns": [
+  "Ram Ram bhai, sau gram haldi aur teen packet chhota Maggi aur teen packet Ghadi detergent de diyo"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, pakka kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna e"
+  ]
+ },
+ "gold": [
+  [
+   "ghadi-1kg",
+   3,
+   "pkt"
+  ],
+  [
+   "haldi",
+   0.1,
+   "kg"
+  ],
+  [
+   "maggi-70",
+   3,
+   "pkt"
+  ]
+ ],
+ "draft": true
+}

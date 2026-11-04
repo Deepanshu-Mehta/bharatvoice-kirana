@@ -1,0 +1,47 @@
+{
+ "id": "hinglish-030",
+ "register": "hinglish",
+ "customer": "CUST-003",
+ "voice": "Girish",
+ "tts_language": "hi-en",
+ "tags": [
+  "multi"
+ ],
+ "turns": [
+  "Bhaiya, chaar packet Parle-G biscuit aur dhai kilo moong dal aur ek kilo arhar dal chahiye"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, confirm kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna hi"
+  ]
+ },
+ "gold": [
+  [
+   "moong-dal",
+   2.5,
+   "kg"
+  ],
+  [
+   "parle-g",
+   4,
+   "pkt"
+  ],
+  [
+   "toor-dal-loose",
+   1,
+   "kg"
+  ]
+ ],
+ "draft": false
+}

@@ -1,0 +1,22 @@
+# DRAFT — every entry must be confirmed by at least 2 native Haryanvi speakers before the eval/demo.
+# reviewed: false  -> register detection and templates are flagged as draft in traces.
+reviewed: false
+strong_markers: [konya, koina, koniya, konia, mhara, mhare, mhari, thara, thare, thari, ram ram, ib, kit, diyo]
+weak_markers: [ke, ghana, ghani, sai, se, tau, chhora, chhori]
+negation: [konya, na]          # "konya chahiye" = don't want
+# How Prisma (hi-IN codemix) actually writes "konya" on noisy phone audio (eval 5 Nov): कौन या, कोइना, कोनिया
+konya_stt_variants: [kaun ya, kon ya, koina, koniya, konia, kauna, konyaa, koinya]
+normalise:                      # haryanvi -> hindi/hinglish, applied before rules extraction
+  konya: nahi
+  kaun ya chahiye: nahi chahiye
+  kon ya chahiye: nahi chahiye
+  koina: nahi
+  koniya: nahi
+  konia: nahi
+  koinya: nahi
+  ke ke: kya kya
+  ghana: bahut
+  ib: ab
+  kit: kahan
+  mhara: hamara
+  thara: tumhara

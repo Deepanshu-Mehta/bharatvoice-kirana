@@ -1,0 +1,46 @@
+{
+ "id": "hinglish-017",
+ "register": "hinglish",
+ "customer": "CUST-003",
+ "voice": "Shlok",
+ "tts_language": "hi-en",
+ "tags": [
+  "replace"
+ ],
+ "turns": [
+  "Haan bhaiya, aadha darjan ande aur do packet Britannia bread bhej dena",
+  "Britannia bread ki jagah Good Day biscuit de do"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, confirm kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna hi"
+  ],
+  "qty": [
+   "do packet"
+  ]
+ },
+ "gold": [
+  [
+   "eggs",
+   6,
+   "pc"
+  ],
+  [
+   "good-day",
+   2,
+   "pkt"
+  ]
+ ],
+ "draft": false
+}

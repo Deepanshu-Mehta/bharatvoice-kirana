@@ -1,0 +1,47 @@
+{
+ "id": "haryanvi-010",
+ "register": "haryanvi",
+ "customer": "CUST-003",
+ "voice": "Omkar",
+ "tts_language": "hi-en",
+ "tags": [
+  "multi"
+ ],
+ "turns": [
+  "Ram Ram bhai, aadha kilo moong dal aur dhai kilo Pillsbury atta aur sau gram haldi de diyo"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, pakka kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna e"
+  ]
+ },
+ "gold": [
+  [
+   "haldi",
+   0.1,
+   "kg"
+  ],
+  [
+   "moong-dal",
+   0.5,
+   "kg"
+  ],
+  [
+   "pillsbury-atta",
+   2.5,
+   "kg"
+  ]
+ ],
+ "draft": true
+}

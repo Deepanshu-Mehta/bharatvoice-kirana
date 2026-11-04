@@ -1,0 +1,45 @@
+{
+ "id": "haryanvi-019",
+ "register": "haryanvi",
+ "customer": "CUST-003",
+ "voice": "Vikrant",
+ "tts_language": "hi-en",
+ "tags": [
+  "descriptor",
+  "needs_clarification"
+ ],
+ "turns": [
+  "Ram Ram bhai, ek litre sarson ka tel aur teen kilo chana dal bhej diyo"
+ ],
+ "answers": {
+  "brand_choice": [
+   "Fortune wala"
+  ],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, pakka kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna e"
+  ]
+ },
+ "gold": [
+  [
+   "chana-dal",
+   3,
+   "kg"
+  ],
+  [
+   "fortune-mustard-oil",
+   1,
+   "l"
+  ]
+ ],
+ "draft": true
+}

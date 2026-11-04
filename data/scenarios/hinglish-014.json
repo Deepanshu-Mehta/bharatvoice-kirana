@@ -1,0 +1,43 @@
+{
+ "id": "hinglish-014",
+ "register": "hinglish",
+ "customer": "CUST-003",
+ "voice": "Shlok",
+ "tts_language": "hi-en",
+ "tags": [
+  "correction"
+ ],
+ "turns": [
+  "Bhaiya, ek darjan ande aur teen kilo cheeni de dena",
+  "nahi nahi, ande aadha darjan kar do"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, confirm kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna hi"
+  ]
+ },
+ "gold": [
+  [
+   "cheeni-loose",
+   3,
+   "kg"
+  ],
+  [
+   "eggs",
+   6,
+   "pc"
+  ]
+ ],
+ "draft": false
+}

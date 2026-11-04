@@ -1,0 +1,45 @@
+{
+ "id": "hinglish-003",
+ "register": "hinglish",
+ "customer": "CUST-003",
+ "voice": "Shlok",
+ "tts_language": "hi-en",
+ "tags": [
+  "brand_clash",
+  "needs_clarification"
+ ],
+ "turns": [
+  "Bhaiya, ek litre doodh aur paav kilo Aashirvaad atta bhej dena"
+ ],
+ "answers": {
+  "brand_choice": [
+   "Amul Taaza"
+  ],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, confirm kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna hi"
+  ]
+ },
+ "gold": [
+  [
+   "aashirvaad-atta",
+   0.25,
+   "kg"
+  ],
+  [
+   "amul-taaza",
+   1,
+   "l"
+  ]
+ ],
+ "draft": false
+}

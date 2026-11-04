@@ -1,0 +1,46 @@
+{
+ "id": "hindi-007",
+ "register": "hindi",
+ "customer": "CUST-003",
+ "voice": "Nalini",
+ "tts_language": "hi-IN",
+ "tags": [
+  "replace"
+ ],
+ "turns": [
+  "तीन पैकेट टाटा नमक और दो पैकेट सर्फ एक्सेल दे दीजिए",
+  "सर्फ एक्सेल की जगह गुड डे बिस्किट दे दीजिए"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "हाँ, कर दीजिए"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "बस इतना ही"
+  ],
+  "qty": [
+   "दो पैकेट"
+  ]
+ },
+ "gold": [
+  [
+   "good-day",
+   2,
+   "pkt"
+  ],
+  [
+   "tata-salt",
+   3,
+   "pkt"
+  ]
+ ],
+ "draft": false
+}

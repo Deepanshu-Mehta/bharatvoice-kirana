@@ -1,0 +1,39 @@
+{
+ "id": "hinglish-repeat",
+ "register": "hinglish",
+ "customer": "CUST-001",
+ "voice": "Kaveri",
+ "tts_language": "hi-en",
+ "tags": [
+  "repeat_order"
+ ],
+ "turns": [
+  "pichli baar wala saaman bhej do"
+ ],
+ "answers": {
+  "confirm": [
+   "haan, confirm kar do"
+  ],
+  "done": [
+   "bas itna hi"
+  ]
+ },
+ "gold": [
+  [
+   "aashirvaad-atta",
+   5,
+   "kg"
+  ],
+  [
+   "amul-taaza",
+   2,
+   "l"
+  ],
+  [
+   "tata-tea-250",
+   1,
+   "pkt"
+  ]
+ ],
+ "draft": false
+}

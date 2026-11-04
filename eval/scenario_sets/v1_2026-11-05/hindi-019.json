@@ -1,0 +1,42 @@
+{
+ "id": "hindi-019",
+ "register": "hindi",
+ "customer": "CUST-003",
+ "voice": "Deepak",
+ "tts_language": "hi-IN",
+ "tags": [
+  "descriptor",
+  "needs_clarification",
+  "needs_clarification"
+ ],
+ "turns": [
+  "आधा लीटर sarson ka tel और आधा लीटर sarson ka tel चाहिए"
+ ],
+ "answers": {
+  "brand_choice": [
+   "Fortune wala",
+   "Fortune wala"
+  ],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "हाँ, कर दीजिए"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "बस इतना ही"
+  ]
+ },
+ "gold": [
+  [
+   "fortune-mustard-oil",
+   1.0,
+   "l"
+  ]
+ ],
+ "draft": false
+}

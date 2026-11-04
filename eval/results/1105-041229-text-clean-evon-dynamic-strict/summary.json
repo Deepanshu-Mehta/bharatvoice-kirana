@@ -1,0 +1,64 @@
+{
+ "haryanvi": {
+  "n": 31,
+  "OEM": 0.71,
+  "item_F1": 0.796,
+  "questions_per_call": 0.61,
+  "handoff_rate": 0.161,
+  "hallucinated_price_rate": 0.0,
+  "unconfirmed_order_rate": 0.0,
+  "stt_p50_ms": null,
+  "stt_p95_ms": null
+ },
+ "ALL": {
+  "n": 93,
+  "OEM": 0.806,
+  "item_F1": 0.873,
+  "questions_per_call": 0.53,
+  "handoff_rate": 0.054,
+  "hallucinated_price_rate": 0.0,
+  "unconfirmed_order_rate": 0.0,
+  "stt_p50_ms": null,
+  "stt_p95_ms": null
+ },
+ "hindi": {
+  "n": 31,
+  "OEM": 0.935,
+  "item_F1": 0.952,
+  "questions_per_call": 0.29,
+  "handoff_rate": 0.0,
+  "hallucinated_price_rate": 0.0,
+  "unconfirmed_order_rate": 0.0,
+  "stt_p50_ms": null,
+  "stt_p95_ms": null
+ },
+ "hinglish": {
+  "n": 31,
+  "OEM": 0.774,
+  "item_F1": 0.871,
+  "questions_per_call": 0.68,
+  "handoff_rate": 0.0,
+  "hallucinated_price_rate": 0.0,
+  "unconfirmed_order_rate": 0.0,
+  "stt_p50_ms": null,
+  "stt_p95_ms": null
+ },
+ "_meta": {
+  "run_id": "1105-041229-text-clean-evon-dynamic-strict",
+  "args": {
+   "mode": "text",
+   "condition": "clean",
+   "registers": null,
+   "ids": null,
+   "limit": null,
+   "extractor": "evon",
+   "biasing": "dynamic",
+   "stt_format": "codemix",
+   "budget": null,
+   "dry_run": false,
+   "tag": "strict"
+  },
+  "stt_config": "prisma-v3.0|hi-IN,en-IN|codemix|dynamic|sub=1",
+  "spent_credits": 0.0
+ }
+}

@@ -1,0 +1,42 @@
+{
+ "id": "hinglish-003",
+ "register": "hinglish",
+ "customer": "CUST-003",
+ "voice": "Kaveri",
+ "tts_language": "hi-en",
+ "tags": [
+  "brand_clash",
+  "needs_clarification",
+  "needs_clarification"
+ ],
+ "turns": [
+  "Suniye, ek litre doodh aur aadha litre doodh bhej dena"
+ ],
+ "answers": {
+  "brand_choice": [
+   "Amul Taaza",
+   "Amul Taaza"
+  ],
+  "size_choice": [],
+  "substitute_offer": [
+   "haan chalega"
+  ],
+  "confirm": [
+   "haan, confirm kar do"
+  ],
+  "cancel_confirm": [
+   "haan"
+  ],
+  "done": [
+   "bas itna hi"
+  ]
+ },
+ "gold": [
+  [
+   "amul-taaza",
+   1.5,
+   "l"
+  ]
+ ],
+ "draft": false
+}

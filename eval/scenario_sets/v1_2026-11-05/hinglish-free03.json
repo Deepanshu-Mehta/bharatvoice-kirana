@@ -1,0 +1,33 @@
+{
+ "id": "hinglish-free03",
+ "register": "hinglish",
+ "customer": "CUST-003",
+ "voice": "Girish",
+ "tts_language": "hi-en",
+ "tags": [
+  "freeform"
+ ],
+ "turns": [
+  "nahane wala sabun, laal wala, Lifebuoy, do piece"
+ ],
+ "answers": {
+  "brand_choice": [],
+  "confirm": [
+   "haan, confirm kar do"
+  ],
+  "done": [
+   "bas itna hi"
+  ],
+  "substitute_offer": [
+   "haan chalega"
+  ]
+ },
+ "gold": [
+  [
+   "lifebuoy",
+   2,
+   "pc"
+  ]
+ ],
+ "draft": true
+}
