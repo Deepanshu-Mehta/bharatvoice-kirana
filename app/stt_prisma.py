@@ -33,10 +33,12 @@ class STTConfig:
     format: str | None = os.environ.get("STT_FORMAT", "codemix")  # keeps spoken numbers ("paav" stays a word)
     biasing: str = os.environ.get("STT_BIASING", "dynamic")  # none | static | dynamic
     substitution: bool = os.environ.get("STT_SUBSTITUTION", "1") == "1"
+    second_opinion: bool = os.environ.get("STT_SECOND_OPINION", "0") == "1"  # plan T4
     extra_keyterms: list[str] = field(default_factory=list)
 
     def name(self) -> str:
-        return f"{self.model}|{self.language_code}|{self.format}|{self.biasing}|sub={int(self.substitution)}"
+        return (f"{self.model}|{self.language_code}|{self.format}|{self.biasing}|sub={int(self.substitution)}"
+                f"|2nd={int(self.second_opinion)}")
 
 
 def load_substitutions() -> list[dict]:
@@ -92,13 +94,55 @@ def to_wav16k(audio: bytes) -> tuple[bytes, float]:
     return buf.getvalue(), len(data) / 16000.0
 
 
+def parse_score(transcript: str, session=None) -> tuple[float, bool]:
+    """How well the agent can understand this transcript: (score, weak). Uses the same extractor + resolver."""
+    from app.brain.dm import TAU_LOW
+    from app.brain.extract_rules import Context, extract
+    from app.brain.resolver import Resolver
+    global _res
+    try:
+        _res
+    except NameError:
+        _res = Resolver()
+    words = transcript.split()
+    if not words:
+        return 0.0, False
+    ctx = Context(pending=session.pending.kind if session is not None and session.pending else None,
+                  awaiting_confirm=bool(session is not None and session.awaiting_confirm))
+    f = extract(transcript, ctx)
+    if not f.actions:
+        return 0.0, len(words) >= 2
+    score, weak = 0.0, False
+    for a in f.actions:
+        if a.type == "add" and a.product_phrase:
+            r = _res.resolve(a.product_phrase, k=3)
+            p = r.p_correct if r.candidates else 0.0
+            score += p
+            weak |= p < TAU_LOW
+        else:
+            score += 1.0
+    return score / len(f.actions), weak
+
+
 def transcribe(audio: bytes, session=None, cfg: STTConfig | None = None, client: GnaniClient | None = None,
                filename: str = "utt.wav") -> dict:
     cfg = cfg or STTConfig()
     client = client or get_client()
     ctx = build_context(session, cfg)
+    subs = load_substitutions() if cfg.substitution else None
     r = client.stt(audio, filename, model=cfg.model, language_code=cfg.language_code, format=cfg.format,
-                   substitution_map=load_substitutions() if cfg.substitution else None, **ctx)
+                   substitution_map=subs, **ctx)
     r["_config"] = cfg.name()
     r["_context"] = {k: (v if k != "keyterms" else len(v)) for k, v in ctx.items()}
+    if cfg.second_opinion and cfg.model == "prisma-v3.0":
+        s1, weak = parse_score(r.get("transcript", ""), session)
+        if weak:  # only hard turns pay for a second call (one-request limit: sequential, ~0.2-0.3 s)
+            r2 = client.stt(audio, filename, model="prisma-v3.0", language_code="indic-auto", format="transliterate",
+                            substitution_map=subs, **ctx)
+            s2, _ = parse_score(r2.get("transcript", ""), session)
+            r["_second_opinion"] = {"primary": round(s1, 3), "translit": round(s2, 3), "chosen": "primary"}
+            if s2 > s1 + 0.05:
+                r["_second_opinion"]["chosen"] = "translit"
+                r["_primary_transcript"] = r.get("transcript", "")
+                r["transcript"] = r2.get("transcript", "")
     return r

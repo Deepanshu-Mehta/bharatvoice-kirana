@@ -110,9 +110,13 @@ All numbers come from `eval/` runs (`eval/results/<run_id>/summary.json`). Test 
 - Genuine Prisma confusions were curated by hand: "type powder" → Tide, "rind" → Rin, "broke bond" → Red Label, "klinik" → Clinic Plus, "traffic chana" → Kabuli Chana.
 - **Held-out** name resolution, using voices never used in mining: **75.0% → 90.3%**.
 
-**5. Safety.** Hallucinated-price rate **0** and unconfirmed-order rate **0** in every run, including Evon-only runs.
+**5. Hardest channel and a negative result** (G.711 + 5 dB SNR + 2% packet loss, n = 68):
+- OEM is 0.71 overall: Hinglish 0.53, Haryanvi 0.88. Compare Hinglish at 0.90 on the 10 dB channel.
+- A "second opinion" (re-transcribe weak turns with `format=transliterate` and keep the hypothesis the resolver trusts more) re-transcribed 17% of turns but did **not** help (0.69). It is off by default.
 
-**6. Latency** (server side, end of speech to first agent audio): STT ≈ 0.2–0.5 s + agent logic ≈ 0.01–0.15 s + first TTS chunk ≈ 0.3–0.6 s ≈ **0.9 s**. Add about 0.45 s of browser end-pointing for what the caller feels.
+**6. Safety.** Hallucinated-price rate **0** and unconfirmed-order rate **0** in every run, including Evon-only runs.
+
+**7. Latency** (server side, end of speech to first agent audio): STT ≈ 0.2–0.5 s + agent logic ≈ 0.01–0.15 s + first TTS chunk ≈ 0.3–0.6 s ≈ **0.9 s**. Add about 0.45 s of browser end-pointing for what the caller feels.
 
 ## What we learned about Gnani's models
 - **Number normalisation:** Prisma's default ITN turned "paav kilo" (¼ kg) into "0.5 किलो". `format=codemix` keeps spoken numbers, so we parse fractions ourselves.
@@ -170,7 +174,8 @@ app/
     templates.py      register-aware replies (Hinglish / Hindi / Haryanvi)
   static/             call page, board
 data/                 catalog.yaml, customers, Haryanvi lexicon, scenarios, mined aliases, substitution rules
-eval/                 runner, phone channel, scenario generator, alias mining, held-out check, results/
+eval/                 runner (text / audio / real-speaker modes), phone channel, scenario generator, STT bake-off,
+                      alias mining, held-out check, results/
 infra/                Modal/vLLM deployment, smoke tests, voice-clone check, phrase pre-cache
 tests/                172 offline tests
 ```
@@ -193,6 +198,14 @@ Deploy your own with `uv run modal deploy infra/modal_app.py`.
 - Measured costs: STT ≈ 0.0056 credits/s and TTS ≈ 0.0018 credits/char.
 - All evaluation so far used about 1–2% of the 5,000 programme credits.
 - Evon runs on Modal: at most one container, scale-to-zero after 10 idle minutes, endpoint protected by an API key.
+
+## Recording real speakers
+`http://localhost:8080/record` (local only, disabled in the public demo):
+- Speakers pick an alias, read and tick a consent statement, then record each prompt their own way. Clips auto-stop at 20 s and can be played back.
+- Two prompt sets: the 30-prompt STT bake-off, or full order conversations per register.
+- Clips are saved to the gitignored `data/real/`. Evaluate them with:
+  - `uv run python -m eval.bakeoff --source real --budget 10`
+  - `uv run python -m eval.run --mode real --speaker <alias> --budget 10`
 
 ## Data policy
 **Synthetic data only.**

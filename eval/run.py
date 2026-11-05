@@ -81,7 +81,17 @@ def next_customer_text(s: Session, sc: dict, queue: list[str], answers: dict, la
     return (answers.get("done") or ["bas itna hi"])[0]
 
 
-def run_scenario(sc: dict, mode: str, condition: str, cfg: STTConfig, extractor, babble: list[bytes]) -> dict:
+REAL = ROOT / "data" / "real" / "scenarios"
+
+
+def real_clip(speaker: str, sc_id: str, text: str) -> bytes | None:
+    """Recorded clip for this scenario line (recorded via /record, set=scenarios:<register>)."""
+    p = REAL / speaker / f"{sc_id}__{hashlib.sha1(text.encode()).hexdigest()[:8]}.wav"
+    return p.read_bytes() if p.exists() else None
+
+
+def run_scenario(sc: dict, mode: str, condition: str, cfg: STTConfig, extractor, babble: list[bytes],
+                 speaker: str = "") -> dict:
     client = get_client()
     s = Session(sc["customer"], extractor=extractor, session_id=f"eval-{sc['id']}")
     s.greet()
@@ -94,14 +104,19 @@ def run_scenario(sc: dict, mode: str, condition: str, cfg: STTConfig, extractor,
         text = next_customer_text(s, sc, queue, answers, last, reprompted)
         last = text
         rec = {"step": step, "said": text}
-        if mode == "audio":
-            wav = client.tts(text, sc["voice"], model="timbre-v2.5", language=sc["tts_language"])
+        if mode in ("audio", "real"):
+            wav = real_clip(speaker, sc["id"], text) if mode == "real" else None
+            rec["real_voice"] = wav is not None
+            if wav is None:
+                wav = client.tts(text, sc["voice"], model="timbre-v2.5", language=sc["tts_language"])
             seed = int(hashlib.sha1(f"{sc['id']}|{step}".encode()).hexdigest()[:8], 16)
             wav = apply(wav, condition, seed=seed, babble=[b for b in babble if b != wav][:4])
             t0 = time.perf_counter()
             r = transcribe(wav, s, cfg, filename="turn.wav")
             rec["stt_ms"] = round((time.perf_counter() - t0) * 1000)
             rec["stt_cached"] = r.get("_cached")
+            if r.get("_second_opinion"):
+                rec["second_opinion"] = r["_second_opinion"]
             heard = r.get("transcript", "")
         else:
             heard = text
@@ -122,7 +137,9 @@ def run_scenario(sc: dict, mode: str, condition: str, cfg: STTConfig, extractor,
     cart = [(l["sku"], l["qty"], l["unit"]) for l in s.cart_snapshot()]
     final = [(l["sku"], l["qty"], l["unit"]) for l in s.order["lines"]] if s.order else None
     price_ok = all(abs(l["price"] - s.cat.get(l["sku"]).price) < 1e-9 for l in (s.order or {}).get("lines", []))
+    real_turns = sum(1 for st in steps if st.get("real_voice"))
     return {"id": sc["id"], "register": sc["register"], "tags": sc["tags"], "draft": sc.get("draft", False),
+            "real_voice_turns": real_turns,
             "gold": sc["gold"], "final": final, "cart": cart, "handoff": s.handed_off, "steps": steps,
             "questions": questions, "n_steps": len(steps), "hallucinated_price": not price_ok,
             "unconfirmed_order": bool(s.order) and readbacks == 0, **score(final, cart, sc["gold"])}
@@ -160,7 +177,8 @@ def summarize(rows: list[dict]) -> dict:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--mode", choices=["text", "audio"], default="text")
+    ap.add_argument("--mode", choices=["text", "audio", "real"], default="text")
+    ap.add_argument("--speaker", default="", help="real mode: speaker alias used on /record")
     ap.add_argument("--condition", choices=list(CONDITIONS), default="clean")
     ap.add_argument("--registers", nargs="*")
     ap.add_argument("--ids", nargs="*")
@@ -168,6 +186,7 @@ def main() -> None:
     ap.add_argument("--extractor", choices=["rules", "evon", "hybrid"], default="rules")
     ap.add_argument("--biasing", choices=["none", "static", "dynamic"], default="dynamic")
     ap.add_argument("--stt-format", default="codemix")
+    ap.add_argument("--second-opinion", action="store_true", help="plan T4: re-transcribe weak turns (translit)")
     ap.add_argument("--budget", type=float, help="credit budget for this run (required in audio mode)")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--tag", default="")
@@ -179,7 +198,13 @@ def main() -> None:
           f"biasing={a.biasing} | worst-case ~{calls} API calls, ~{est:.2f} credits (cache hits cost 0)")
     if a.dry_run:
         return
-    if a.mode == "audio" and a.budget is None:
+    if a.mode == "real":
+        if not a.speaker:
+            raise SystemExit("real mode needs --speaker")
+        have = {p.stem.split("__")[0] for p in (REAL / a.speaker).glob("*.wav")}
+        scenarios = [sc for sc in scenarios if sc["id"] in have]
+        print(f"real mode: {len(scenarios)} scenarios have recordings from {a.speaker}")
+    if a.mode in ("audio", "real") and a.budget is None:
         raise SystemExit("audio mode needs --budget <credits> (see the dry-run estimate)")
     extractor = rules_extract
     if a.extractor in ("evon", "hybrid"):
@@ -188,12 +213,13 @@ def main() -> None:
         if a.extractor == "hybrid":
             from app.brain.extract_hybrid import HybridExtractor
             extractor = HybridExtractor(extractor)
-    cfg = STTConfig(format=a.stt_format or None, biasing=a.biasing)
-    run_id = time.strftime("%m%d-%H%M%S") + f"-{a.mode}-{a.condition}-{a.extractor}-{a.biasing}{('-' + a.tag) if a.tag else ''}"
+    cfg = STTConfig(format=a.stt_format or None, biasing=a.biasing, second_opinion=a.second_opinion)
+    run_id = (time.strftime("%m%d-%H%M%S") + f"-{a.mode}-{a.condition}-{a.extractor}-{a.biasing}"
+              + ("-2nd" if a.second_opinion else "") + (f"-{a.tag}" if a.tag else ""))
     out_dir = RESULTS / run_id
     out_dir.mkdir(parents=True, exist_ok=True)
     babble = []
-    if a.mode == "audio":
+    if a.mode in ("audio", "real"):
         babble = [p.read_bytes() for p in sorted((ROOT / "eval" / "cache" / "tts").glob("*.wav"))[:8]]
     rows = []
     client = get_client()
@@ -201,7 +227,7 @@ def main() -> None:
         with (out_dir / "calls.jsonl").open("w") as f:
             for sc in scenarios:
                 try:
-                    row = run_scenario(sc, a.mode, a.condition, cfg, extractor, babble)
+                    row = run_scenario(sc, a.mode, a.condition, cfg, extractor, babble, a.speaker)
                 except GnaniAPIError as e:  # one flaky API call must not lose the whole run
                     print(f"! {sc['id']}: API error {e.status}, skipped (not counted)")
                     continue

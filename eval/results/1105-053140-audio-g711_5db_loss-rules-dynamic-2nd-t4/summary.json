@@ -1,0 +1,58 @@
+{
+ "haryanvi": {
+  "n": 34,
+  "OEM": 0.882,
+  "item_F1": 0.95,
+  "questions_per_call": 0.59,
+  "handoff_rate": 0.059,
+  "hallucinated_price_rate": 0.0,
+  "unconfirmed_order_rate": 0.0,
+  "stt_p50_ms": 190,
+  "stt_p95_ms": 216
+ },
+ "ALL": {
+  "n": 68,
+  "OEM": 0.691,
+  "item_F1": 0.829,
+  "questions_per_call": 0.76,
+  "handoff_rate": 0.162,
+  "hallucinated_price_rate": 0.0,
+  "unconfirmed_order_rate": 0.0,
+  "stt_p50_ms": 184,
+  "stt_p95_ms": 415
+ },
+ "hinglish": {
+  "n": 34,
+  "OEM": 0.5,
+  "item_F1": 0.708,
+  "questions_per_call": 0.94,
+  "handoff_rate": 0.265,
+  "hallucinated_price_rate": 0.0,
+  "unconfirmed_order_rate": 0.0,
+  "stt_p50_ms": 180,
+  "stt_p95_ms": 415
+ },
+ "_meta": {
+  "run_id": "1105-053140-audio-g711_5db_loss-rules-dynamic-2nd-t4",
+  "args": {
+   "mode": "audio",
+   "speaker": "",
+   "condition": "g711_5db_loss",
+   "registers": [
+    "hinglish",
+    "haryanvi"
+   ],
+   "ids": null,
+   "limit": null,
+   "extractor": "rules",
+   "biasing": "dynamic",
+   "stt_format": "codemix",
+   "second_opinion": true,
+   "budget": 12.0,
+   "dry_run": false,
+   "tag": "t4"
+  },
+  "stt_config": "prisma-v3.0|hi-IN,en-IN|codemix|dynamic|sub=1|2nd=1",
+  "spent_credits": 0.7365120000000001
+ }
+}

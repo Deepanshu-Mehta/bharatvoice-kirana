@@ -378,3 +378,83 @@ async def voicenote_confirm(did: str):
     for e in s._events:
         await broadcast(e)
     return _draft_view(did, s, "")
+
+
+# ---------------------------------------------------------------- /record: consented real-speaker recordings (local only)
+import hashlib as _hashlib
+import re as _re
+
+REAL_DIR = ROOT / "data" / "real"
+CONSENT_TEXT = ("I agree that my voice recordings may be used to evaluate the BharatVoice project for the Gnani.ai "
+                "challenge. Recordings stay on the project laptop and are not published without my separate permission.")
+
+
+def _no_public():
+    if PUBLIC_DEMO:
+        raise HTTPException(404, "not available in the public demo")
+
+
+def scenario_prompt_id(sc_id: str, text: str) -> str:
+    return f"{sc_id}__{_hashlib.sha1(text.encode()).hexdigest()[:8]}"
+
+
+def prompts_for(set_name: str, max_scenarios: int = 8) -> list[dict]:
+    if set_name == "bakeoff":
+        return yaml.safe_load((ROOT / "data" / "prompts" / "bakeoff.yaml").read_text())["prompts"]
+    if set_name.startswith("scenarios:"):  # e.g. scenarios:haryanvi -> every turn/answer of that register's scenarios
+        reg = set_name.split(":", 1)[1]
+        out = []
+        for p in sorted((ROOT / "data" / "scenarios").glob(f"{reg}-*.json"))[:max_scenarios]:
+            sc = json.loads(p.read_text())
+            texts = list(sc["turns"]) + [x for v in sc["answers"].values() for x in v]
+            for t in dict.fromkeys(texts):
+                out.append({"id": scenario_prompt_id(sc["id"], t), "register": reg, "text": t, "scenario": sc["id"]})
+        return out
+    raise HTTPException(400, "unknown set")
+
+
+@app.get("/record")
+def record_page():
+    _no_public()
+    return FileResponse(STATIC / "record.html")
+
+
+@app.get("/api/record/prompts")
+def record_prompts(set: str = "bakeoff", speaker: str = "", max_scenarios: int = 8):
+    _no_public()
+    spk = _re.sub(r"[^A-Za-z0-9_-]", "", speaker)[:32]
+    folder = REAL_DIR / set.split(":")[0] / spk if spk else None
+    done = {p.stem for p in folder.glob("*.wav")} if folder and folder.exists() else set()
+    return {"consent_text": CONSENT_TEXT,
+            "prompts": [{**p, "done": p["id"] in done} for p in prompts_for(set, max_scenarios)]}
+
+
+@app.post("/api/record")
+async def record_save(file: UploadFile = File(...), speaker: str = Form(...), prompt_id: str = Form(...),
+                      set: str = Form("bakeoff"), text_said: str = Form(""),
+                      reg: str = Form("", alias="register"), consent: str = Form("")):
+    _no_public()
+    if consent != "yes":
+        raise HTTPException(400, "consent required")
+    spk = _re.sub(r"[^A-Za-z0-9_-]", "", speaker)[:32]
+    pid = _re.sub(r"[^A-Za-z0-9_-]", "", prompt_id)[:64]
+    if not spk or not pid:
+        raise HTTPException(400, "bad speaker or prompt id")
+    wav = await asyncio.to_thread(_decode_any, await file.read())
+    import io as _io
+    import soundfile as _sf
+    secs = _sf.info(_io.BytesIO(wav)).duration
+    if secs < 0.4 or secs > 30:
+        raise HTTPException(400, f"clip is {secs:.1f}s; keep it between 0.4 and 30 s")
+    folder = REAL_DIR / set.split(":")[0] / spk
+    folder.mkdir(parents=True, exist_ok=True)
+    (folder / f"{pid}.wav").write_bytes(wav)
+    with (folder / "manifest.jsonl").open("a") as f:
+        f.write(json.dumps({"prompt_id": pid, "text_said": text_said, "register": reg, "set": set,
+                            "seconds": round(secs, 2), "ts": time.time()}, ensure_ascii=False) + "\n")
+    consent_log = REAL_DIR / "consent.jsonl"
+    seen = consent_log.read_text() if consent_log.exists() else ""
+    if f'"speaker": "{spk}"' not in seen:
+        with consent_log.open("a") as f:
+            f.write(json.dumps({"speaker": spk, "statement": CONSENT_TEXT, "ts": time.time()}) + "\n")
+    return {"ok": True, "seconds": round(secs, 2)}

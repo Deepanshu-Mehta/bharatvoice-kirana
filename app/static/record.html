@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>BharatVoice · record</title>
+<link rel="stylesheet" href="/static/style.css">
+<style>
+  .rec { max-width: 780px; margin: 24px auto; display: grid; gap: 14px; }
+  .rec textarea { width: 100%; font: inherit; font-size: 20px; padding: 12px; border-radius: 10px; border: 1px solid var(--line); min-height: 90px; }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .big { font-size: 17px; padding: 12px 20px; }
+  .recording { background: #b91c1c !important; }
+  .plist { display: flex; flex-wrap: wrap; gap: 6px; }
+  .plist span { font-size: 12px; padding: 3px 8px; border-radius: 99px; background: #f1ece4; cursor: pointer; }
+  .plist span.done { background: #dcfce7; color: #166534; } .plist span.cur { outline: 2px solid var(--ink); }
+  .consent { background: #fff7ed; border: 1px solid #fed7aa; padding: 10px 12px; border-radius: 10px; font-size: 14px; }
+  .meta { color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+<header><div class="brand">BharatVoice <span>· recording session</span></div></header>
+<div class="rec">
+  <div class="row">
+    <input id="speaker" placeholder="Speaker alias (e.g. spk1, no real name needed)">
+    <select id="set">
+      <option value="bakeoff">STT bake-off (30 prompts)</option>
+      <option value="scenarios:haryanvi">Haryanvi order conversations</option>
+      <option value="scenarios:hinglish">Hinglish order conversations</option>
+      <option value="scenarios:hindi">Hindi order conversations</option>
+    </select>
+    <button id="load">Load</button>
+  </div>
+  <label class="consent"><input type="checkbox" id="consent"> <span id="consentText"></span></label>
+  <div class="meta" id="pmeta"></div>
+  <textarea id="text"></textarea>
+  <div class="meta">Say it the way you normally would. If you change the words, edit the text above to match what you said (keep the items and quantities).</div>
+  <div class="row">
+    <button id="recbtn" class="big">● Record</button>
+    <button id="play" disabled>▶ Play</button>
+    <button id="save" disabled>Save &amp; next</button>
+    <button id="skip">Skip</button>
+    <span id="status" class="meta"></span>
+  </div>
+  <div class="plist" id="plist"></div>
+</div>
+<script>
+const $ = (id) => document.getElementById(id);
+let prompts = [], idx = 0, rec = null, chunks = [], blob = null, timer = null;
+async function load() {
+  const r = await fetch(`/api/record/prompts?set=${encodeURIComponent($("set").value)}&speaker=${encodeURIComponent($("speaker").value)}`);
+  const d = await r.json(); $("consentText").textContent = d.consent_text; prompts = d.prompts;
+  idx = Math.max(0, prompts.findIndex(p => !p.done)); show();
+}
+function show() {
+  const p = prompts[idx]; if (!p) return;
+  $("text").value = p.text; $("pmeta").textContent = `${idx + 1}/${prompts.length} · ${p.id} · ${p.register}${p.scenario ? " · " + p.scenario : ""}`;
+  $("plist").innerHTML = prompts.map((q, i) => `<span class="${q.done ? "done" : ""} ${i === idx ? "cur" : ""}" onclick="idx=${i};show()">${i + 1}</span>`).join("");
+  blob = null; $("play").disabled = true; $("save").disabled = true; $("status").textContent = "";
+}
+async function toggleRec() {
+  if (rec && rec.state === "recording") { rec.stop(); return; }
+  if (!$("consent").checked) { alert("Please read and tick the consent box first."); return; }
+  if (!$("speaker").value.trim()) { alert("Enter a speaker alias."); return; }
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  rec = new MediaRecorder(stream); chunks = [];
+  rec.ondataavailable = (e) => chunks.push(e.data);
+  rec.onstop = () => { stream.getTracks().forEach(t => t.stop()); clearTimeout(timer); blob = new Blob(chunks, { type: rec.mimeType });
+    $("recbtn").classList.remove("recording"); $("recbtn").textContent = "● Record"; $("play").disabled = false; $("save").disabled = false; $("status").textContent = "recorded"; };
+  rec.start(); $("recbtn").classList.add("recording"); $("recbtn").textContent = "■ Stop"; $("status").textContent = "recording… (auto-stops at 20 s)";
+  timer = setTimeout(() => rec.state === "recording" && rec.stop(), 20000);
+}
+$("recbtn").onclick = toggleRec;
+$("play").onclick = () => blob && new Audio(URL.createObjectURL(blob)).play();
+$("skip").onclick = () => { idx = Math.min(prompts.length - 1, idx + 1); show(); };
+$("save").onclick = async () => {
+  const p = prompts[idx], f = new FormData();
+  f.append("file", blob, "clip.webm"); f.append("speaker", $("speaker").value.trim()); f.append("prompt_id", p.id);
+  f.append("set", $("set").value); f.append("text_said", $("text").value); f.append("register", p.register); f.append("consent", "yes");
+  const r = await fetch("/api/record", { method: "POST", body: f });
+  if (!r.ok) { $("status").textContent = "error: " + (await r.text()); return; }
+  p.done = true; idx = Math.min(prompts.length - 1, idx + 1); show(); $("status").textContent = "saved ✓";
+};
+$("load").onclick = load; load();
+</script>
+</body>
+</html>

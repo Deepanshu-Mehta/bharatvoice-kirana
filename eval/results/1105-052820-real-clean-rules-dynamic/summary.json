@@ -1,0 +1,21 @@
+{
+ "_meta": {
+  "run_id": "1105-052820-real-clean-rules-dynamic",
+  "args": {
+   "mode": "real",
+   "speaker": "nobody",
+   "condition": "clean",
+   "registers": null,
+   "ids": null,
+   "limit": null,
+   "extractor": "rules",
+   "biasing": "dynamic",
+   "stt_format": "codemix",
+   "budget": 1.0,
+   "dry_run": false,
+   "tag": ""
+  },
+  "stt_config": "prisma-v3.0|hi-IN,en-IN|codemix|dynamic|sub=1",
+  "spent_credits": 0.0
+ }
+}
