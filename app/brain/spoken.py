@@ -49,7 +49,7 @@ WORDS.update({
     "theek": "ठीक", "toh": "तो", "udhaar": "उधार", "uplabdh": "उपलब्ध", "vinamra": "विनम्र", "wahi": "वही",
     "wala": "वाला", "wale": "वाले", "woh": "वो", "ya": "या", "yaad": "याद", "yahi": "यही", "zyada": "ज़्यादा",
     "ram": "राम", "ne": "ने", "achha": "अच्छा", "pahunch": "पहुँच", "jayega": "जाएगा", "daam": "दाम", "kam": "कम",
-    "yeh": "यह", "bas": "बस",
+    "yeh": "यह", "bas": "बस", "munshi": "मुंशी", "general": "जनरल", "store": "स्टोर", "aaj": "आज", "sharma": "शर्मा", "gupta": "गुप्ता", "tau": "ताऊ",
     # Haryanvi (DRAFT spellings, to be confirmed by native speakers with the rest of the lexicon)
     "aala": "आला", "du": "दूँ", "diyo": "दियो", "fer": "फेर", "ghana": "घणा", "had": "हद", "ib": "इब",
     "jyaga": "ज्यागा", "bhejange": "भेजांगे", "karange": "करांगे", "konya": "कोन्या", "rya": "र्या", "san": "सां",

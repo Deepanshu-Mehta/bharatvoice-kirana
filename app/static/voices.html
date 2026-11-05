@@ -22,12 +22,22 @@
 <body>
 <header class="top"><a class="wordmark" href="/">BharatVoice <small>voice lab</small></a></header>
 <main class="lab">
-  <h1>Which shop voice sounds like a person?</h1>
+  <h1>Round 2: Munshi ji, the shop's clerk</h1>
+  <p>Greets regulars by name, remembers the usual, writes the parchi. Same persona in every male voice, plus a brisker counter pace for two of them. <b>Greeting</b> and <b>Haryanvi</b> show the warmth; <b>Remembers</b> shows the personality.</p>
+  <table><thead><tr><th></th><th>Voice</th><th>Greeting</th><th>Remembers</th><th>Readback</th><th>Haryanvi</th><th>Phone-line error</th></tr></thead><tbody id="rows2"></tbody></table>
+  <h1 style="margin-top:2.5rem">Round 1: which shop voice sounds like a person?</h1>
   <p>Same four lines in each setup. Listen with headphones and pick the one that sounds most like a real kirana bhaiya on the phone. “Phone-line error” is how much Prisma mishears that voice after an 8&nbsp;kHz call with shop noise (lower is clearer).</p>
   <table><thead><tr><th></th><th>Setup</th><th>Greeting</th><th>Question</th><th>Readback</th><th>Shop calls you</th><th>Phone-line error</th></tr></thead><tbody id="rows"></tbody></table>
   <p class="line" id="lines"></p>
 </main>
 <script>
+fetch("/api/voicelab?round=2").then(r => r.json()).then(rows => {
+  const order = ["greet", "clarify", "readback", "outbound"];
+  document.getElementById("rows2").innerHTML = rows.map(r => `<tr><td class="id">${r.id}</td>
+    <td class="lbl"><b>${r.label}</b><small>${r.model}, ${r.voice}, speed ${r.speed}</small></td>
+    ${order.map(n => `<td><audio controls preload="none" src="/voicelab/${r.id}-${n}.wav"></audio></td>`).join("")}
+    <td class="cer">${(r.mean_cer * 100).toFixed(1)}%</td></tr>`).join("");
+});
 fetch("/api/voicelab").then(r => r.json()).then(rows => {
   const order = ["greet", "clarify", "readback", "outbound"];
   document.getElementById("rows").innerHTML = rows.map(r => `<tr><td class="id">${r.id}</td>

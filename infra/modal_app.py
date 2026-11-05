@@ -84,4 +84,14 @@ def seed_cache():
                     if local.exists():
                         batch.put_file(str(local), f"/cache/tts/{key}.wav")
                         n += 1
+        import yaml
+        from app.brain.templates import render
+        for cid, cust in yaml.safe_load((ROOT / "data" / "customers.yaml").read_text()).items():
+            for reg in ("hinglish", "hindi", "haryanvi"):  # "Namaste Sharma ji!" plays instantly for regulars
+                text = render("greet_known", reg, name=cust["name"], shop="Sharma General Store")
+                _, key = c._tts_body(spoken_text(text), VOICE, MODEL, LANG, 1.0, 16000, None)
+                local = ROOT / "eval" / "cache" / "tts" / f"{key}.wav"
+                if local.exists():
+                    batch.put_file(str(local), f"/cache/tts/{key}.wav")
+                    n += 1
     print(f"uploaded {n} cached phrases")

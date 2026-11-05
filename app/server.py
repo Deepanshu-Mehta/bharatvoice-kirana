@@ -576,9 +576,9 @@ def voices_page():
 
 
 @app.get("/api/voicelab")
-def voicelab_results():
+def voicelab_results(round: int = 1):
     _no_public()
-    p = VOICELAB / "results.json"
+    p = VOICELAB / ("results.json" if round == 1 else f"results{round}.json")
     return json.loads(p.read_text()) if p.exists() else []
 
 

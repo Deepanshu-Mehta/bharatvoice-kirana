@@ -56,18 +56,42 @@ SETUPS = [
 ]
 
 
+# Round 2: the "Munshi ji" persona (greets regulars by name, remembers the usual) across male v3.0 voices
+MUNSHI = {
+    "greet": "नमस्ते शर्मा जी! शर्मा जनरल स्टोर से, मैं दुकान का AI मुंशी बोल रहा हूँ। <pauses> बोलिए, आज क्या भेजूँ?",
+    "clarify": "अच्छा जी, Aashirvaad आटा, वही पिछली बार जितना, पाँच किलो? <pauses> भेज दूँ?",
+    "readback": "ठीक है शर्मा जी। तो पाँच किलो Aashirvaad आटा, और दो लीटर Amul Taaza दूध। कुल ₹372 हुए। <pauses> Confirm कर दूँ?",
+    "outbound": "राम राम ताऊ जी! शर्मा जनरल स्टोर तै, मैं दुकान का AI मुंशी बोल र्या सूँ। <pauses> बोलो, आज के भेजूँ?",
+}
+ROUND2 = [
+    ("M1", "Yashraj, warm", "timbre-v3.0", "Yashraj", "auto", MUNSHI, 1.0),
+    ("M2", "Yashraj, warm, brisk counter pace", "timbre-v3.0", "Yashraj", "auto", MUNSHI, 1.08),
+    ("M3", "Devansh, conversational", "timbre-v3.0", "Devansh", "auto", MUNSHI, 1.0),
+    ("M4", "Devansh, conversational, brisk", "timbre-v3.0", "Devansh", "auto", MUNSHI, 1.08),
+    ("M5", "Prakash, professional", "timbre-v3.0", "Prakash", "auto", MUNSHI, 1.0),
+    ("M6", "Harshad, professional", "timbre-v3.0", "Harshad", "auto", MUNSHI, 1.0),
+    ("M7", "Avinash, professional", "timbre-v3.0", "Avinash", "auto", MUNSHI, 1.0),
+    ("M8", "Shubham, expressive and energetic", "timbre-v3.0", "Shubham", "auto", MUNSHI, 1.0),
+]
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--budget", type=float, default=6)
+    ap.add_argument("--round", type=int, default=1)
     a = ap.parse_args()
+    setups = SETUPS if a.round == 1 else ROUND2
     OUT.mkdir(parents=True, exist_ok=True)
     c = get_client()
     results = []
-    with c.run("voicelab", budget=a.budget):
-        for sid, label, model, voice, lang, lines in SETUPS:
-            row = {"id": sid, "label": label, "model": model, "voice": voice, "clips": {}, "cer": {}}
+    run_id = "voicelab" if a.round == 1 else f"voicelab{a.round}"
+    with c.run(run_id, budget=a.budget):
+        for setup in setups:
+            sid, label, model, voice, lang, lines = setup[:6]
+            speed = setup[6] if len(setup) > 6 else 1.0
+            row = {"id": sid, "label": label, "model": model, "voice": voice, "speed": speed, "clips": {}, "cer": {}}
             for name, text in lines.items():
-                wav = c.tts(text, voice, model=model, language=lang)
+                wav = c.tts(text, voice, model=model, language=lang, speed=speed)
                 (OUT / f"{sid}-{name}.wav").write_bytes(wav)
                 heard = c.stt(apply(wav, "g711_10db", seed=7), "v.wav", model="prisma-v3.0",
                               language_code="hi-IN,en-IN", format="codemix").get("transcript", "")
@@ -77,8 +101,9 @@ def main() -> None:
             row["mean_cer"] = round(sum(row["cer"].values()) / len(row["cer"]), 3)
             results.append(row)
             print(f"{sid} {label:55s} phone-line CER {row['mean_cer']:.3f}")
-    (OUT / "results.json").write_text(json.dumps(results, ensure_ascii=False, indent=1))
-    print(f"spent ~{c.spent_in_run('voicelab'):.3f} credits; listen at http://localhost:8080/voices")
+    (OUT / ("results.json" if a.round == 1 else f"results{a.round}.json")).write_text(
+        json.dumps(results, ensure_ascii=False, indent=1))
+    print(f"spent ~{c.spent_in_run(run_id):.3f} credits; listen at http://localhost:8080/voices")
 
 
 if __name__ == "__main__":

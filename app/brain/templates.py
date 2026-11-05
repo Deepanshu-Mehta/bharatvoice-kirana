@@ -8,10 +8,17 @@ from __future__ import annotations
 from app.brain.text import number_to_hindi, rupees_to_hindi
 
 T: dict[str, dict[str, str]] = {
+    # Persona: "Munshi ji", the shop's clerk who writes the parchi and the khata. Honest ("AI munshi"),
+    # trusted, and greets regulars by name, which is what makes a shop on the phone sound human.
     "greet": {
-        "hinglish": "Namaste! Main {shop} ka AI assistant hoon. Boliye, kya bhejna hai?",
-        "hindi": "Namaste! Main {shop} ka AI sahayak hoon. Bataiye, kya chahiye?",
-        "haryanvi": "Ram Ram ji! Main {shop} ka AI assistant su. Bolo, ke chahiye?",
+        "hinglish": "Namaste ji! {shop} se, main dukaan ka AI munshi bol raha hoon. Boliye, kya bhejna hai?",
+        "hindi": "Namaste ji! {shop} se, main dukaan ka AI munshi bol raha hoon. Bataiye, kya chahiye?",
+        "haryanvi": "Ram Ram ji! {shop} te, main dukaan ka AI munshi bol rya su. Bolo, ke chahiye?",
+    },
+    "greet_known": {
+        "hinglish": "Namaste {name}! {shop} se, main dukaan ka AI munshi bol raha hoon. Boliye, aaj kya bhejun?",
+        "hindi": "Namaste {name}! {shop} se, main dukaan ka AI munshi bol raha hoon. Bataiye, aaj kya bhejna hai?",
+        "haryanvi": "Ram Ram {name}! {shop} te, main dukaan ka AI munshi bol rya su. Bolo, aaj ke bhejun?",
     },
     "added": {
         "hinglish": "{item}, theek hai. Aur kuch?",
@@ -59,9 +66,9 @@ T: dict[str, dict[str, str]] = {
         "haryanvi": "Ram Ram {name}, {shop} te bol rya su. Thara {lines} khatam hone aala hoga. Wahi bhej du? Total {total}.",
     },
     "usual_qty": {
-        "hinglish": "{name}, pichhli baar jitna {qty}?",
+        "hinglish": "{name}, wahi pichhli baar jitna, {qty}?",
         "hindi": "{name}, pichhli baar ki tarah {qty}?",
-        "haryanvi": "{name}, pichhli baar jitna {qty}?",
+        "haryanvi": "{name}, wahi pichhli baar jitna, {qty}?",
     },
     "ask_unit": {
         "hinglish": "{name} kitne {unit}?",

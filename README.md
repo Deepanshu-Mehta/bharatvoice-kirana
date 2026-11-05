@@ -149,7 +149,12 @@ Negative result, kept honest: biasing known customers toward *only their own* br
 
 Changes made:
 - **Mixed script.** Timbre reads all-Latin text with an English profile, which sounded anglicised. The display stays Roman, while what Timbre speaks is Devanagari for Hindi and Haryanvi words with Latin brands, and money as "₹216" for Timbre's own number reading. This **nearly halves the phone-line error**.
-- **A male, conversational voice** (Timbre v3.0 *Devansh*), matching the shop's male first-person replies, with one persona across Hindi, Hinglish and Haryanvi.
+- **A persona: Munshi ji, the shop's clerk who writes the parchi and the khata.**
+  - We considered a formal manager (sounds like a bank IVR), a young helper (customers won't trust him with prices or udhaar) and a comic seth (memorable, but a caricature).
+  - Munshi ji is trusted, efficient, and honest about being AI ("dukaan ka AI munshi").
+  - What makes him sound real is mostly *what* he says: he greets regulars by name ("Namaste Sharma ji!") and remembers the usual ("wahi pichhli baar jitna, paanch kilo?"). The customer memory makes that genuine.
+- **A male, conversational voice** (Timbre v3.0 *Devansh*), chosen in voice-lab round 2 from all six male v3.0 voices. It was also the clearest on the phone line (CER 8.1%).
+- **No borrowed voices.** We deliberately do not clone celebrities, TV characters or voices taken from the internet. Without consent that would be impersonation, and against the challenge's authenticity rules. A real shopkeeper's voice is supported only with their consent.
 - **`<pauses>` before the closing question**, as Gnani's docs recommend for prompts.
 - **Varied acknowledgements** instead of the same sentence every turn.
 - **Optional:** the shopkeeper's own cloned voice, with consent (`infra/clone_check.py --ref … --save`).

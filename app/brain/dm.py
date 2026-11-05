@@ -592,7 +592,9 @@ class Session:
         return text
 
     def greet(self) -> str:
-        text = self.r("greet", shop=self.shop)
+        known = self.customer.get("name") and (self.customer.get("history") or (self.memory is not None and self.memory.orders))
+        text = (self.r("greet_known", name=self.customer["name"], shop=self.shop) if known
+                else self.r("greet", shop=self.shop))
         self.last_agent_prompt = text
         return text
 
