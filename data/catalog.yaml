@@ -27,7 +27,8 @@ categories:
   noodles:   {generic: [noodles, नूडल्स]}
   snacks:    {generic: [namkeen, chips, नमकीन, चिप्स]}
   drinks:    {generic: [cold drink, thanda, कोल्ड ड्रिंक, ठंडा]}
-  detergent: {generic: [washing powder, surf, sarf, detergent, वाशिंग पाउडर, सर्फ]}
+  detergent: {generic: [washing powder, surf, sarf, detergent, kapde dhone ka powder, kapde dhone wala powder, kapde dhone aala powder,
+                        kapde dhone ka, kapde dhone wala, वाशिंग पाउडर, सर्फ, कपड़े धोने का पाउडर, कपड़े धोने वाला पाउडर]}
   dishwash:  {generic: [bartan sabun, bartan wala, बर्तन साबुन]}
   soap:      {generic: [sabun, soap, nahane ka sabun, साबुन]}
   toothpaste: {generic: [toothpaste, manjan, paste, टूथपेस्ट, मंजन]}

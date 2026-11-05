@@ -195,7 +195,8 @@ async function call() {
   try {
     if (!ws) await connect();
     await startMic();
-    setState("speaking", "Shop is speaking", "");
+    // the greeting may already have finished while the voice detector loaded: then start listening right away
+    if (speaking || !replyDone) setState("speaking", "Shop is speaking", ""); else audioDone();
   } catch (e) {
     micOn = false;
     setState("idle", ws ? "Speak instead" : "Call the shop",
@@ -231,8 +232,7 @@ if (ob && STARTERS[ob]) {
   card.querySelector(".who-calls").textContent = { "CUST-001": "Sharma ji", "CUST-002": "Tau ji", "CUST-003": "Gupta ji" }[ob];
   document.getElementById("pickup").onclick = async () => {
     card.hidden = true; outbound = true;
-    try { await connect(); setState("speaking", "Shop is speaking", ""); }
-    catch (e) { $("status").textContent = "Couldn't reach the shop. Try again in a moment."; }
+    await call();  // picking up opens the microphone, like answering a real phone
   };
   document.getElementById("decline").onclick = () => { card.hidden = true; history.replaceState(null, "", "/"); };
 }

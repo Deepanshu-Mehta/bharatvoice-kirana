@@ -1,0 +1,91 @@
+{
+ "1": {
+  "off": {
+   "questions": 3,
+   "oem": 1.0,
+   "turns": 6,
+   "n": 3
+  },
+  "on": {
+   "questions": 3,
+   "oem": 1.0,
+   "turns": 6,
+   "n": 3
+  }
+ },
+ "2": {
+  "off": {
+   "questions": 3.67,
+   "oem": 0.667,
+   "turns": 6.67,
+   "n": 3
+  },
+  "on": {
+   "questions": 2,
+   "oem": 1.0,
+   "turns": 5,
+   "n": 3
+  }
+ },
+ "3": {
+  "off": {
+   "questions": 3,
+   "oem": 1.0,
+   "turns": 6,
+   "n": 3
+  },
+  "on": {
+   "questions": 0.33,
+   "oem": 1.0,
+   "turns": 3.33,
+   "n": 3
+  }
+ },
+ "4": {
+  "off": {
+   "questions": 4,
+   "oem": 1.0,
+   "turns": 7,
+   "n": 3
+  },
+  "on": {
+   "questions": 1.33,
+   "oem": 1.0,
+   "turns": 4.33,
+   "n": 3
+  }
+ },
+ "5": {
+  "off": {
+   "questions": 3,
+   "oem": 1.0,
+   "turns": 6,
+   "n": 3
+  },
+  "on": {
+   "questions": 0.33,
+   "oem": 1.0,
+   "turns": 3.33,
+   "n": 3
+  }
+ },
+ "all_off": {
+  "questions_per_call": 3.33,
+  "oem": 0.933
+ },
+ "all_on": {
+  "questions_per_call": 1.4,
+  "oem": 1.0
+ },
+ "_meta": {
+  "run_id": "1105-144840-learning-text-personal",
+  "mode": "text",
+  "calls": 5,
+  "personas": [
+   "CUST-002",
+   "CUST-001",
+   "CUST-003"
+  ],
+  "spent_credits": 0.0
+ }
+}

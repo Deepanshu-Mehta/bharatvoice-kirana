@@ -1,0 +1,49 @@
+{
+ "haryanvi": {
+  "n": 31,
+  "OEM": 0.903,
+  "item_F1": 0.935,
+  "questions_per_call": 0.84,
+  "handoff_rate": 0.032,
+  "hallucinated_price_rate": 0.0,
+  "unconfirmed_order_rate": 0.0,
+  "stt_p50_ms": 190,
+  "stt_p95_ms": 349
+ },
+ "ALL": {
+  "n": 31,
+  "OEM": 0.903,
+  "item_F1": 0.935,
+  "questions_per_call": 0.84,
+  "handoff_rate": 0.032,
+  "hallucinated_price_rate": 0.0,
+  "unconfirmed_order_rate": 0.0,
+  "stt_p50_ms": 190,
+  "stt_p95_ms": 349
+ },
+ "_meta": {
+  "run_id": "1105-144930-audio-g711_10db-rules-dynamic-key-ei-haryanvi",
+  "args": {
+   "mode": "audio",
+   "speaker": "",
+   "condition": "g711_10db",
+   "registers": [
+    "haryanvi"
+   ],
+   "ids": null,
+   "exclude_tags": [
+    "freeform"
+   ],
+   "limit": null,
+   "extractor": "rules",
+   "biasing": "dynamic",
+   "stt_format": "codemix",
+   "second_opinion": false,
+   "budget": 4.0,
+   "dry_run": false,
+   "tag": "key-ei-haryanvi"
+  },
+  "stt_config": "prisma-v3.0|hi-IN,en-IN|codemix|dynamic|sub=1|2nd=0|personal=0",
+  "spent_credits": 2.09748
+ }
+}

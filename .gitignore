@@ -16,3 +16,7 @@ traces/
 plan.md
 .playwright-mcp/
 state/
+
+# demo video build outputs (raw footage, renders)
+video/out/
+video/state/

@@ -109,3 +109,19 @@ def test_outbound_decline_orders_nothing():
     s.start_outbound([{"sku": "amul-taaza", "qty": 2, "unit": "l"}])
     s.handle("nahi")
     assert s.order is None
+
+
+def test_lookup_survives_one_added_or_dropped_word():
+    from app.brain.memory import CustomerMemory
+    m = CustomerMemory("CUST-001")
+    m.learn([{"sku": "surf-excel-1kg", "qty": 1, "unit": "pkt", "said": "kapde dhone powder", "via": "asked"}])
+    assert m.lookup("kapde dhone powder")["sku"] == "surf-excel-1kg"
+    assert m.lookup("kapde dhone wala powder") is None or m.lookup("kapde dhone wala powder")["sku"] == "surf-excel-1kg"
+    assert m.lookup("vahin kapde dhone powder")["sku"] == "surf-excel-1kg"
+    assert m.lookup("dhone") is None  # a single shared word is not a memory hit
+
+
+def test_wahi_is_a_memory_cue_not_a_product_word():
+    from app.brain.extract_rules import extract
+    f = extract("वहीं कपड़े dhone powder भेज दो")
+    assert [a.product_phrase for a in f.actions if a.type == "add"] == ["kapre dhone powder"]

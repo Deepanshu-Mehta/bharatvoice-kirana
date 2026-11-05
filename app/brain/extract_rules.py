@@ -52,7 +52,9 @@ FILLER = _kset("bhaiya", "bhai", "ji", "please", "plz", "ek", "aur", "bhi", "cha
                "deejiye", "toh", "to", "wo", "woh", "jo", "haan", "acha", "accha", "theek", "achha", "bas", "hi",
                "uski", "uske", "iski", "iske", "jagah", "badle", "instead", "bajaye", "nahi", "nahin", "matlab",
                "sorry", "galti", "se", "bhi", "laga", "lagao", "rakh", "rakhna", "add", "plus", "ram", "tau",
-               "suniye", "suno", "diyo", "de diyo", "dijiye", "deejiye", "dena ji", "namaste", "bhej diyo")
+               "suniye", "suno", "diyo", "de diyo", "dijiye", "deejiye", "dena ji", "namaste", "bhej diyo",
+               # "the same one": a cue to look in the customer's memory, never part of the product's name
+               "wahi", "wahin", "vahi", "vahin", "wohi", "vohi", "same")
 PRICE_Q = ["kitne ka", "kitne ki", "kitne ke", "kitne mein", "kya rate", "rate kya", "kya daam", "daam kya", "kya bhav",
            "bhav kya", "price kya", "kya price", "kitne ka hai", "kitne ki hai", "kitne rupaye ka", "kitne rupaye ki"]
 STOCK_Q = ["hai kya", "hain kya", "milega", "milegi", "mil jayega", "mil jaayega", "available", "rakhte ho", "hoga kya",

@@ -274,3 +274,16 @@ def test_bare_number_in_brand_answer_keeps_stated_quantity():
 def test_remove_word_with_unitless_number_removes():
     s, _ = talk(["teen packet chhota maggi aur do packet parle g", "पाव जी, biscuit रहने दो।"])
     assert cart(s) == [("maggi-70", 3, "pkt")]
+
+
+def test_unknown_fragment_in_multi_item_order_is_asked_not_dropped():
+    # regression: a short unresolved fragment next to resolved items used to trigger the "misheard bas itna hi"
+    # readback, silently dropping the item
+    s, r = talk(["do kilo Aashirvaad atta, ek litre Amul Taaza doodh, aur kapde dhone wala powder bhej do"])
+    assert "Surf Excel" in r[0] and "Confirm" not in r[0]
+    assert s.pending is not None
+
+
+def test_lone_short_unknown_after_items_still_reads_back():
+    s, r = talk(["do kilo Aashirvaad atta", "bas ittu sa"])
+    assert "Confirm" in r[1]

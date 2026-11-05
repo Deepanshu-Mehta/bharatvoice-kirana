@@ -41,10 +41,17 @@ class CustomerMemory:
         if k in self.phrases:
             return self.phrases[k]
         best, score = None, 0.0
+        kt = k.split()
         for pk, v in self.phrases.items():
-            if abs(len(pk.split()) - len(k.split())) > 1:
+            pt = pk.split()
+            if abs(len(pt) - len(kt)) > 1:
                 continue
             s = fuzz.ratio(pk, k)
+            # the phone line often adds or drops one small word ("kapde dhone [wala] powder"): a learned phrase of
+            # 2+ words found whole inside the new one (or vice versa) is the same request
+            short, long_ = (pt, kt) if len(pt) <= len(kt) else (kt, pt)
+            if len(short) >= 2 and any(long_[i:i + len(short)] == short for i in range(len(long_) - len(short) + 1)):
+                s = max(s, 95.0)
             if s > score:
                 best, score = v, s
         return best if score >= 88 else None

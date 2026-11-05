@@ -99,6 +99,7 @@ _KEY_RULES = [
     (r"ph", "f"), (r"w", "v"), (r"z", "j"), (r"q", "k"), (r"x", "ks"), (r"ck", "k"),
     (r"chh", "ch"), (r"sh", "s"), (r"c(?=[eiy])", "s"), (r"c(?!h)", "k"),
     (r"aa", "a"), (r"ee", "i"), (r"ii", "i"), (r"oo", "u"), (r"uu", "u"), (r"ai", "e"), (r"au", "o"),
+    (r"ei", "e"),  # mein / में (romanised "men"), dein / दें ("den"): Prisma writes Hindi words in Devanagari
     (r"iye\b", "ie"),  # chahiye / chahie / चाहिए -> chahie ; dijiye / दीजिए -> dijie
     (r"ay\b", "e"), (r"ey\b", "e"), (r"y\b", "i"),
 ]

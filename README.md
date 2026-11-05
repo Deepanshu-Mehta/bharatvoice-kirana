@@ -114,9 +114,9 @@ Negative result, kept honest: biasing known customers toward *only their own* br
 
 | Register | n | OEM | Notes |
 |---|---|---|---|
-| Hinglish | 31 | 0.90 | |
-| Hindi | 31 | 0.97 | |
-| Haryanvi | 34 | 0.77 → **0.88** | After the STT-aware dialect layer; handoffs 15% → 6% |
+| Hinglish | 31 | 0.90 → 0.84 | Re-measured Nov 5 with the new greeting as STT context: on 2 calls Prisma heard "पाव किलो" (¼ kg) as "पाँच किलो" (5 kg). Recognition variance, not a logic change; it shows the size of the error bar at n = 31 |
+| Hindi | 31 | 0.97 → **1.00** | |
+| Haryanvi | 34 | 0.77 → 0.88 → **0.90** | STT-aware dialect layer (handoffs 15% → 6%), then Devanagari "में" matched as "mein" (khata requests) |
 
 **3. Where Evon earns its place** (text transcripts)
 

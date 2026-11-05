@@ -132,6 +132,7 @@ class Session:
                  extractor: Callable[[str, Context], Frame] | None = None, shop: str = "Sharma General Store",
                  session_id: str | None = None, memory=None, on_learn: Callable | None = None):
         self.memory = memory  # CustomerMemory or None (memory off)
+        self._lone_action = True
         self.on_learn = on_learn
         self.cat = catalog or load_catalog()
         self.resolver = resolver or Resolver(self.cat)
@@ -307,9 +308,10 @@ class Session:
         res = self.resolver.resolve(phrase, pack_hint=hint, history=dict(self.history_counts),
                                     qty_certainty=q.certainty if q else 0.8)
         self._trace.setdefault("resolutions", []).append(self._res_trace(res))
-        if not res.candidates and self.cart and q is None and len(phrase.split()) <= 4:
-            # short unknown utterance after "Aur kuch?" is most likely a misheard "bas itna hi":
-            # read back (the readback itself asks for an explicit yes, so nothing is ordered by mistake)
+        if not res.candidates and self.cart and q is None and len(phrase.split()) <= 4 and self._lone_action:
+            # a short unknown utterance ON ITS OWN after "Aur kuch?" is most likely a misheard "bas itna hi":
+            # read back (the readback itself asks for an explicit yes, so nothing is ordered by mistake).
+            # Not for one fragment of a multi-item order: that item must be asked about, never silently dropped.
             return self._readback()
         if not res.candidates:
             self.unresolved_streak += 1
@@ -621,6 +623,7 @@ class Session:
         cart_before = [(l.product.id, l.qty) for l in self.cart]
         actions = list(frame.actions) + self.queue
         self.queue = []
+        self._lone_action = len(actions) == 1
         added: list[str] = []
         parts: list[str] = []
         for i, a in enumerate(actions):
