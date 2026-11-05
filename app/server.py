@@ -237,7 +237,14 @@ async def ws_call(ws: WebSocket):
             t_turn = time.perf_counter()
             stt_info: dict = {}
             if msg.get("bytes"):
-                wav, secs = await asyncio.to_thread(to_wav16k, msg["bytes"])
+                if len(msg["bytes"]) > 2_500_000:  # ~20 s of 16 kHz PCM is ~0.64 MB; refuse anything far larger
+                    await ws.send_json({"type": "error", "text": "That clip is too long. Speak one order line at a time."})
+                    continue
+                try:
+                    wav, secs = await asyncio.to_thread(to_wav16k, msg["bytes"])
+                except Exception:
+                    await ws.send_json({"type": "error", "text": "Couldn't read that audio. Please try again."})
+                    continue
                 timings["audio_s"] = round(secs, 2)
                 if secs < 0.3:
                     continue
@@ -255,8 +262,11 @@ async def ws_call(ws: WebSocket):
                     (TRACES / "audio").mkdir(exist_ok=True)
                     (TRACES / "audio" / f"{session.session_id}-{turn:02d}.wav").write_bytes(wav)
             else:
-                data = json.loads(msg.get("text") or "{}")
-                text = data.get("text", "")
+                try:
+                    data = json.loads(msg.get("text") or "{}")
+                except json.JSONDecodeError:
+                    continue
+                text = str(data.get("text", ""))[:300]  # a phone turn is short; cap what strangers can send
             await ws.send_json({"type": "transcript", "text": text})
             t0 = time.perf_counter()
             result = await asyncio.to_thread(session.handle, text)
@@ -360,8 +370,9 @@ CHUNK_S = 20.0
 
 def _decode_any(raw: bytes) -> bytes:
     """Any container WhatsApp/phones produce (ogg/opus, m4a, mp3, wav) -> 16 kHz mono PCM16 WAV via ffmpeg."""
-    return subprocess.run(["ffmpeg", "-loglevel", "error", "-i", "pipe:0", "-ar", "16000", "-ac", "1",
-                           "-c:a", "pcm_s16le", "-f", "wav", "pipe:1"], input=raw, capture_output=True, check=True).stdout
+    return subprocess.run(["ffmpeg", "-loglevel", "error", "-t", "300", "-i", "pipe:0", "-ar", "16000", "-ac", "1",
+                           "-c:a", "pcm_s16le", "-f", "wav", "pipe:1"], input=raw, capture_output=True, check=True,
+                          timeout=60).stdout
 
 
 def _chunks(wav: bytes) -> list[bytes]:
@@ -404,7 +415,7 @@ async def voicenote(request: Request, file: UploadFile = File(...), customer: st
         raise HTTPException(413, "voice note too large")
     try:
         wav = await asyncio.to_thread(_decode_any, raw)
-    except subprocess.CalledProcessError:
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
         raise HTTPException(400, "could not decode audio")
     session = Session(customer, extractor=get_extractor(os.environ.get("EXTRACTOR", "rules")),
                       memory=memory_for(client_ip(request.headers, request.client), customer), on_learn=save_memory)

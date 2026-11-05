@@ -60,7 +60,7 @@ Everything learned is per customer, visible on the shop counter and erasable. In
 - **Price and stock questions, and money quantities.** "Aashirvaad atta kitne ka hai?", "Amul Gold hai kya?" and "bees rupaye ka dhaniya" are all handled. The quantity is derived from the catalog price, and money lines are read back as money.
 - **"Dheere boliye".** The agent repeats itself more slowly (Timbre speed 0.85) for elderly callers.
 - **Safe by construction.** Prices, totals and stock come only from code. An order is placed only after a readback and an explicit yes, and placement is idempotent.
-- **Fast.** Streaming TTS and cached phrases give about **0.9 s** from the end of the caller's speech to the first agent audio (server side).
+- **Fast.** From the end of the caller's speech to the shop's first audio: p50 **0.28 s**, p95 **0.43 s** server side for common replies, and about 0.5–0.8 s for brand-new sentences (`eval/latency_bench.py`).
 - **Measured.** A self-testing harness replays scenarios through Timbre → phone channel (G.711, noise, packet loss) → Prisma → agent, and scores **Order Exact Match**.
 
 ## Architecture: the LLM proposes, code decides
@@ -85,7 +85,8 @@ caller ──► browser VAD ──► Prisma v3.0 (REST, one call per utterance
 |---|---|---|
 | **Prisma v3.0** (STT) | Every caller utterance | REST `/stt/v3`, `language_code=hi-IN,en-IN`, `format=codemix`. Per-turn `keyterms` and `previous_text`, plus `topic`, `enable_substitution` and `substitution_map` |
 | **Prisma v2.5** (STT) | Ablations | Baseline comparison |
-| **Timbre v2.5** (TTS) | Agent voice (Poorvi, Hinglish); every synthetic test caller | SSE streaming for live replies, REST for test audio; everything cached |
+| **Timbre v3.0** (TTS) | The shop's voice: *Munshi ji* in Yashraj's voice (warm, male), with `<pauses>` audio tags | SSE streaming, spoken in mixed script (Devanagari Hindi + Latin brands); common phrases pre-generated |
+| **Timbre v2.5** (TTS) | Every synthetic test caller (12+ voices) and the voice-lab baseline | REST, cached forever |
 | **Voice cloning** (`vachana-vc-v1`) | Optional shopkeeper voice (with consent) | Embedding from a 5–30 s clip, then cloned streaming TTS |
 | **Evon v3.3** (30B MoE, open weights) | Turns the rules cannot parse; Evon-only ablation | Self-hosted with vLLM on Modal (A100-80GB, scale-to-zero), thinking off, strict per-action JSON schema |
 
@@ -137,7 +138,15 @@ Negative result, kept honest: biasing known customers toward *only their own* br
 
 **6. Safety.** Hallucinated-price rate **0** and unconfirmed-order rate **0** in every run, including Evon-only runs.
 
-**7. Latency** (server side, end of speech to first agent audio): STT ≈ 0.2–0.5 s + agent logic ≈ 0.01–0.15 s + first TTS chunk ≈ 0.3–0.6 s ≈ **0.9 s**. Add about 0.45 s of browser end-pointing for what the caller feels.
+**7. Latency** (`eval/latency_bench.py`: 20 spoken turns, fresh audio every turn so nothing is served from the STT cache):
+
+| Stage | p50 | p95 |
+|---|---|---|
+| Prisma STT | 198 ms | 348 ms |
+| Agent logic | 70 ms | 104 ms |
+| End of speech to first audio (common replies, pre-generated) | **280 ms** | **431 ms** |
+
+A brand-new sentence adds 180–380 ms for Timbre's first streamed chunk. The browser needs about 0.45 s to notice you stopped speaking. The demo runs in a US region, so callers in India add about 0.25 s of network.
 
 ## Making the shop sound like a person
 `infra/voice_lab.py` (listen locally at `/voices`) compares Timbre setups on the same four shop lines and measures how well Prisma understands each voice after an 8&nbsp;kHz call with shop noise:
