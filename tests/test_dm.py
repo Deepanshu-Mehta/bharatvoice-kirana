@@ -78,7 +78,7 @@ def test_dozen():
 
 def test_repeat_last_order():
     s, r = talk(["pichli baar wala saaman bhej do", "haan"], cust="CUST-001")
-    assert ("aashirvaad-atta", 5, "kg") in cart(s) and s.order
+    assert ("amul-taaza", 2, "l") in cart(s) and ("good-day", 2, "pkt") in cart(s) and s.order
 
 
 def test_handoff_after_two_unknown_items():
@@ -264,3 +264,13 @@ def test_balance_query():
 def test_slow_down_repeats_and_flags():
     s, r = talk(["do kilo atta", "thoda dheere boliye"])
     assert s.slow and r[1] == r[0]
+
+
+def test_bare_number_in_brand_answer_keeps_stated_quantity():
+    s, _ = talk(["teen packet surf", "Ghadi 1."])
+    assert cart(s) == [("ghadi-1kg", 3, "pkt")]
+
+
+def test_remove_word_with_unitless_number_removes():
+    s, _ = talk(["teen packet chhota maggi aur do packet parle g", "पाव जी, biscuit रहने दो।"])
+    assert cart(s) == [("maggi-70", 3, "pkt")]

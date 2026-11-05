@@ -16,6 +16,7 @@ import os
 import time
 from pathlib import Path
 
+import hashlib
 import subprocess
 import uuid
 
@@ -25,6 +26,7 @@ from fastapi.responses import FileResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.brain.dm import LEDGER, Session
+from app.brain.memory import MemoryStore
 from app.brain.templates import render, speak_money
 from app.brain.extract_rules import extract as rules_extract
 from app.gnani_client import CreditGuardError, GnaniAPIError, get_client
@@ -65,6 +67,26 @@ def allow(ip: str, kind: str, per_hour: int) -> bool:
     return True
 app.mount("/static", StaticFiles(directory=STATIC), name="static")
 
+MEMORY = MemoryStore()  # per-customer memory, learned only from confirmed orders
+_visitor_mem: dict[tuple[str, str], object] = {}  # public demo: per-visitor copies, in memory only, never shown to others
+
+
+def memory_for(ip: str, cid: str):
+    """Local: the shop's real memory. Public demo: a private per-visitor copy seeded from the synthetic history,
+    so one visitor's second call remembers their first, and nobody else ever sees a stranger's words."""
+    if not PUBLIC_DEMO:
+        return MEMORY.get(cid)
+    k = (hashlib.sha1(ip.encode()).hexdigest()[:12], cid)
+    if k not in _visitor_mem:
+        if len(_visitor_mem) > 2000:
+            _visitor_mem.clear()
+        _visitor_mem[k] = MemoryStore(persist=False).get(cid)
+    return _visitor_mem[k]
+
+
+def save_memory(mem) -> None:
+    if not PUBLIC_DEMO:
+        MEMORY.save(mem)
 board_clients: set[WebSocket] = set()
 board_log: list[dict] = []  # recent events replayed to a newly opened board
 _evon = None
@@ -180,12 +202,23 @@ async def ws_call(ws: WebSocket):
         return
     customer = ws.query_params.get("customer", "CUST-001")
     extractor_name = ws.query_params.get("extractor", os.environ.get("EXTRACTOR", "rules"))
-    session = Session(customer, extractor=get_extractor(extractor_name))
+    session = Session(customer, extractor=get_extractor(extractor_name), memory=memory_for(ip, customer),
+                      on_learn=save_memory)
     cfg = STTConfig()
     trace_path = TRACES / f"{session.session_id}.jsonl"
     await broadcast({"type": "call_started", "session": session.session_id, "customer": customer,
                      "extractor": extractor_name})
-    greet = session.greet()
+    if ws.query_params.get("outbound") == "1":  # the shop calls the customer before they run out
+        session._events = []
+        greet = session.start_outbound(memory_for(ip, customer).due(horizon_days=7))
+        for e in session._events:
+            await broadcast(e)
+        await ws.send_json({"type": "cart", "cart": session.cart_snapshot(), "total": session.total,
+                            "pending": None, "register": session.register, "source": "memory",
+                            "suggestions": suggestions(session), "payment": None,
+                            "awaiting_confirm": session.awaiting_confirm})
+    else:
+        greet = session.greet()
     await speak(ws, greet, {})
     await ws.send_json({"type": "suggest", "items": suggestions(session)})
     turn = 0
@@ -373,7 +406,8 @@ async def voicenote(request: Request, file: UploadFile = File(...), customer: st
         wav = await asyncio.to_thread(_decode_any, raw)
     except subprocess.CalledProcessError:
         raise HTTPException(400, "could not decode audio")
-    session = Session(customer, extractor=get_extractor(os.environ.get("EXTRACTOR", "rules")))
+    session = Session(customer, extractor=get_extractor(os.environ.get("EXTRACTOR", "rules")),
+                      memory=memory_for(client_ip(request.headers, request.client), customer), on_learn=save_memory)
     session.greet()
     cfg = STTConfig()
     texts: list[str] = []
@@ -498,3 +532,34 @@ async def record_save(file: UploadFile = File(...), speaker: str = Form(...), pr
         with consent_log.open("a") as f:
             f.write(json.dumps({"speaker": spk, "statement": CONSENT_TEXT, "ts": time.time()}) + "\n")
     return {"ok": True, "seconds": round(secs, 2)}
+
+
+# ---------------------------------------------------------------- customer memory (what the shop has learned)
+def _names() -> dict:
+    return {cid: c.get("name", cid) for cid, c in CUSTOMERS.items()}
+
+
+@app.get("/api/memory")
+def memory_all(horizon_days: float = 7.0):
+    cat = __import__("app.brain.catalog", fromlist=["load_catalog"]).load_catalog()
+    out = []
+    for cid in CUSTOMERS:
+        m = MEMORY.get(cid)
+        due = [{**d, "name": cat.get(d["sku"]).name} for d in m.due(horizon_days=horizon_days) if d["sku"] in cat.by_id]
+        out.append({"customer": cid, "name": _names()[cid],
+                    "learned": [] if PUBLIC_DEMO else  # strangers' words are never shown on the public counter
+                    [{"said": v["said"], "sku": v["sku"], "name": cat.get(v["sku"]).name, "count": v["count"]}
+                     for v in m.phrases.values() if v["sku"] in cat.by_id],
+                    "orders": len(m.orders), "due": due})
+    return out
+
+
+@app.post("/api/memory/{cid}/forget")
+async def memory_forget(cid: str):
+    if cid not in CUSTOMERS:
+        raise HTTPException(404, "unknown customer")
+    if PUBLIC_DEMO:
+        raise HTTPException(403, "the public demo keeps its memory")
+    MEMORY.reset(cid)
+    await broadcast({"type": "memory_updated", "customer": cid, "learned": []})
+    return {"ok": True}

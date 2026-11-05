@@ -22,8 +22,11 @@ MAX_UTTERANCE_S = 20.0
 SHORT_BRAND_MAX = 4
 
 
+SAFE_SHORT = {"Amul", "Parle"}  # short but not confusable with common Hindi words
+
+
 def _collision_prone(term: str) -> bool:
-    return len(term.replace(" ", "").replace("-", "")) <= SHORT_BRAND_MAX
+    return term not in SAFE_SHORT and len(term.replace(" ", "").replace("-", "")) <= SHORT_BRAND_MAX
 
 
 @dataclass
@@ -34,11 +37,14 @@ class STTConfig:
     biasing: str = os.environ.get("STT_BIASING", "dynamic")  # none | static | dynamic
     substitution: bool = os.environ.get("STT_SUBSTITUTION", "1") == "1"
     second_opinion: bool = os.environ.get("STT_SECOND_OPINION", "0") == "1"  # plan T4
+    # Personal-only brand biasing for known customers was a NEGATIVE result on noisy audio (OEM 0.80 -> 0.60, eval 6 Nov):
+    # keep the shop-wide brand list and add each customer's own learned words on top.
+    personal: bool = os.environ.get("STT_PERSONAL_KEYTERMS", "0") == "1"
     extra_keyterms: list[str] = field(default_factory=list)
 
     def name(self) -> str:
         return (f"{self.model}|{self.language_code}|{self.format}|{self.biasing}|sub={int(self.substitution)}"
-                f"|2nd={int(self.second_opinion)}")
+                f"|2nd={int(self.second_opinion)}|personal={int(self.personal)}")
 
 
 def load_substitutions() -> list[dict]:
@@ -68,8 +74,18 @@ def build_context(session, cfg: STTConfig) -> dict:
         for line in session.cart:
             if line.product.brand:
                 terms.append(line.product.brand)
+        if getattr(session, "memory", None) is not None:  # this customer's own words (per-customer ASR biasing)
+            terms += session.memory.keyterms()
     terms += cfg.extra_keyterms
-    terms += [t for t in cat.top_terms() if not _collision_prone(t)]
+    mem = getattr(session, "memory", None) if session is not None else None
+    if cfg.personal and mem is not None and mem.usual:
+        # known customer: bias toward THEIR brands, not the shop's most popular ones. Global brand padding made
+        # Prisma insert brands the caller never said ("das kilo atta" -> "दस किलो Aashirvaad Atta"), eval 5 Nov.
+        for sku in mem.usual:
+            if sku in cat.by_id and cat.get(sku).brand and not _collision_prone(cat.get(sku).brand):
+                terms.append(cat.get(sku).brand)
+    else:
+        terms += [t for t in cat.top_terms() if not _collision_prone(t)]
     seen, out = set(), []
     for t in terms:
         if t and t.lower() not in seen:

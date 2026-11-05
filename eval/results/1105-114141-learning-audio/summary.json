@@ -1,0 +1,91 @@
+{
+ "1": {
+  "off": {
+   "questions": 2.67,
+   "oem": 0.667,
+   "turns": 5.67,
+   "n": 3
+  },
+  "on": {
+   "questions": 2.67,
+   "oem": 0.667,
+   "turns": 5.67,
+   "n": 3
+  }
+ },
+ "2": {
+  "off": {
+   "questions": 3.33,
+   "oem": 0.333,
+   "turns": 5.67,
+   "n": 3
+  },
+  "on": {
+   "questions": 1.67,
+   "oem": 0.333,
+   "turns": 4.67,
+   "n": 3
+  }
+ },
+ "3": {
+  "off": {
+   "questions": 3,
+   "oem": 1.0,
+   "turns": 6,
+   "n": 3
+  },
+  "on": {
+   "questions": 0.67,
+   "oem": 1.0,
+   "turns": 3.67,
+   "n": 3
+  }
+ },
+ "4": {
+  "off": {
+   "questions": 4,
+   "oem": 1.0,
+   "turns": 7,
+   "n": 3
+  },
+  "on": {
+   "questions": 1.33,
+   "oem": 1.0,
+   "turns": 4.33,
+   "n": 3
+  }
+ },
+ "5": {
+  "off": {
+   "questions": 3,
+   "oem": 1.0,
+   "turns": 6,
+   "n": 3
+  },
+  "on": {
+   "questions": 0.33,
+   "oem": 1.0,
+   "turns": 3.33,
+   "n": 3
+  }
+ },
+ "all_off": {
+  "questions_per_call": 3.2,
+  "oem": 0.8
+ },
+ "all_on": {
+  "questions_per_call": 1.33,
+  "oem": 0.8
+ },
+ "_meta": {
+  "run_id": "1105-114141-learning-audio",
+  "mode": "audio",
+  "calls": 5,
+  "personas": [
+   "CUST-002",
+   "CUST-001",
+   "CUST-003"
+  ],
+  "spent_credits": 3.933512
+ }
+}

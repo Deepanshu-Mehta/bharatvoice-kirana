@@ -182,6 +182,7 @@ def main() -> None:
     ap.add_argument("--condition", choices=list(CONDITIONS), default="clean")
     ap.add_argument("--registers", nargs="*")
     ap.add_argument("--ids", nargs="*")
+    ap.add_argument("--exclude-tags", nargs="*", default=[])
     ap.add_argument("--limit", type=int)
     ap.add_argument("--extractor", choices=["rules", "evon", "hybrid"], default="rules")
     ap.add_argument("--biasing", choices=["none", "static", "dynamic"], default="dynamic")
@@ -192,7 +193,8 @@ def main() -> None:
     ap.add_argument("--tag", default="")
     a = ap.parse_args()
 
-    scenarios = load_scenarios(a.registers, a.limit, a.ids)
+    scenarios = [sc for sc in load_scenarios(a.registers, a.limit, a.ids)
+                 if not set(sc["tags"]) & set(a.exclude_tags)]
     calls, est = estimate(scenarios)
     print(f"{len(scenarios)} scenarios | mode={a.mode} condition={a.condition} extractor={a.extractor} "
           f"biasing={a.biasing} | worst-case ~{calls} API calls, ~{est:.2f} credits (cache hits cost 0)")

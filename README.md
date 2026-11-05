@@ -5,7 +5,7 @@
 > Entry for Gnani.ai's **Great Indian AI Internship Challenge** · solo build · `#GnaniAI` `#GreatIndianAIInternshipChallenge`
 >
 > 📞 **Try it live:** [call the kirana yourself](https://deepanshu-m23csai--bharatvoice-demo-web.us-east.modal.run) (Chrome + headphones; [shopkeeper board](https://deepanshu-m23csai--bharatvoice-demo-web.us-east.modal.run/board))
-> · 🎥 Demo video: *coming soon* · 📊 Results: [below](#results) · 🧪 172 tests, all offline
+> · 🎥 Demo video: *coming soon* · 📊 Results: [below](#results) · 🧪 186 tests, all offline
 
 ---
 
@@ -31,6 +31,18 @@ Agent : Aapka order: do kilo Aashirvaad Atta, do litre Amul Taaza Milk. Total do
 Caller: haan
 Agent : Order confirm! Aadhe ghante mein pahunch jayega. Dhanyavaad!   → order lands on the shopkeeper board
 ```
+
+## The idea: the shopkeeper's memory, on the phone
+A kirana's real edge over a 10-minute delivery app is that bhaiya **knows his customers**: when Sharma ji says "atta" he means Aashirvaad, 5 kilo. BharatVoice learns the same thing, from one source only.
+
+**Every confirmed order is a verified label.** The readback plus an explicit "haan" means we know exactly what the customer's words meant, with no annotation and no retraining. From those confirmed orders, per customer:
+- **It never asks the same customer the same question twice.** Tau ji's "kapde dhone aala surf" gets a "kaun sa?" once ("Ghadi aala"). After he confirms, the phrase is his:
+  - matched instantly next time
+  - added to Prisma's `keyterms` for his calls, so it is *heard* better too
+- **It knows the usual.** "Atta bhej dena" gets "Pillsbury atta, pichhli baar jitna das kilo?"
+- **It calls you before you run out.** From each customer's purchase rhythm, the counter shows who's due. One tap and the shop calls: *"Namaste Sharma ji, aapka do litre Amul doodh aur paanch kilo Aashirvaad atta khatam hone wala hoga. Wahi bhej doon?"* The offer *is* the readback, so nothing is ordered without a yes, and "haan, par atta das kilo" just works.
+
+Everything learned is per customer, visible on the shop counter and erasable. In the public demo it stays private to each visitor.
 
 ## Features
 - **Code-mixed and dialect-aware.** Hinglish, Hindi and Haryanvi, with a dialect layer tuned to how Prisma actually transcribes Haryanvi. For example, the negation *konya* comes out as कौन या / कोइना / कोनिया.
@@ -79,6 +91,15 @@ caller ──► browser VAD ──► Prisma v3.0 (REST, one call per utterance
 
 ## Results
 All numbers come from `eval/` runs (`eval/results/<run_id>/summary.json`). Test callers are Timbre voices and the noise is synthetic unless stated; see [Limitations](#limitations).
+
+**0. It learns each regular customer** (`eval/learning_curve.py`): 3 personas with their own words × 5 consecutive calls; memory off (every call starts fresh) vs on (learned from earlier *confirmed* orders only)
+
+| | Questions per call (avg) | By the 5th call | Exact orders |
+|---|---|---|---|
+| Text transcripts, memory off → on | 3.33 → **1.40** | 3.0 → **0.33** | 93% → **100%** |
+| Noisy phone audio (G.711 + 10 dB), off → on | 3.27 → **1.67** | 3.0 → **0.33** | 80% → 80% |
+
+Negative result, kept honest: biasing known customers toward *only their own* brands lost accuracy on noisy audio (0.80 → 0.60). The shop-wide brand list stays, and each customer's learned words are added on top.
 
 **1. Dialogue-conditioned ASR biasing** (Hinglish, n = 31, G.711 8 kHz + 10 dB shop noise)
 
@@ -132,7 +153,7 @@ All numbers come from `eval/` runs (`eval/results/<run_id>/summary.json`). Test 
 git clone https://github.com/Deepanshu-Mehta/bharatvoice-kirana.git && cd bharatvoice-kirana
 uv sync
 cp .env.example .env                # add GNANI_API_KEY (and HUGGING_FACE_TOKEN for Evon weights)
-uv run pytest -q                    # 172 tests, no API calls
+uv run pytest -q                    # 186 tests, no API calls
 uv run uvicorn app.server:app --port 8080
 ```
 Open **http://localhost:8080** (call page; use Chrome and headphones) and **http://localhost:8080/board** (shopkeeper board). You can type turns instead of speaking; that uses no speech-to-text credits.
@@ -170,14 +191,15 @@ app/
     extract_rules.py  rules extractor + Haryanvi dialect layer
     extract_evon.py   Evon v3.3 extractor (strict JSON schema, fallback to rules)
     extract_hybrid.py rules first, Evon for hard turns
-    dm.py             dialogue manager (the only place that decides)
+    dm.py             dialogue manager (the only place that decides); outbound "you're due" calls
+    memory.py         per-customer memory learned only from confirmed orders
     templates.py      register-aware replies (Hinglish / Hindi / Haryanvi)
   static/             call page, board
 data/                 catalog.yaml, customers, Haryanvi lexicon, scenarios, mined aliases, substitution rules
 eval/                 runner (text / audio / real-speaker modes), phone channel, scenario generator, STT bake-off,
                       alias mining, held-out check, results/
 infra/                Modal/vLLM deployment, smoke tests, voice-clone check, phrase pre-cache
-tests/                172 offline tests
+tests/                186 offline tests
 ```
 
 ## Public demo

@@ -1,9 +1,18 @@
 # Synthetic customers only (no real names or numbers). credit_limit/balance in INR (udhaar khata).
+# history: newest first; it seeds each customer's memory (purchase rhythm -> outbound 'due' calls).
 CUST-001:
   balance: 850
   credit_limit: 3000
   history:
-  - date: 2026-10-28
+  - date: '2026-11-01'
+    lines:
+    - qty: 2
+      sku: amul-taaza
+      unit: l
+    - qty: 2
+      sku: good-day
+      unit: pkt
+  - date: '2026-10-28'
     lines:
     - qty: 5
       sku: aashirvaad-atta
@@ -14,14 +23,22 @@ CUST-001:
     - qty: 1
       sku: tata-tea-250
       unit: pkt
-  - date: 2026-10-14
+  - date: '2026-10-21'
+    lines:
+    - qty: 2
+      sku: amul-taaza
+      unit: l
+    - qty: 2
+      sku: cheeni-loose
+      unit: kg
+  - date: '2026-10-14'
     lines:
     - qty: 5
       sku: aashirvaad-atta
       unit: kg
     - qty: 2
-      sku: cheeni-loose
-      unit: kg
+      sku: amul-taaza
+      unit: l
     - qty: 1
       sku: fortune-mustard-oil
       unit: l
@@ -31,7 +48,7 @@ CUST-002:
   balance: 0
   credit_limit: 2000
   history:
-  - date: 2026-10-30
+  - date: '2026-10-30'
     lines:
     - qty: 1
       sku: amul-taaza
@@ -42,6 +59,22 @@ CUST-002:
     - qty: 2
       sku: maggi-70
       unit: pkt
+  - date: '2026-10-23'
+    lines:
+    - qty: 1
+      sku: amul-taaza
+      unit: l
+    - qty: 4
+      sku: parle-g
+      unit: pkt
+  - date: '2026-10-16'
+    lines:
+    - qty: 1
+      sku: amul-taaza
+      unit: l
+    - qty: 10
+      sku: pillsbury-atta
+      unit: kg
   name: Tau ji
   register: haryanvi
 CUST-003:

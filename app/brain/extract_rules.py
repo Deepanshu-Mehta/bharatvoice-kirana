@@ -185,7 +185,7 @@ def _segment_action(seg_roman: str) -> Action | None:
                 return Action(type="replace", target=left or "LAST", product_phrase=right, qty_text=qty_text)
     is_remove = _has_any(toks_k, REMOVE_WORDS) or (" konya " in joined)
     phrase = _product_words(toks_r, toks_k, q_idx)
-    if is_remove and not qs:
+    if is_remove and (not qs or all(q.unit is None for q in qs)):  # "पाव जी biscuit रहने दो": paav was "Parle"
         return Action(type="remove", target=phrase or "LAST")
     starts_with_no = toks_k[0] in NO
     is_update = _has_any(toks_k, UPDATE_WORDS) or starts_with_no

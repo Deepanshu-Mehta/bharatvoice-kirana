@@ -1,0 +1,46 @@
+{
+ "hinglish": {
+  "n": 34,
+  "OEM": 0.735,
+  "item_F1": 0.85,
+  "questions_per_call": 0.71,
+  "handoff_rate": 0.088,
+  "hallucinated_price_rate": 0.0,
+  "unconfirmed_order_rate": 0.0,
+  "stt_p50_ms": 202,
+  "stt_p95_ms": 384
+ },
+ "ALL": {
+  "n": 34,
+  "OEM": 0.735,
+  "item_F1": 0.85,
+  "questions_per_call": 0.71,
+  "handoff_rate": 0.088,
+  "hallucinated_price_rate": 0.0,
+  "unconfirmed_order_rate": 0.0,
+  "stt_p50_ms": 202,
+  "stt_p95_ms": 384
+ },
+ "_meta": {
+  "run_id": "1105-114542-audio-g711_10db-rules-dynamic-brandonly",
+  "args": {
+   "mode": "audio",
+   "speaker": "",
+   "condition": "g711_10db",
+   "registers": [
+    "hinglish"
+   ],
+   "ids": null,
+   "limit": null,
+   "extractor": "rules",
+   "biasing": "dynamic",
+   "stt_format": "codemix",
+   "second_opinion": false,
+   "budget": 6.0,
+   "dry_run": false,
+   "tag": "brandonly"
+  },
+  "stt_config": "prisma-v3.0|hi-IN,en-IN|codemix|dynamic|sub=1|2nd=0|personal=1",
+  "spent_credits": 1.552848
+ }
+}

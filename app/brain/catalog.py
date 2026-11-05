@@ -56,8 +56,8 @@ class Catalog:
         out: list[str] = []
         for p in sorted(prods, key=lambda p: -p.pop):
             terms = ([p.brand] if p.brand else []) + ([] if brands_only else p.aliases[:1])
-            if brands_only and p.brand:
-                terms += [a for a in p.aliases[:2] if a.isascii() and p.brand.lower() in a.lower()]
+            if brands_only and p.brand:  # measured config (0.90 OEM on noisy Hinglish); known customers use
+                terms += [a for a in p.aliases[:2] if a.isascii() and p.brand.lower() in a.lower()]  # personal terms
             for t in terms:  # no digits: sizes like "1 kg" in keyterms would bias how quantities are heard
                 if t and t not in out and t.isascii() and not any(ch.isdigit() for ch in t):
                     out.append(t)

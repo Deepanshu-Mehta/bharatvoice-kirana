@@ -178,7 +178,7 @@ def main(n_per_register: int = 30, seed: int = 7) -> None:
         sc = {"id": f"{reg}-repeat", "register": reg, "customer": "CUST-001", "voice": VOICES[reg][0][0],
               "tts_language": VOICES[reg][0][1], "tags": ["repeat_order"], "turns": [txt],
               "answers": {"confirm": [YES[reg]], "done": [DONE[reg]]},
-              "gold": [["aashirvaad-atta", 5, "kg"], ["amul-taaza", 2, "l"], ["tata-tea-250", 1, "pkt"]],
+              "gold": [["amul-taaza", 2, "l"], ["good-day", 2, "pkt"]],
               "draft": reg == "haryanvi"}
         (OUT / f"{sc['id']}.json").write_text(json.dumps(sc, ensure_ascii=False, indent=1))
         count += 1

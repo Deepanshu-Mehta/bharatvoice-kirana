@@ -84,6 +84,8 @@ class Line:
     qty: float
     unit: str
     money: float | None = None  # "bees rupaye ka dhaniya": spoken as money, quantity derived from the price
+    said: str | None = None  # the customer's own words for this item (learned only after the order is confirmed)
+    via: str | None = None  # direct | asked | memory
 
     @property
     def amount(self) -> float:
@@ -96,7 +98,8 @@ class Line:
 
     def as_dict(self) -> dict:
         return {"line": self.id, "sku": self.product.id, "name": self.product.name, "qty": self.qty,
-                "unit": self.unit, "price": self.product.price, "amount": self.amount}
+                "unit": self.unit, "price": self.product.price, "amount": self.amount, "via": self.via,
+                "said": self.said}
 
 
 @dataclass
@@ -111,6 +114,8 @@ class Pending:
     line_id: int | None = None  # for set_qty (correction whose number was lost)
     soft: bool = False  # follow-up to a price/stock question: if unanswered, just handle the turn normally
     replaced: str | None = None  # name of the line a replace removed
+    said: str = ""  # the customer's original words for the item being clarified
+    via: str = "asked"
 
 
 @dataclass
@@ -125,7 +130,9 @@ class Session:
     def __init__(self, customer_id: str = "CUST-001", *, catalog: Catalog | None = None,
                  resolver: Resolver | None = None,
                  extractor: Callable[[str, Context], Frame] | None = None, shop: str = "Sharma General Store",
-                 session_id: str | None = None):
+                 session_id: str | None = None, memory=None, on_learn: Callable | None = None):
+        self.memory = memory  # CustomerMemory or None (memory off)
+        self.on_learn = on_learn
         self.cat = catalog or load_catalog()
         self.resolver = resolver or Resolver(self.cat)
         self.extractor = extractor or extract
@@ -220,17 +227,29 @@ class Session:
         return max(pool, key=lambda c: c.pop, default=None)
 
     # ------------------------------------------------------------------ commit
-    def _commit(self, p: Product, q: Qty | None, *, replaced: str | None = None, checked: bool = False) -> str:
+    def _commit(self, p: Product, q: Qty | None, *, replaced: str | None = None, checked: bool = False,
+                said: str | None = None, via: str = "direct") -> str:
+        if q is None and self.memory is not None and p.unit in ("pkt", "pc"):  # "biscuit bhej dena" = the usual
+            usual = self.memory.usual_qty(p.id)
+            if usual and usual.get("unit") == p.unit and float(usual["qty"]) != 1.0:
+                self.pending = Pending("qty_default", [p], Qty(float(usual["qty"]), None, 1.0), speak_name(p),
+                                       replaced=replaced, said=said or "", via=via)
+                return self._ask(self.r("usual_qty", name=speak_name(p), qty=speak_qty(float(usual["qty"]), p.unit)))
         qty = self._to_base(p, q)
         if qty is not None and not checked and qty > TYPICAL_MAX.get(p.cat, float("inf")):
-            self.pending = Pending("qty_confirm", [p], q, speak_name(p), replaced=replaced)
+            self.pending = Pending("qty_confirm", [p], q, speak_name(p), replaced=replaced, said=said or "", via=via)
             return self._ask(self.r("confirm_big_qty", item=f"{speak_qty(qty, p.unit)} {speak_name(p)}"))
         if qty is None:
             if q is None:
-                self.pending = Pending("qty", [p], None, speak_name(p))
+                usual = self.memory.usual_qty(p.id) if self.memory is not None else None
+                if usual and usual.get("unit") == p.unit:  # "Pillsbury atta, pichhli baar jitna 10 kilo?"
+                    self.pending = Pending("qty_default", [p], Qty(float(usual["qty"]), p.unit, 1.0), speak_name(p),
+                                           replaced=replaced, said=said or "", via=via)
+                    return self._ask(self.r("usual_qty", name=speak_name(p), qty=speak_qty(float(usual["qty"]), p.unit)))
+                self.pending = Pending("qty", [p], None, speak_name(p), said=said or "", via=via)
                 return self._ask(self.r("ask_qty", name=speak_name(p)))
             unit = {"kg": "kilo", "l": "litre"}.get(p.unit, "packet")
-            self.pending = Pending("unit", [p], q, speak_name(p))
+            self.pending = Pending("unit", [p], q, speak_name(p), said=said or "", via=via)
             return self._ask(self.r("ask_unit", name=speak_name(p), unit=unit))
         if self.stock[p.id] < qty:
             sub = self._substitute_for(p, qty)
@@ -249,8 +268,10 @@ class Session:
         if existing:
             existing.qty = round(existing.qty + qty, 3)
             line = existing
+            if said and not existing.said:
+                existing.said, existing.via = said, via
         else:
-            line = Line(self._next_line, p, round(qty, 3), p.unit, money)
+            line = Line(self._next_line, p, round(qty, 3), p.unit, money, said, via)
             self._next_line += 1
             self.cart.append(line)
         self.last_line_id = line.id
@@ -272,6 +293,11 @@ class Session:
             if q and self.cart:
                 return self._update(None, qty_text)
             return self._ask(self.r("not_understood_item", phrase=""))
+        if self.memory is not None:  # this customer's own words, confirmed in an earlier order
+            hit = self.memory.lookup(phrase)
+            if hit is not None and hit["sku"] in self.cat.by_id:
+                self._trace.setdefault("memory_hits", []).append({"phrase": phrase, "sku": hit["sku"], "said": hit["said"]})
+                return self._commit(self.cat.get(hit["sku"]), q, replaced=replaced, said=phrase, via="memory")
         hint = None
         if q:
             v, u = q.normalized()
@@ -292,14 +318,14 @@ class Session:
         self.unresolved_streak = 0
         top = [c.product for c in res.candidates]
         if res.p_correct >= TAU_HIGH or len(top) == 1 and res.p_correct >= TAU_LOW:
-            return self._commit(top[0], q, replaced=replaced)
+            return self._commit(top[0], q, replaced=replaced, said=phrase, via="direct")
         a = top[0]
         if res.p_correct >= TAU_LOW and len(top) >= 2:
             b = top[1]
             if a.brand == b.brand and a.cat == b.cat and a.size and b.size and a.size != b.size:
-                self.pending = Pending("size_choice", [a, b], q, phrase, replaced=replaced)
+                self.pending = Pending("size_choice", [a, b], q, phrase, replaced=replaced, said=phrase)
                 return self._ask(self.r("ask_size", name=re.sub(r" (bada|chhota)$", "", speak_name(a))))
-            self.pending = Pending("brand_choice", [a, b], q, phrase, replaced=replaced)
+            self.pending = Pending("brand_choice", [a, b], q, phrase, replaced=replaced, said=phrase)
             na, nb = short_names([a, b])
             return self._ask(self.r("ask_two", a=na, b=nb))
         cands = res.candidates
@@ -309,7 +335,7 @@ class Session:
         opts = [p for p in (in_stock or [c.product for c in cands]) if p.cat == a.cat][:3] or top[:3]
         names = short_names(opts)
         options = names[0] if len(names) == 1 else ", ".join(names[:-1]) + " ya " + names[-1]
-        self.pending = Pending("brand_choice", opts, q, phrase, replaced=replaced)
+        self.pending = Pending("brand_choice", opts, q, phrase, replaced=replaced, said=phrase)
         return self._ask(self.r("ask_open", generic=_generic_word(a), options=options))
 
     def _update(self, target: str | None, qty_text: str | None) -> str:
@@ -382,9 +408,11 @@ class Session:
             self.pending = None
             q_new = parse_qty(text)
             if q_new is not None:  # "nahi, paav kilo" -> use the corrected quantity
-                return self._commit(pend.candidates[0], q_new, replaced=pend.replaced, checked=True)
+                return self._commit(pend.candidates[0], q_new, replaced=pend.replaced, checked=True,
+                                    said=pend.said, via=pend.via)
             if yes:
-                return self._commit(pend.candidates[0], pend.qty, replaced=pend.replaced, checked=True)
+                return self._commit(pend.candidates[0], pend.qty, replaced=pend.replaced, checked=True,
+                                    said=pend.said, via=pend.via)
             self.pending = Pending("qty", [pend.candidates[0]], None, pend.phrase, replaced=pend.replaced)
             return self._ask(self.r("ask_qty", name=speak_name(pend.candidates[0])))
         if pend.kind == "set_qty":
@@ -400,6 +428,16 @@ class Session:
             self.last_line_id = line.id
             self._emit("cart_updated", cart=self.cart_snapshot(), total=self.total)
             return self.r("updated", item=line.spoken())
+        if pend.kind == "qty_default":  # "pichhli baar jitna 10 kilo?" -> haan / "nahi, paanch kilo"
+            q_new = parse_qty(text)
+            if q_new is not None:
+                self.pending = None
+                return self._commit(pend.candidates[0], q_new, replaced=pend.replaced, said=pend.said, via=pend.via)
+            if yes:
+                self.pending = None
+                return self._commit(pend.candidates[0], pend.qty, replaced=pend.replaced, said=pend.said, via=pend.via)
+            self.pending = Pending("qty", [pend.candidates[0]], None, pend.phrase, said=pend.said, via=pend.via)
+            return self._ask(self.r("ask_qty", name=speak_name(pend.candidates[0])))
         if pend.kind in ("qty", "unit"):
             q = parse_qty(text)
             if q is None and pend.soft:  # caller moved on ("aur Pillsbury kitne ka?"): treat as a fresh turn
@@ -410,18 +448,27 @@ class Session:
             if q is None:
                 return self._retry(pend)
             self.pending = None
-            return self._commit(pend.candidates[0], q)
+            return self._commit(pend.candidates[0], q, said=pend.said or None, via=pend.via)
         # brand_choice / size_choice
         chosen: Product | None = None
+        cands = list(pend.candidates)
         for k in keys:
-            if k in ORDINALS and ORDINALS[k] < len(pend.candidates):
-                chosen = pend.candidates[ORDINALS[k]]
-            if pend.kind == "size_choice" and k in SIZE:
-                chosen = next((c for c in pend.candidates if c.size == SIZE[k]), chosen)
+            if k in ORDINALS and ORDINALS[k] < len(cands):
+                chosen = cands[ORDINALS[k]]
+            if k in SIZE and any(c.size for c in cands):  # "Tata chhota wala": size narrows a brand question too
+                sized = [c for c in cands if c.size in (SIZE[k], None)]
+                if pend.kind == "size_choice" or len(sized) == 1:
+                    chosen = next((c for c in sized if c.size == SIZE[k]), chosen)
+                cands = sized or cands
         if chosen is None and yes and len(pend.candidates) == 1:
             chosen = pend.candidates[0]
+        if chosen is None and pend.kind in ("brand_choice", "size_choice"):
+            # answers often use just the brand's first word ("Tata wala", "Mother wala")
+            firsts = [c for c in cands if c.brand and key(c.brand).split()[0] in keys]
+            if len(firsts) == 1:
+                chosen = firsts[0]
         if chosen is None:
-            res = self.resolver.resolve(text, restrict=pend.candidates, k=3)
+            res = self.resolver.resolve(text, restrict=cands, k=3)
             self._trace.setdefault("choice_resolution", []).append(self._res_trace(res))
             if res.top and res.top.alias > 0 and (len(res.candidates) == 1 or res.features["margin"] > 0.05):
                 chosen = res.top.product
@@ -432,8 +479,9 @@ class Session:
                 return self.r("substitute_declined", a=pend.phrase)
             return self._retry(pend)
         self.pending = None
-        q = parse_qty(text) or pend.qty  # "Pillsbury wala, teen kilo"
-        return self._commit(chosen, q, replaced=pend.replaced)
+        q_ans = parse_qty(text)  # "Pillsbury wala, teen kilo" overrides; a bare "1" ("Ghadi wala" heard as "Ghadi 1") doesn't
+        q = q_ans if (q_ans is not None and (q_ans.unit is not None or pend.qty is None)) else pend.qty
+        return self._commit(chosen, q, replaced=pend.replaced, said=pend.said or None, via="asked")
 
     def _retry(self, pend: Pending) -> str:
         pend.attempts += 1
@@ -484,6 +532,13 @@ class Session:
                 order["balance_after"] = LEDGER[self.customer_id]
                 self._emit("khata_updated", customer=self.customer_id, balance=LEDGER[self.customer_id])
             self._emit("order_placed", order=order)
+            if self.memory is not None:  # the readback + explicit "haan" makes this a verified label
+                learned = self.memory.learn([{"sku": l.product.id, "qty": l.qty, "unit": l.unit, "said": l.said,
+                                              "via": l.via, "money": l.money} for l in self.cart], ts=order["ts"])
+                order["learned"] = learned
+                if self.on_learn:
+                    self.on_learn(self.memory)
+                self._emit("memory_updated", customer=self.customer_id, learned=learned)
         self.order = order
         self.awaiting_confirm = False
         eta = "Aadhe ghante mein pahunch jayega."
@@ -510,6 +565,31 @@ class Session:
         return self._readback("repeat_loaded")
 
     # ------------------------------------------------------------------ turn
+    def start_outbound(self, due: list[dict]) -> str:
+        """The shop calls first: pre-fill the cart with what the customer usually re-buys, then read it back.
+        Everything after this is the normal dialogue ("haan" / "atta das kilo kar do" / "doodh hata do")."""
+        for d in due:
+            if d["sku"] not in self.cat.by_id:
+                continue
+            p = self.cat.get(d["sku"])
+            qty = float(d["qty"])
+            if self.stock[p.id] < qty:
+                continue
+            self.cart.append(Line(self._next_line, p, qty, p.unit, None, None, "memory"))
+            self._next_line += 1
+        if not self.cart:
+            return self.greet()
+        self.awaiting_confirm = True  # the offer IS a readback: nothing is ordered without an explicit yes
+        self.last_line_id = self.cart[-1].id
+        lines = ", ".join(l.spoken() for l in self.cart)
+        text = self.r("outbound_offer", name=self.customer.get("name", ""), shop=self.shop, lines=lines,
+                      total=speak_money(self.total))
+        self._events = []
+        self._emit("outbound_started", cart=self.cart_snapshot(), total=self.total)
+        self._emit("cart_updated", cart=self.cart_snapshot(), total=self.total)
+        self.last_agent_prompt = text
+        return text
+
     def greet(self) -> str:
         text = self.r("greet", shop=self.shop)
         self.last_agent_prompt = text

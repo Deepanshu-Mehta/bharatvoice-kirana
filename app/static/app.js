@@ -7,7 +7,7 @@ const STARTERS = {
 };
 let customer = "CUST-001", ws = null, vadObj = null, micOn = false;
 let actx = null, nextTime = 0, sources = [], replyDone = true, carry = null, speaking = false;
-let lines = new Map(), ended = false, lastAgent = "", askNext = false;
+let lines = new Map(), ended = false, lastAgent = "", askNext = false, outbound = false;
 
 // ---------------------------------------------------------------- small helpers
 function setState(state, label, status) {
@@ -68,6 +68,7 @@ function renderCart(m) {
       li.className = "new";
       li.innerHTML = `<span class="what"></span><span class="amt"></span>`;
       li.querySelector(".what").textContent = `${label} ${shortName(l.name)}`;
+      if (l.via === "memory") { const n = document.createElement("span"); n.className = "recall"; n.textContent = "yaad tha"; li.querySelector(".what").appendChild(n); }
       li.querySelector(".amt").textContent = money(l.amount);
       ol.appendChild(li);
       lines.set(l.sku, { li, label });
@@ -135,7 +136,8 @@ function connect() {
     actx.resume();
     resetParchi(); $("convo").innerHTML = ""; $("timing").textContent = "";
     const proto = location.protocol === "https:" ? "wss" : "ws";
-    ws = new WebSocket(`${proto}://${location.host}/ws/call?customer=${customer}`);
+    ws = new WebSocket(`${proto}://${location.host}/ws/call?customer=${customer}${outbound ? "&outbound=1" : ""}`);
+    outbound = false;
     ws.binaryType = "arraybuffer";
     ws.onopen = () => { $("hang").hidden = false; resolve(); };
     ws.onerror = () => reject(new Error("connection failed"));
@@ -217,3 +219,53 @@ document.querySelectorAll(".who button").forEach((b) => b.onclick = () => {
 $("today").textContent = new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short" });
 chips(STARTERS[customer]);
 fetch("/api/config").then((r) => r.json()).then((c) => { if (c.public_demo) $("notice").hidden = false; }).catch(() => {});
+
+// ---------------------------------------------------------------- the shop calls you (/?outbound=CUST-001)
+const ob = new URLSearchParams(location.search).get("outbound");
+if (ob && STARTERS[ob]) {
+  customer = ob;
+  document.querySelectorAll(".who button").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.cust === ob)));
+  chips(STARTERS[ob]);
+  const card = document.getElementById("incoming");
+  card.hidden = false;
+  card.querySelector(".who-calls").textContent = { "CUST-001": "Sharma ji", "CUST-002": "Tau ji", "CUST-003": "Gupta ji" }[ob];
+  document.getElementById("pickup").onclick = async () => {
+    card.hidden = true; outbound = true;
+    try { await connect(); setState("speaking", "Shop is speaking", ""); }
+    catch (e) { $("status").textContent = "Couldn't reach the shop. Try again in a moment."; }
+  };
+  document.getElementById("decline").onclick = () => { card.hidden = true; history.replaceState(null, "", "/"); };
+}
+
+// ---------------------------------------------------------------- learning-curve chart (questions per call)
+(function curve() {
+  const svg = document.getElementById("curve");
+  if (!svg) return;
+  const D = window.LEARNING || { off: [3.0, 3.67, 3.0, 4.0, 3.0], on: [3.0, 2.0, 0.33, 1.33, 0.33], caption: "" };
+  const W = 520, H = 260, L = 40, R = 90, T = 16, B = 36, ymax = 4.5;
+  const PAD = 18;  // keep the first point off the y-axis labels
+  const x = (i) => L + PAD + i * (W - L - R - PAD) / (D.on.length - 1), y = (v) => T + (1 - v / ymax) * (H - T - B);
+  const ns = "http://www.w3.org/2000/svg", el = (t, a) => { const e = document.createElementNS(ns, t); for (const k in a) e.setAttribute(k, a[k]); svg.appendChild(e); return e; };
+  for (let v = 0; v <= 4; v++) { el("line", { x1: L, x2: W - R, y1: y(v), y2: y(v), class: "grid" }); el("text", { x: L - 10, y: y(v) + 4, "text-anchor": "end", class: "axis" }).textContent = v; }
+  D.on.forEach((_, i) => { el("text", { x: x(i), y: H - 12, "text-anchor": "middle", class: "axis" }).textContent = `Call ${i + 1}`; });
+  const tip = el("g", { class: "tipbox", visibility: "hidden" });
+  const tipBg = document.createElementNS(ns, "rect"); tipBg.setAttribute("rx", 6); tipBg.setAttribute("fill", "#18224f"); tip.appendChild(tipBg);
+  const tipTx = document.createElementNS(ns, "text"); tipTx.setAttribute("fill", "#fdfeff"); tipTx.setAttribute("font-size", "12"); tip.appendChild(tipTx);
+  for (const [k, name] of [["off", "Starts fresh"], ["on", "Remembers"]]) {
+    el("path", { d: D[k].map((v, i) => `${i ? "L" : "M"}${x(i)},${y(v)}`).join(" "), class: `line ${k}` });
+    D[k].forEach((v, i) => {
+      el("circle", { cx: x(i), cy: y(v), r: 5, class: k });
+      const h = el("circle", { cx: x(i), cy: y(v), r: 14, class: "hit", tabindex: 0 });
+      const show = () => { tipTx.textContent = `${name}, call ${i + 1}: ${v.toFixed(1)} questions`; tip.setAttribute("visibility", "visible");
+        const w = tipTx.getComputedTextLength() + 16; tipBg.setAttribute("width", w); tipBg.setAttribute("height", 24);
+        const tx = Math.min(x(i) - w / 2, W - w), ty = y(v) - 36; tipBg.setAttribute("x", tx); tipBg.setAttribute("y", ty); tipTx.setAttribute("x", tx + 8); tipTx.setAttribute("y", ty + 16); };
+      h.addEventListener("mouseenter", show); h.addEventListener("focus", show);
+      h.addEventListener("mouseleave", () => tip.setAttribute("visibility", "hidden")); h.addEventListener("blur", () => tip.setAttribute("visibility", "hidden"));
+    });
+    const last = D[k].length - 1;
+    el("text", { x: x(last) + 10, y: y(D[k][last]) + 4, class: "lbl" }).textContent = `${D[k][last].toFixed(1)} ${k === "on" ? "remembers" : "fresh"}`;
+  }
+  svg.appendChild(tip);
+  document.getElementById("curveDesc").textContent = `Questions per call over five calls. Starts fresh: ${D.off.join(", ")}. Remembers: ${D.on.join(", ")}.`;
+  document.getElementById("curveCap").textContent = D.caption;
+})();

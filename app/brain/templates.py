@@ -53,6 +53,16 @@ T: dict[str, dict[str, str]] = {
         "hindi": "{item}? Itna zyada, pakka?",
         "haryanvi": "{item}? Itna ghana, pakka?",
     },
+    "outbound_offer": {
+        "hinglish": "Namaste {name}, {shop} se bol raha hoon. Aapka {lines} khatam hone wala hoga. Wahi bhej doon? Total {total}.",
+        "hindi": "Namaste {name}, {shop} se bol rahe hain. Aapka {lines} khatam hone wala hoga. Kya wahi bhej dein? Kul {total}.",
+        "haryanvi": "Ram Ram {name}, {shop} te bol rya su. Thara {lines} khatam hone aala hoga. Wahi bhej du? Total {total}.",
+    },
+    "usual_qty": {
+        "hinglish": "{name}, pichhli baar jitna {qty}?",
+        "hindi": "{name}, pichhli baar ki tarah {qty}?",
+        "haryanvi": "{name}, pichhli baar jitna {qty}?",
+    },
     "ask_unit": {
         "hinglish": "{name} kitne {unit}?",
         "hindi": "{name} kitne {unit} chahiye?",

@@ -18,6 +18,7 @@
 <header class="top">
   <a class="wordmark" href="/">BharatVoice <small>भारतवॉइस</small></a>
   <nav aria-label="Sections">
+    <a href="#memory" class="hide-sm">It remembers</a>
     <a href="#heard" class="hide-sm">What it hears</a>
     <a href="#proof" class="hide-sm">Proof</a>
     <a href="#flow" class="hide-sm">How it works</a>
@@ -30,7 +31,7 @@
 <section class="hero" id="call" aria-label="Call the shop">
   <div class="intro">
     <h1>Bhaiya, do kilo atta bhej dena.<span class="reply">“Aashirvaad wala ya Pillsbury?”</span></h1>
-    <p class="lede">BharatVoice answers a kirana's phone, understands <strong>Hinglish, Hindi and Haryanvi</strong> on a noisy line, and writes the order exactly right. It asks only when it's unsure, and nothing is ordered until you say <strong>haan</strong>.</p>
+    <p class="lede">BharatVoice answers a kirana's phone, understands <strong>Hinglish, Hindi and Haryanvi</strong> on a noisy line, and writes the order exactly right. Like the shopkeeper, it <strong>remembers how each customer talks</strong>, so it never asks the same question twice, and it calls you before you run out.</p>
   </div>
 
   <div class="callctl">
@@ -46,6 +47,12 @@
     <p class="status" id="status" aria-live="polite">Use headphones so the shop doesn't hear itself.</p>
   </div>
 
+  <div class="incoming" id="incoming" hidden role="dialog" aria-label="Incoming call">
+    <p>Sharma General Store is calling <b class="who-calls"></b></p>
+    <p class="why">The shop noticed some of your usual items are about to run out.</p>
+    <div class="talkrow"><button class="talk" id="pickup" type="button"><span class="dot" aria-hidden="true"></span>Pick up</button>
+    <button class="ghost" id="decline" type="button">Not now</button></div>
+  </div>
   <div class="parchi-wrap">
     <div class="parchi" id="parchi" aria-live="polite" aria-label="Your order">
       <div class="shop">Sharma General Store <span id="today"></span></div>
@@ -79,6 +86,29 @@
     <div class="row"><span class="said">ande konya chahiye</span><span class="got">अंडे कौन या चाहिए?</span><span class="fix"><strong>Eggs removed.</strong> “Konya” is Haryanvi for “don’t”, and we taught the agent every way Prisma spells it.</span></div>
     <div class="row"><span class="said">nahi nahi, moong do kilo kar do</span><span class="got">नहीं नहीं, Moong Dal किलो कर दो</span><span class="fix"><strong>“Moong Dal kitna kar doon?”</strong> When the number is lost, it asks instead of guessing.</span></div>
     <div class="row"><span class="said">paav kilo haldi</span><span class="got">पाँच किलो हल्दी</span><span class="fix"><strong>“Paanch kilo haldi? Itna zyada, pakka?”</strong> Unusual quantities are confirmed before they reach the bill.</span></div>
+  </div>
+</section>
+
+<section class="sec rule-top" id="memory">
+  <h2>It remembers each customer, like the shopkeeper does</h2>
+  <p>Every confirmed order is a verified example of what a customer's words mean. BharatVoice learns from those, and only those, so it never asks the same customer the same question twice.</p>
+  <div class="memgrid">
+    <figure class="chart">
+      <h3 class="charttitle">Clarifying questions per call, same customers, call after call</h3>
+      <div class="legend"><span><i class="sw on"></i>Remembers</span><span><i class="sw off"></i>Starts fresh every call</span></div>
+      <svg id="curve" viewBox="0 0 520 260" role="img" aria-labelledby="curveDesc"><desc id="curveDesc"></desc></svg>
+      <figcaption id="curveCap"></figcaption>
+    </figure>
+    <div class="learned">
+      <div class="note"><span class="said">“kapde dhone aala surf”</span><span class="means">Tau ji means Ghadi. Asked once, on the first call.</span></div>
+      <div class="note"><span class="said">“atta”</span><span class="means">For Tau ji that's Pillsbury, 10 kilo. “Pichhli baar jitna das kilo?”</span></div>
+      <div class="note"><span class="said">“lal aala sabun”</span><span class="means">Lifebuoy. His words also go into Prisma's keyterms for his next call, so they're heard better too.</span></div>
+      <div class="callsyou">
+        <h3>And the shop calls you before you run out</h3>
+        <p>From each customer's rhythm (milk every week, atta every fortnight) the counter knows who's due. One tap and the shop calls: <i>“Namaste Sharma ji, aapka do litre Amul doodh aur paanch kilo Aashirvaad atta khatam hone wala hoga. Wahi bhej doon?”</i> “Haan, par atta das kilo” is all it takes.</p>
+        <a class="trycall" href="/?outbound=CUST-001">Let the shop call Sharma ji</a>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -126,6 +156,11 @@
   <span>Built by Deepanshu Mehta on Gnani.ai's Prisma, Timbre and Evon, for the Great Indian AI Internship Challenge.</span>
   <span><a href="https://github.com/Deepanshu-Mehta/bharatvoice-kirana">Source code and results</a></span>
 </footer>
+<script>
+  // eval/learning_curve.py --mode audio (6 Nov): 3 regular customers x 5 calls, Timbre voices, G.711 + 10 dB shop noise
+  window.LEARNING = { off: [3.0, 3.33, 3.0, 4.0, 3.0], on: [3.0, 2.67, 1.0, 1.33, 0.33],
+    caption: "Three regular customers, five calls each, on a noisy phone line. Remembering halves the questions (3.3 to 1.7 per call on average, 3.0 to 0.3 by the fifth call) with exactly the same order accuracy. Call 4 rises because it brought items the shop hadn't heard from them yet." };
+</script>
 <script src="/static/app.js"></script>
 </body>
 </html>
