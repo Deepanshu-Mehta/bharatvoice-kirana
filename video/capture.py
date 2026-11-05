@@ -4,7 +4,7 @@ A headless Chromium opens the real call page (1080x1920: a 432x768 phone viewpor
 replaces the microphone with a synthetic stream; each caller line (Timbre voice -> simulated phone line) is played
 into it, so the page's own voice detector, the server, Prisma, the agent, Evon and Munshi ji's streamed voice all
 run exactly as for a visitor. We record:
-  frames/   every compositor frame (CDP screencast, JPEG) with its wall-clock timestamp
+  frames/   full-resolution screenshots in a tight loop (JPEG), each with its wall-clock timestamp
   events    every server message (transcript, cart, replies, timings, end) and when each caller line played
   audio     the shop's audio exactly as the page scheduled it, plus the caller lines, on one timeline
 
@@ -164,14 +164,19 @@ async def capture(browser, base: str, scene: dict) -> None:
     cdp = await ctx.new_cdp_session(page)
     frames: list[dict] = []
 
-    def on_frame(p):
-        name = f"{len(frames):05d}.jpg"
-        (out / "frames" / name).write_bytes(base64.b64decode(p["data"]))
-        frames.append({"t": p["metadata"]["timestamp"], "file": name})
-        asyncio.ensure_future(cdp.send("Page.screencastFrameAck", {"sessionId": p["sessionId"]}))
-    cdp.on("Page.screencastFrame", on_frame)
-    await cdp.send("Page.startScreencast", {"format": "jpeg", "quality": 92, "maxWidth": int(W * DPR),
-                                            "maxHeight": int(H * DPR), "everyNthFrame": 1})
+    # Full-resolution frames: CDP screencast ignores the 2.5x pixel density (it yields 432x768), so grab
+    # device-pixel screenshots in a tight loop instead (~15-25 fps; the UI changes slowly).
+    stop = asyncio.Event()
+
+    async def grab():
+        while not stop.is_set():
+            t = time.time()
+            r = await cdp.send("Page.captureScreenshot", {"format": "jpeg", "quality": 90, "optimizeForSpeed": True,
+                                                         "clip": {"x": 0, "y": 0, "width": W, "height": H, "scale": DPR}})
+            name = f"{len(frames):05d}.jpg"
+            (out / "frames" / name).write_bytes(base64.b64decode(r["data"]))
+            frames.append({"t": (t + time.time()) / 2, "file": name})
+    grabber = asyncio.ensure_future(grab())
     t0 = time.time()
     marks = {"start": t0}
     await asyncio.sleep(1.2)
@@ -192,7 +197,8 @@ async def capture(browser, base: str, scene: dict) -> None:
         print(f"  [{scene['id']}] line {i} answered: {ok}")
     await _wait(page, AUDIO_DONE, 30)
     await asyncio.sleep(1.5)
-    await cdp.send("Page.stopScreencast")
+    stop.set()
+    await grabber
     events = await page.evaluate("__H.events")
     agent = await page.evaluate("__H.agent")
     await ctx.close()

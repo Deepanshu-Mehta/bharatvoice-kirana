@@ -97,8 +97,8 @@ button { font: inherit; cursor: pointer; }
 .parchi .empty { color: #9aa8d8; }
 .parchi .totalline { display: flex; justify-content: space-between; border-top: 2px solid var(--ballpoint); margin-top: .4rem; padding-top: .1rem; font-size: 1.5rem; }
 .parchi .totalline span:first-child { color: var(--ink-2); font-size: 1.15rem; }
-.stamp { position: absolute; right: 1.6rem; bottom: 2.6rem; font: 400 2.1rem/1 var(--serif); color: var(--margin); border: 3px double var(--margin); border-radius: 10px; padding: .45rem .8rem .25rem; transform: rotate(-11deg); opacity: .85; mix-blend-mode: multiply; }
-.stamp small { display: block; font: 600 .7rem/1.2 var(--sans); letter-spacing: .02em; text-align: center; }
+.stamp { position: absolute; right: 2.2rem; bottom: 2.6rem; font: 400 2.1rem/1 var(--serif); color: var(--margin); border: 3px double var(--margin); border-radius: 10px; padding: .45rem .8rem .25rem; transform: rotate(-11deg); opacity: .85; mix-blend-mode: multiply; }
+.stamp small { display: block; white-space: nowrap; font: 600 .7rem/1.2 var(--sans); letter-spacing: .02em; text-align: center; }
 .stamp.thump { animation: thump .45s cubic-bezier(.2, 1.6, .4, 1) both; }
 @keyframes thump { from { transform: rotate(-11deg) scale(2.2); opacity: 0; } to { transform: rotate(-11deg) scale(1); opacity: .85; } }
 .question { position: absolute; left: 4.4rem; right: 1.6rem; bottom: .9rem; color: var(--margin); font: 400 1.1rem/1.4 var(--hand); }

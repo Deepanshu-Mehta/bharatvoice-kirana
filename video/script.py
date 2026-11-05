@@ -34,7 +34,7 @@ SCENES = [
         "बस इतना ही।",
         "हाँ।",
     ]},
-    {"id": "outbound", "customer": "CUST-002", "voice": "tau", "outbound": True, "lines": [
+    {"id": "outbound", "customer": "CUST-002", "voice": "tau", "outbound": True, "fresh_memory": True, "lines": [
         "हाँ भेज दे, खाते में लिख दियो।",
     ]},
 ]
