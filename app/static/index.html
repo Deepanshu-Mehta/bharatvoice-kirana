@@ -3,139 +3,129 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BharatVoice · call</title>
-<link rel="stylesheet" href="/static/style.css">
-<script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/ort.wasm.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@ricky0123/vad-web@0.0.31/dist/bundle.min.js"></script>
+<title>BharatVoice: the kirana phone that writes the order right</title>
+<meta name="description" content="An AI that answers a neighbourhood kirana's phone in Hinglish, Hindi and Haryanvi, and writes the order exactly right. Built on Gnani.ai's Prisma, Timbre and Evon.">
+<meta property="og:title" content="BharatVoice: call the kirana, watch the order write itself">
+<meta property="og:description" content="Hinglish, Hindi and Haryanvi phone orders, on a noisy line, written down exactly right. Built on Gnani.ai.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400&family=Mukta:wght@400;600&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/site.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231e2e78'/%3E%3Cpath d='M9 8h14M9 14h14M9 20h9' stroke='%23fdfeff' stroke-width='2.4' stroke-linecap='round'/%3E%3Ccircle cx='23' cy='22' r='3.4' fill='%23f4b400'/%3E%3C/svg%3E">
+<script defer src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/ort.wasm.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@ricky0123/vad-web@0.0.31/dist/bundle.min.js"></script>
 </head>
 <body>
-<header>
-  <div class="brand">BharatVoice <span>· Sharma General Store</span></div>
-  <div class="controls">
-    <select id="customer">
-      <option value="CUST-001">Sharma ji · Hinglish</option>
-      <option value="CUST-002">Tau ji · Haryanvi</option>
-      <option value="CUST-003">Gupta ji · Hindi</option>
-    </select>
-    <select id="extractor">
-      <option value="rules">Rules extractor</option>
-      <option value="hybrid">Hybrid (rules + Evon)</option>
-      <option value="evon">Evon v3.3 only</option>
-    </select>
-    <label class="chk"><input type="checkbox" id="bargein"> barge-in (headphones)</label>
-    <button id="start">Start call</button>
-    <button id="stop" disabled>End</button>
-  </div>
+<header class="top">
+  <a class="wordmark" href="/">BharatVoice <small>भारतवॉइस</small></a>
+  <nav aria-label="Sections">
+    <a href="#heard" class="hide-sm">What it hears</a>
+    <a href="#proof" class="hide-sm">Proof</a>
+    <a href="#flow" class="hide-sm">How it works</a>
+    <a href="/board">Shop counter</a>
+    <a href="https://github.com/Deepanshu-Mehta/bharatvoice-kirana">Code</a>
+  </nav>
 </header>
-<div id="demo" class="demo" hidden>Public demo · synthetic shop &amp; prices · your audio is sent to Gnani.ai for
-  transcription and is not stored · limits apply · please don't share personal details.
-  Try: <i>"do kilo atta aur ek litre doodh"</i>, <i>"Aashirvaad atta kitne ka hai?"</i>, <i>"nahi nahi, teen kilo kar do"</i>,
-  <i>"udhaar mein likh do"</i> (as Sharma ji). <a href="/board" target="_blank">Shopkeeper board ↗</a></div>
+
 <main>
-  <section class="call">
-    <div id="status" class="status">idle</div>
-    <div id="log" class="log"></div>
-    <form id="typed" class="typed">
-      <input id="typedText" placeholder="Type a turn instead of speaking (no STT credits)…" autocomplete="off">
+<section class="hero" id="call" aria-label="Call the shop">
+  <div class="intro">
+    <h1>Bhaiya, do kilo atta bhej dena.<span class="reply">“Aashirvaad wala ya Pillsbury?”</span></h1>
+    <p class="lede">BharatVoice answers a kirana's phone, understands <strong>Hinglish, Hindi and Haryanvi</strong> on a noisy line, and writes the order exactly right. It asks only when it's unsure, and nothing is ordered until you say <strong>haan</strong>.</p>
+  </div>
+
+  <div class="callctl">
+    <div class="who" role="group" aria-label="Call as">
+      <button type="button" data-cust="CUST-001" aria-pressed="true">Sharma ji<small>Hinglish</small></button>
+      <button type="button" data-cust="CUST-002" aria-pressed="false">Tau ji<small>Haryanvi</small></button>
+      <button type="button" data-cust="CUST-003" aria-pressed="false">Gupta ji<small>Hindi</small></button>
+    </div>
+    <div class="talkrow">
+      <button class="talk" id="talk" data-state="idle" type="button"><span class="dot" aria-hidden="true"></span><span id="talkLabel">Call the shop</span></button>
+      <button class="ghost" id="hang" type="button" hidden>Hang up</button>
+    </div>
+    <p class="status" id="status" aria-live="polite">Use headphones so the shop doesn't hear itself.</p>
+  </div>
+
+  <div class="parchi-wrap">
+    <div class="parchi" id="parchi" aria-live="polite" aria-label="Your order">
+      <div class="shop">Sharma General Store <span id="today"></span></div>
+      <ol id="lines"><li class="empty"><span class="what">Order yahan likha jayega</span><span></span></li></ol>
+      <div class="totalline" id="totalline" hidden><span>Kul</span><span id="total">₹0</span></div>
+      <div class="question" id="question"></div>
+      <div class="stamp" id="stamp" hidden></div>
+    </div>
+    <div class="convo" id="convo" aria-label="Conversation"></div>
+    <div class="timing" id="timing"></div>
+  </div>
+
+  <div class="tryline">
+    <h2 id="tryHead">Or tap a line to say it</h2>
+    <div class="chips" id="chips"></div>
+    <form class="typed" id="typed">
+      <input id="typedText" autocomplete="off" placeholder="Type what you'd say on the phone" aria-label="Type what you'd say">
       <button>Send</button>
     </form>
-  </section>
-  <aside class="cart">
-    <h2>Order <span id="badges"></span></h2>
-    <table><thead><tr><th>Item</th><th>Qty</th><th class="r">₹</th></tr></thead><tbody id="lines"></tbody></table>
-    <div class="total">Total <span id="total">₹0</span></div>
-    <div id="pending" class="pending"></div>
-    <div id="timings" class="timings"></div>
-    <div class="foot">Prisma (STT) · Timbre (TTS) · Evon v3.3 (understanding) — all Gnani.ai</div>
-  </aside>
+    <p class="notice" id="notice" hidden>Demo shop with made-up prices. Your voice goes to Gnani.ai for transcription and isn't stored.</p>
+  </div>
+</section>
+
+<section class="sec" id="heard">
+  <h2>What a phone line does to words</h2>
+  <p>Real transcripts from our tests on Gnani's Prisma, next to what BharatVoice wrote on the parchi instead.</p>
+  <div class="heard">
+    <div class="row cap"><span>Said</span><span>Heard on the line</span><span>Written down</span></div>
+    <div class="row"><span class="said">paav kilo jeera</span><span class="got">0.5 किलो जीरा</span><span class="fix"><strong>250 g Jeera.</strong> Spoken numbers are kept as words and parsed: paav, sawa, dhai, saadhe.</span></div>
+    <div class="row"><span class="said">ek packet Surf Excel</span><span class="got">सर, F Excel</span><span class="fix"><strong>Surf Excel.</strong> Every name is matched by sound across Devanagari and Roman spellings.</span></div>
+    <div class="row"><span class="said">ande konya chahiye</span><span class="got">अंडे कौन या चाहिए?</span><span class="fix"><strong>Eggs removed.</strong> “Konya” is Haryanvi for “don’t”, and we taught the agent every way Prisma spells it.</span></div>
+    <div class="row"><span class="said">nahi nahi, moong do kilo kar do</span><span class="got">नहीं नहीं, Moong Dal किलो कर दो</span><span class="fix"><strong>“Moong Dal kitna kar doon?”</strong> When the number is lost, it asks instead of guessing.</span></div>
+    <div class="row"><span class="said">paav kilo haldi</span><span class="got">पाँच किलो हल्दी</span><span class="fix"><strong>“Paanch kilo haldi? Itna zyada, pakka?”</strong> Unusual quantities are confirmed before they reach the bill.</span></div>
+  </div>
+</section>
+
+<section class="sec rule-top" id="proof">
+  <h2>Tested the way phone lines actually sound</h2>
+  <p>Every test call is spoken by Gnani's Timbre voices, squeezed through an 8&nbsp;kHz phone channel with shop noise, transcribed by Prisma and scored on the final order. Every item, quantity and unit has to match.</p>
+  <div class="proof">
+    <figure class="chart">
+      <h3 class="charttitle">Orders written exactly right on a noisy phone line</h3>
+      <div class="bars" role="img" aria-label="Orders exactly right on a noisy line: no context 58 percent, brand names 77 percent, brands plus the shop's last question 90 percent">
+        <div class="bar" tabindex="0"><span class="lbl">No context</span><span class="track"><span class="fill" style="width:58%"></span></span><span class="val">58%</span><span class="tip">18 of 31 calls exactly right</span></div>
+        <div class="bar" tabindex="0"><span class="lbl">Brand names</span><span class="track"><span class="fill" style="width:77%"></span></span><span class="val">77%</span><span class="tip">24 of 31 calls exactly right</span></div>
+        <div class="bar best" tabindex="0"><span class="lbl">Brands + last question</span><span class="track"><span class="fill" style="width:90%"></span></span><span class="val">90%</span><span class="tip">28 of 31 calls, with 43% fewer follow-up questions</span></div>
+      </div>
+      <figcaption>Hinglish calls on a noisy phone line. Telling Prisma which brands are in play and what the shop just asked lifts exact orders from 58% to 90%.</figcaption>
+    </figure>
+    <div class="facts">
+      <div><b>97%</b><span>Hindi orders exactly right on the same noisy line</span></div>
+      <div><b>88%</b><span>Haryanvi, up from 77% after tuning to how Prisma hears the dialect</span></div>
+      <div><b>0</b><span>wrong prices or unconfirmed orders in any test. Prices come from code, never from the model.</span></div>
+      <div><b>≈0.9 s</b><span>from your last word to the shop's first word back</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec rule-top" id="flow">
+  <h2>What happens in one turn</h2>
+  <ol class="flow">
+    <li><h3>Hear</h3><p><em>Prisma v3.0</em> transcribes, primed with the brands in your order and the question the shop just asked.</p></li>
+    <li><h3>Understand</h3><p>Rules handle everyday phrasing in milliseconds. <em>Evon v3.3</em> steps in for lines like “woh meethi safed cheez jo chai mein daalte hain”.</p></li>
+    <li><h3>Decide</h3><p>Code matches the catalog, checks stock and udhaar limits, and decides whether to ask. The model never sets a price.</p></li>
+    <li><h3>Reply</h3><p><em>Timbre</em> answers in your own way of speaking, streamed so the first word arrives in about half a second.</p></li>
+  </ol>
+</section>
+
+<section class="sec rule-top">
+  <div class="made">
+    <h2>On the shopkeeper's side of the counter</h2>
+    <p><strong>WhatsApp voice notes</strong> become draft orders with one tap. <strong>Udhaar</strong> is written in the khata with a credit limit the code enforces, and the shop can send a polite reminder in the customer's own way of speaking. <a href="/board">Open the shop counter</a>.</p>
+  </div>
+</section>
 </main>
-<script>
-const $ = (id) => document.getElementById(id);
-let ws = null, myvad = null, speaking = false;
-let actx = null, nextTime = 0, sources = [], replyDone = true, carry = null;
 
-function bubble(who, text, extra) {
-  const d = document.createElement("div");
-  d.className = "bubble " + who;
-  d.textContent = text;
-  if (extra) { const s = document.createElement("small"); s.textContent = extra; d.appendChild(s); }
-  $("log").appendChild(d); $("log").scrollTop = 1e9;
-}
-function setStatus(t, cls) { $("status").textContent = t; $("status").className = "status " + (cls || ""); }
-
-function unitLabel(q, u) { return (+q).toString() + " " + ({kg:"kg", l:"L", pkt:"pkt", pc:"pc"}[u] || u); }
-function renderCart(m) {
-  $("lines").innerHTML = m.cart.map(l => `<tr><td>${l.name}</td><td>${unitLabel(l.qty, l.unit)}</td><td class="r">${l.amount.toFixed(0)}</td></tr>`).join("");
-  $("total").textContent = "₹" + m.total.toFixed(0);
-  $("pending").textContent = m.pending ? "waiting for answer: " + m.pending.replace("_", " ") : "";
-  $("badges").innerHTML = `<i>${m.register}</i>` + (m.source ? `<i>${m.source}</i>` : "");
-}
-
-function encodeWAV(samples, sr = 16000) {
-  const buf = new ArrayBuffer(44 + samples.length * 2), v = new DataView(buf);
-  const w = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
-  w(0, "RIFF"); v.setUint32(4, 36 + samples.length * 2, true); w(8, "WAVE"); w(12, "fmt ");
-  v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true); v.setUint32(24, sr, true);
-  v.setUint32(28, sr * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true); w(36, "data");
-  v.setUint32(40, samples.length * 2, true);
-  for (let i = 0; i < samples.length; i++) { const s = Math.max(-1, Math.min(1, samples[i])); v.setInt16(44 + i * 2, s < 0 ? s * 0x8000 : s * 0x7fff, true); }
-  return new Blob([buf], { type: "audio/wav" });
-}
-
-function stopAudio() { sources.forEach(s => { try { s.stop(); } catch (e) {} }); sources = []; nextTime = 0; speaking = false; }
-function maybeDone() {
-  if (replyDone && sources.length === 0) { speaking = false; if (myvad && ws) { myvad.start(); setStatus("listening…", "live"); } }
-}
-function playChunk(buf) {
-  let bytes = new Uint8Array(buf);
-  if (carry) { const m = new Uint8Array(carry.length + bytes.length); m.set(carry); m.set(bytes, carry.length); bytes = m; carry = null; }
-  if (bytes.length % 2) { carry = bytes.slice(-1); bytes = bytes.slice(0, -1); }
-  const pcm = new Int16Array(bytes.buffer, bytes.byteOffset, bytes.length / 2);
-  if (!pcm.length) return;
-  const ab = actx.createBuffer(1, pcm.length, 16000), ch = ab.getChannelData(0);
-  for (let i = 0; i < pcm.length; i++) ch[i] = pcm[i] / 32768;
-  const src = actx.createBufferSource(); src.buffer = ab; src.connect(actx.destination);
-  nextTime = Math.max(nextTime, actx.currentTime + 0.03);
-  src.start(nextTime); nextTime += ab.duration;
-  sources.push(src);
-  src.onended = () => { sources = sources.filter(x => x !== src); maybeDone(); };
-}
-
-async function startCall() {
-  const url = `${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/ws/call?customer=${$("customer").value}&extractor=${$("extractor").value}`;
-  ws = new WebSocket(url);
-  ws.binaryType = "arraybuffer";
-  actx = actx || new AudioContext(); await actx.resume();
-  $("log").innerHTML = ""; $("lines").innerHTML = ""; $("total").textContent = "₹0";
-  ws.onmessage = (ev) => {
-    if (ev.data instanceof ArrayBuffer) { playChunk(ev.data); return; }
-    const m = JSON.parse(ev.data);
-    if (m.type === "transcript") bubble("me", m.text || "(silence)");
-    else if (m.type === "reply_start") {
-      bubble("agent", m.text); replyDone = false; speaking = true;
-      if (myvad && !$("bargein").checked) myvad.pause();
-      setStatus("agent speaking…", "agent");
-    }
-    else if (m.type === "reply_end") { replyDone = true; maybeDone(); }
-    else if (m.type === "cart") renderCart(m);
-    else if (m.type === "timings") $("timings").textContent = Object.entries(m).filter(([k]) => k !== "type").map(([k, v]) => `${k} ${v}`).join(" · ");
-    else if (m.type === "error") bubble("err", m.text);
-    else if (m.type === "end") { setStatus(m.order ? `order ${m.order.order_id} placed` : "handed off to shopkeeper", "done"); if (myvad) myvad.pause(); }
-  };
-  ws.onclose = () => setStatus("call ended");
-  myvad = await vad.MicVAD.new({
-    baseAssetPath: "https://cdn.jsdelivr.net/npm/@ricky0123/vad-web@0.0.31/dist/",
-    onnxWASMBasePath: "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/",
-    positiveSpeechThreshold: 0.6, redemptionMs: 450, minSpeechMs: 250,
-    onSpeechStart: () => { if (speaking && $("bargein").checked) stopAudio(); setStatus("hearing you…", "live"); },
-    onSpeechEnd: (audio) => { if (ws && ws.readyState === 1) { ws.send(encodeWAV(audio)); setStatus("thinking…"); } },
-  });
-  $("start").disabled = true; $("stop").disabled = false;
-}
-function stopCall() { if (myvad) myvad.destroy(); myvad = null; if (ws) ws.close(); ws = null; $("start").disabled = false; $("stop").disabled = true; }
-$("start").onclick = startCall; $("stop").onclick = stopCall;
-fetch("/api/config").then(r => r.json()).then(c => { if (c.public_demo) { $("demo").hidden = false; $("extractor").style.display = "none"; } });
-$("typed").onsubmit = (e) => { e.preventDefault(); const t = $("typedText").value.trim(); if (t && ws) { ws.send(JSON.stringify({ type: "text", text: t })); $("typedText").value = ""; } };
-</script>
+<footer>
+  <span>Built by Deepanshu Mehta on Gnani.ai's Prisma, Timbre and Evon, for the Great Indian AI Internship Challenge.</span>
+  <span><a href="https://github.com/Deepanshu-Mehta/bharatvoice-kirana">Source code and results</a></span>
+</footer>
+<script src="/static/app.js"></script>
 </body>
 </html>

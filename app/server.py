@@ -187,6 +187,7 @@ async def ws_call(ws: WebSocket):
                      "extractor": extractor_name})
     greet = session.greet()
     await speak(ws, greet, {})
+    await ws.send_json({"type": "suggest", "items": suggestions(session)})
     turn = 0
     _active_calls += 1
     started = time.time()
@@ -232,7 +233,9 @@ async def ws_call(ws: WebSocket):
             await ws.send_json({"type": "cart", "cart": session.cart_snapshot(), "total": session.total,
                                 "pending": session.pending.kind if session.pending else None,
                                 "register": session.register,
-                                "source": result.frame.source if result.frame else None})
+                                "source": result.frame.source if result.frame else None,
+                                "suggestions": suggestions(session), "payment": session.payment,
+                                "awaiting_confirm": session.awaiting_confirm})
             if result.reply:
                 await speak(ws, result.reply, timings, speed=0.85 if session.slow else 1.0)
             timings["turn_ms"] = round((time.perf_counter() - t_turn) * 1000)
@@ -251,6 +254,43 @@ async def ws_call(ws: WebSocket):
     finally:
         _active_calls -= 1
         await broadcast({"type": "call_ended", "session": session.session_id})
+
+
+# ---------------------------------------------------------------- suggested replies (tap instead of speaking)
+STARTERS = {
+    "hinglish": ["Do kilo atta aur ek litre Amul doodh", "Aashirvaad atta kitne ka hai?", "Pichli baar wala saaman bhej do"],
+    "haryanvi": ["Ram Ram! do kilo cheeni aur ek darjan ande", "bees rupaye ka dhaniya", "mhara kitna baaki se?"],
+    "hindi": ["दो किलो आशीर्वाद आटा भेज दीजिए", "पाव किलो जीरा और ढाई सौ ग्राम हल्दी", "अमूल गोल्ड है क्या?"],
+}
+
+
+def suggestions(s: Session) -> list[str]:
+    from app.brain.dm import short_names
+    if s.order or s.handed_off:
+        return []
+    reg = s.register if s.register in STARTERS else "hinglish"
+    p = s.pending
+    if p is not None:
+        if p.kind == "brand_choice":
+            return [f"{n} wala" for n in short_names(p.candidates)][:3]
+        if p.kind == "size_choice":
+            return ["chhota wala", "bada wala"]
+        if p.kind == "substitute_offer":
+            return ["haan chalega", "nahi, rehne do"]
+        if p.kind in ("qty", "set_qty", "unit"):
+            u = p.candidates[0].unit if p.candidates else "kg"
+            return {"kg": ["ek kilo", "aadha kilo", "do kilo"], "l": ["ek litre", "aadha litre", "do litre"]}.get(
+                u, ["ek packet", "do packet", "teen packet"])
+        if p.kind in ("qty_confirm", "cancel_confirm"):
+            return ["haan", "nahi"]
+    if s.awaiting_confirm:
+        return ["haan, confirm kar do", "udhaar mein likh do", "nahi nahi, ek kilo kar do"]
+    if not s.cart:
+        return STARTERS[reg]
+    last = s.cart[-1].product
+    generic = next((g for g in last.generic if g.isascii()), last.name.split()[0].lower())
+    return ["bas itna hi", f"nahi nahi, {generic} teen kilo kar do" if last.unit == "kg" else "aur ek packet Parle-G",
+            "thoda dheere boliye"]
 
 
 # ---------------------------------------------------------------- udhaar khata

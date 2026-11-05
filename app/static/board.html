@@ -2,96 +2,186 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>BharatVoice · shopkeeper board</title>
-<link rel="stylesheet" href="/static/style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shop counter: Sharma General Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400&family=Mukta:wght@400;600&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/site.css">
+<style>
+  body { background: var(--neel); }
+  .counter { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: clamp(1.5rem, 3vw, 3rem); padding: clamp(1.2rem, 3vw, 2.5rem) clamp(1.25rem, 4vw, 3.5rem) 4rem; color: var(--on-neel); }
+  .counter h2 { font: 400 1.6rem/1.2 var(--serif); margin: 0 0 1rem; }
+  .counter h2 small { font: 400 .95rem var(--sans); color: var(--on-neel-2); margin-left: .6rem; }
+  .slips { display: grid; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); gap: 1.4rem; align-items: start; }
+  .slip { position: relative; background: var(--paper); color: var(--ballpoint); padding: .8rem 1rem 1.6rem 3rem; font: 400 1.08rem/1.9rem var(--hand); box-shadow: 0 14px 30px -14px rgba(5, 10, 40, .7);
+    background-image: linear-gradient(to right, transparent 2.2rem, var(--margin) 2.2rem, var(--margin) calc(2.2rem + 1.5px), transparent calc(2.2rem + 1.5px)), repeating-linear-gradient(to bottom, transparent 0, transparent calc(1.9rem - 1px), var(--rule) calc(1.9rem - 1px), var(--rule) 1.9rem);
+    background-position: 0 0, 0 .8rem; }
+  .slip:nth-child(odd) { transform: rotate(-.8deg); } .slip:nth-child(even) { transform: rotate(.6deg); }
+  .slip header { font: 400 .95rem/1.9rem var(--sans); color: var(--ink-2); display: flex; justify-content: space-between; }
+  .slip header b { color: var(--ink); font: 400 1.05rem/1.9rem var(--serif); }
+  .slip ul { list-style: none; margin: 0; padding: 0; }
+  .slip li { display: flex; justify-content: space-between; gap: .6rem; }
+  .slip li span:last-child { color: var(--ink-2); }
+  .slip .sum { border-top: 2px solid var(--ballpoint); display: flex; justify-content: space-between; font-size: 1.25rem; }
+  .slip:has(.stamp) { padding-bottom: 3.4rem; }
+  .slip .stamp { right: .9rem; bottom: .7rem; font-size: 1.35rem; padding: .3rem .55rem .15rem; }
+  .slip .q { color: var(--margin); }
+  .slip.new { animation: drop .5s cubic-bezier(.2, 1.3, .4, 1) both; }
+  @keyframes drop { from { transform: translateY(-14px) rotate(-3deg); opacity: 0; } }
+  .slip .actions { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .6rem; font: 400 .95rem var(--sans); }
+  .slip .actions button { border: 1px solid var(--rule); background: #eef2fd; color: var(--ink); border-radius: 10px; padding: .3rem .7rem; }
+  .slip .actions button.primary { background: var(--neel); color: var(--paper); border-color: var(--neel); }
+  .empty { color: var(--on-neel-2); font-size: 1rem; }
+  .side { display: grid; gap: 2rem; align-content: start; }
+  .live li, .handoffs li { list-style: none; border-left: 3px solid var(--haldi); padding: .2rem 0 .2rem .9rem; margin-bottom: .8rem; color: var(--on-neel-2); }
+  .live ul, .handoffs ul { padding: 0; margin: 0; }
+  .live b, .handoffs b { color: var(--on-neel); font-weight: 600; }
+  .handoffs li { border-left-color: var(--margin); }
+  .ledger { background: var(--paper); color: var(--ink); padding: .4rem 1rem .8rem 3rem; position: relative; font-size: 1rem;
+    background-image: linear-gradient(to right, transparent 2.2rem, var(--margin) 2.2rem, var(--margin) calc(2.2rem + 1.5px), transparent calc(2.2rem + 1.5px)); }
+  .ledger table { width: 100%; border-collapse: collapse; }
+  .ledger th { text-align: left; font: 400 .9rem var(--sans); color: var(--ink-2); padding: .4rem 0; border-bottom: 2px solid var(--ballpoint); }
+  .ledger td { padding: .45rem 0; border-bottom: 1px solid var(--rule); }
+  .ledger td.amt { font: 400 1.15rem var(--hand); color: var(--ballpoint); text-align: right; padding-right: 1rem; }
+  .ledger th.r { text-align: right; padding-right: 1rem; }
+  .ledger td small { color: var(--ink-2); display: block; font-size: .8rem; }
+  .ledger button { border: 0; background: var(--haldi); color: var(--ink); border-radius: 999px; padding: .3rem .85rem; font-weight: 600; font-size: .9rem; }
+  .ledger button:disabled { opacity: .5; }
+  .drop { border: 1.5px dashed var(--neel-soft); border-radius: 14px; padding: 1rem; color: var(--on-neel-2); display: grid; gap: .7rem; }
+  .drop.over { border-color: var(--haldi); background: var(--neel-deep); }
+  .drop .row { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
+  .drop select, .drop input[type=file] { font: inherit; color: var(--on-neel); background: var(--neel-deep); border: 1px solid var(--neel-soft); border-radius: 10px; padding: .45rem .6rem; max-width: 100%; }
+  .drop button { border: 0; background: var(--paper); color: var(--ink); border-radius: 10px; padding: .5rem 1rem; font-weight: 600; }
+  @media (max-width: 900px) { .counter { grid-template-columns: 1fr; } }
+</style>
 </head>
-<body class="boardpage">
-<header><div class="brand">Sharma General Store <span>· live orders</span></div><div id="clock" class="controls"></div></header>
-<main class="board">
-  <section><h2>Live calls</h2><div id="live"></div>
-    <h2 style="margin-top:18px">WhatsApp voice notes</h2>
-    <form id="vn" class="card vnform">
-      <select id="vncust"><option value="CUST-001">Sharma ji</option><option value="CUST-002">Tau ji</option><option value="CUST-003">Gupta ji</option></select>
-      <input type="file" id="vnfile" accept="audio/*,.ogg,.opus,.m4a,.mp3,.wav">
-      <button>Read order</button>
-      <div class="hint">Forward a customer's voice note (.ogg/.opus/.m4a). The same Gnani pipeline turns it into a draft order.</div>
-    </form>
-    <div id="drafts"></div>
+<body>
+<header class="top">
+  <a class="wordmark" href="/">BharatVoice <small>Sharma General Store, counter</small></a>
+  <nav aria-label="Pages"><a href="/">Call the shop</a><span id="clock" style="color:var(--on-neel-2)"></span></nav>
+</header>
+<main class="counter">
+  <section aria-labelledby="ordersHead">
+    <h2 id="ordersHead">Orders <small id="orderCount">waiting for the first call</small></h2>
+    <div class="slips" id="slips"><p class="empty" id="emptyOrders">New phone orders and voice notes appear here as parchis, ready to pack.</p></div>
   </section>
-  <section><h2>Orders</h2><div id="orders"></div></section>
-  <section><h2>Handoff queue</h2><div id="handoffs"></div>
-    <h2 style="margin-top:18px">Udhaar khata</h2>
-    <table class="card khata"><thead><tr><th>Customer</th><th class="r">Baaki</th><th class="r">Limit</th><th></th></tr></thead><tbody id="khata"></tbody></table>
-  </section>
+  <aside class="side">
+    <section class="live" aria-labelledby="liveHead"><h2 id="liveHead">On the phone now</h2><ul id="live"><li class="none">No calls right now.</li></ul></section>
+    <section aria-labelledby="vnHead">
+      <h2 id="vnHead">WhatsApp voice note</h2>
+      <form class="drop" id="vn">
+        <span>Drop a customer's voice note here, or choose the file. It's read by the same Gnani pipeline and becomes a parchi.</span>
+        <div class="row">
+          <select id="vncust" aria-label="Customer"><option value="CUST-001">Sharma ji</option><option value="CUST-002">Tau ji</option><option value="CUST-003">Gupta ji</option></select>
+          <input type="file" id="vnfile" accept="audio/*,.ogg,.opus,.m4a,.mp3,.wav" aria-label="Voice note file">
+          <button>Read the voice note</button>
+        </div>
+      </form>
+    </section>
+    <section aria-labelledby="khataHead">
+      <h2 id="khataHead">Udhaar khata</h2>
+      <div class="ledger"><table><thead><tr><th>Customer</th><th class="r">Baaki</th><th></th></tr></thead><tbody id="khata"></tbody></table></div>
+    </section>
+    <section class="handoffs" aria-labelledby="hoHead"><h2 id="hoHead">Call back</h2><ul id="handoffs"><li class="none">Nobody is waiting.</li></ul></section>
+  </aside>
 </main>
 <script>
-const live = {}, $ = (id) => document.getElementById(id);
-const U = {kg:"kg", l:"L", pkt:"pkt", pc:"pc"};
-const fmt = (l) => `${(+l.qty)} ${U[l.unit] || l.unit} · ${l.name}`;
-function card(cls, html) { const d = document.createElement("div"); d.className = "card " + cls; d.innerHTML = html; return d; }
-function renderLive() {
-  $("live").innerHTML = "";
-  for (const [sid, c] of Object.entries(live)) {
-    $("live").appendChild(card("live", `<b>${c.customer || sid}</b> <i>${c.extractor || ""}</i><ul>${(c.cart || []).map(l => `<li>${fmt(l)}</li>`).join("")}</ul><div class="t">₹${(c.total || 0).toFixed(0)}</div>`));
-  }
+const $ = (id) => document.getElementById(id);
+const live = {};
+let orders = 0, booted = false;
+setTimeout(() => { booted = true; }, 1200);  // events replayed on page load don't animate; live ones do
+const shortName = (n) => n.replace(/\s+\d+(\.\d+)?\s*(g|kg|ml|l)\b.*$/i, "").replace(/\s+\d+-pack.*$/i, "").replace(/^(Britannia|Parle) /, "");
+function qtyText(l) {
+  if (l.unit === "kg" && l.qty < 1) return `${Math.round(l.qty * 1000)} g`;
+  if (l.unit === "l" && l.qty < 1) return `${Math.round(l.qty * 1000)} ml`;
+  const q = +(+l.qty).toFixed(3);
+  if (l.unit === "pkt") return `${q} packet`;
+  if (l.unit === "pc") return l.sku === "eggs" && q % 12 === 0 ? `${q / 12} darjan` : `${q}`;
+  return `${q} ${{ kg: "kg", l: "litre" }[l.unit] ?? l.unit}`;
 }
-function beep() { try { const a = new AudioContext(), o = a.createOscillator(), g = a.createGain(); o.frequency.value = 880; o.connect(g); g.connect(a.destination); g.gain.setValueAtTime(0.2, a.currentTime); g.gain.exponentialRampToValueAtTime(0.001, a.currentTime + 0.6); o.start(); o.stop(a.currentTime + 0.6); } catch (e) {} }
-
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const linesHtml = (lines) => `<ul>${lines.map((l) => `<li><span>${esc(qtyText(l))} ${esc(shortName(l.name))}</span><span>₹${Math.round(l.amount)}</span></li>`).join("")}</ul>`;
+function addSlip(html, key) {
+  $("emptyOrders")?.remove();
+  let el = key ? document.querySelector(`[data-key="${key}"]`) : null;
+  if (!el) { el = document.createElement("article"); el.className = booted ? "slip new" : "slip"; if (key) el.dataset.key = key; $("slips").prepend(el); }
+  el.innerHTML = html;
+  return el;
+}
+function names() { return { "CUST-001": "Sharma ji", "CUST-002": "Tau ji", "CUST-003": "Gupta ji" }; }
+function orderSlip(o, via) {
+  orders++; $("orderCount").textContent = `${orders} today`;
+  const time = new Date((o.ts || Date.now() / 1000) * 1000).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" });
+  const udhaar = o.payment === "udhaar";
+  addSlip(`<header><b>${esc(names()[o.customer] || o.customer)}</b><span>${via}, ${time}</span></header>${linesHtml(o.lines)}
+    <div class="sum"><span>Kul</span><span>₹${Math.round(o.total)}</span></div>
+    <div class="stamp">${udhaar ? "उधार" : "पक्का"}<small>${udhaar ? "in the khata" : "pack it"}</small></div>`, o.order_id);
+}
+function draftSlip(d) {
+  const q = d.question ? `<div class="q">${esc(d.question)}</div><div class="actions">${(d.choices || []).map((c) => `<button type="button" data-sku="${esc(c.sku)}">${esc(shortName(c.name))}</button>`).join("")}</div>` : "";
+  const confirm = !d.order && d.cart.length ? `<div class="actions"><button type="button" class="primary" data-confirm>Confirm order</button></div>` : "";
+  const el = addSlip(`<header><b>${esc(names()[d.customer] || d.customer)}</b><span>voice note</span></header>${linesHtml(d.cart)}
+    <div class="sum"><span>Kul</span><span>₹${Math.round(d.total)}</span></div>${q}${confirm}`, "draft-" + d.draft_id);
+  el.querySelectorAll("[data-sku]").forEach((b) => b.onclick = async () => {
+    const f = new FormData(); f.append("sku", b.dataset.sku);
+    draftSlip(await (await fetch(`/api/voicenote/${d.draft_id}/choose`, { method: "POST", body: f })).json());
+  });
+  const c = el.querySelector("[data-confirm]");
+  if (c) c.onclick = async () => {
+    const r = await (await fetch(`/api/voicenote/${d.draft_id}/confirm`, { method: "POST" })).json();
+    el.remove(); if (r.order) orderSlip(r.order, "voice note");
+  };
+}
+function renderLive() {
+  const ids = Object.keys(live);
+  $("live").innerHTML = ids.length ? ids.map((s) => { const c = live[s]; const n = (c.cart || []).length;
+    return `<li><b>${esc(names()[c.customer] || c.customer)}</b> is ordering. ${n ? `${n} item${n > 1 ? "s" : ""} so far, ₹${Math.round(c.total || 0)}` : "Just started."}</li>`; }).join("")
+    : `<li class="none">No calls right now.</li>`;
+}
 async function loadKhata() {
   const rows = await (await fetch("/api/khata")).json();
-  $("khata").innerHTML = rows.map(r => `<tr><td>${r.name} <i>${r.register}</i></td><td class="r">₹${r.balance.toFixed(0)}</td><td class="r">${r.limit ? "₹" + r.limit : "—"}</td>
-    <td>${r.balance > 0 ? `<button class="small" onclick="remind('${r.customer}', this)">Remind</button>` : ""}</td></tr>`).join("");
+  $("khata").innerHTML = rows.map((r) => `<tr><td>${esc(r.name)}<small>${r.limit ? `limit ₹${r.limit}` : "no khata"}</small></td><td class="amt">₹${Math.round(r.balance)}</td>
+    <td>${r.balance > 0 ? `<button type="button" data-remind="${esc(r.customer)}">Send reminder</button>` : ""}</td></tr>`).join("");
+  document.querySelectorAll("[data-remind]").forEach((b) => b.onclick = async () => {
+    b.disabled = true; b.textContent = "Speaking…";
+    const r = await fetch(`/api/remind/${b.dataset.remind}`, { method: "POST" });
+    if (r.ok) { const d = await r.json(); const a = new Audio("data:audio/wav;base64," + d.audio); a.onended = () => { b.disabled = false; b.textContent = "Send reminder"; }; a.play(); b.title = d.text; }
+    else { b.disabled = false; b.textContent = r.status === 429 ? "Try later" : "Send reminder"; }
+  });
 }
-async function remind(cid, btn) {
-  btn.disabled = true; btn.textContent = "…";
-  const r = await fetch(`/api/remind/${cid}`, {method: "POST"});
-  if (r.ok) { const d = await r.json(); new Audio("data:audio/wav;base64," + d.audio).play(); btn.title = d.text; }
-  btn.disabled = false; btn.textContent = "Remind";
-}
-
-const drafts = {};
-function renderDraft(d) {
-  let el = drafts[d.draft_id];
-  if (!el) { el = card("draft", ""); drafts[d.draft_id] = el; $("drafts").prepend(el); }
-  const choices = (d.choices || []).map(c => `<button class="small" onclick="choose('${d.draft_id}','${c.sku}')">${c.name}</button>`).join(" ");
-  el.innerHTML = `<b>Voice note · ${d.customer}</b>${d.transcript ? `<div class="q">“${d.transcript}”</div>` : ""}
-    <ul>${d.cart.map(l => `<li>${fmt(l)} <span>₹${l.amount.toFixed(0)}</span></li>`).join("")}</ul>
-    ${d.question ? `<div class="pending">❓ ${d.question}</div><div>${choices}</div>` : ""}
-    <div class="t">₹${d.total.toFixed(0)}</div>
-    ${d.order ? `<div class="ok">✓ ${d.order.order_id} placed</div>` : (d.cart.length ? `<button onclick="confirmDraft('${d.draft_id}')">Confirm order</button>` : "")}`;
-}
-async function choose(did, sku) { const f = new FormData(); f.append("sku", sku); renderDraft(await (await fetch(`/api/voicenote/${did}/choose`, {method: "POST", body: f})).json()); }
-async function confirmDraft(did) { renderDraft(await (await fetch(`/api/voicenote/${did}/confirm`, {method: "POST"})).json()); }
-$("vn").onsubmit = async (e) => {
+const drop = $("vn");
+["dragover", "dragenter"].forEach((e) => drop.addEventListener(e, (ev) => { ev.preventDefault(); drop.classList.add("over"); }));
+["dragleave", "drop"].forEach((e) => drop.addEventListener(e, () => drop.classList.remove("over")));
+drop.addEventListener("drop", (ev) => { ev.preventDefault(); if (ev.dataTransfer.files[0]) { $("vnfile").files = ev.dataTransfer.files; drop.requestSubmit(); } });
+drop.onsubmit = async (e) => {
   e.preventDefault();
   const file = $("vnfile").files[0]; if (!file) return;
+  const btn = drop.querySelector("button"); btn.disabled = true; btn.textContent = "Listening to the note…";
   const f = new FormData(); f.append("file", file); f.append("customer", $("vncust").value);
-  const btn = e.target.querySelector("button"); btn.disabled = true; btn.textContent = "Listening…";
-  const r = await fetch("/api/voicenote", {method: "POST", body: f});
-  btn.disabled = false; btn.textContent = "Read order";
-  if (r.ok) renderDraft(await r.json()); else alert("Could not read voice note: " + (await r.text()));
+  const r = await fetch("/api/voicenote", { method: "POST", body: f });
+  btn.disabled = false; btn.textContent = "Read the voice note";
+  if (r.ok) draftSlip(await r.json()); else alert("Couldn't read that voice note. Try an .ogg, .m4a or .mp3 file under 15 MB.");
 };
-
 const ws = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/ws/board`);
 ws.onmessage = (ev) => {
   const e = JSON.parse(ev.data);
-  if (e.type === "call_started") { live[e.session] = { customer: e.customer, extractor: e.extractor, cart: [], total: 0 }; }
+  if (e.type === "call_started") live[e.session] = { customer: e.customer, cart: [], total: 0 };
   else if (e.type === "cart_updated" && live[e.session]) { live[e.session].cart = e.cart; live[e.session].total = e.total; }
-  else if (e.type === "call_ended") { delete live[e.session]; }
-  else if (e.type === "voicenote_draft") { renderDraft(e); }
-  else if (e.type === "khata_updated") { loadKhata(); }
-  else if (e.type === "order_placed") {
-    const o = e.order;
-    $("orders").prepend(card("order", `<b>${o.order_id}</b> · ${o.customer} <i>${o.register}</i> <i>${o.payment}</i><ul>${o.lines.map(l => `<li>${fmt(l)} <span>₹${l.amount.toFixed(0)}</span></li>`).join("")}</ul><div class="t">Total ₹${o.total.toFixed(0)}</div>`));
-    beep(); delete live[e.session]; loadKhata();
+  else if (e.type === "call_ended") delete live[e.session];
+  else if (e.type === "voicenote_draft") draftSlip(e);
+  else if (e.type === "khata_updated") loadKhata();
+  else if (e.type === "order_placed" && !String(e.session || "").startsWith("eval")) {
+    if (!document.querySelector(`[data-key="${e.order.order_id}"]`)) orderSlip(e.order, "phone call");
+    delete live[e.session]; loadKhata();
   } else if (e.type === "handoff") {
-    $("handoffs").prepend(card("handoff", `<b>${e.session}</b><div>${e.reason}</div><div class="q">“${e.transcript || ""}”</div><ul>${(e.cart || []).map(l => `<li>${fmt(l)}</li>`).join("")}</ul>`));
-    beep();
+    const ul = $("handoffs"); ul.querySelector(".none")?.remove();
+    const li = document.createElement("li"); li.innerHTML = `<b>Call back</b> ${esc(e.reason)}`; ul.prepend(li);
   }
   renderLive();
 };
 loadKhata();
-setInterval(() => $("clock").textContent = new Date().toLocaleTimeString("en-IN"), 1000);
+const tick = () => $("clock").textContent = new Date().toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" });
+tick(); setInterval(tick, 15000);
 </script>
 </body>
 </html>
