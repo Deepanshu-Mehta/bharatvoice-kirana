@@ -10,7 +10,11 @@ first two seconds; title-card opens did worst).
   uv run python -m video.capture ...          # footage (clean callers) + video/out/raw/first_noisy (noisy take)
   uv run python -m video.film --stills        # contact sheet
   uv run python -m video.film                 # -> video/out/bharatvoice_film.mp4
-Music: put a track you have the rights to at video/assets/music.(mp3|m4a|wav); it is ducked under the voices.
+Music: "Product Video" by SoundSurfer (Pixabay Content License; the file stays local, video/assets/ is gitignored).
+Chosen over a future-bass track by measurement: 18% vs 26% of its power in the 300-3400 Hz speech range and a
+steady level (the other jumped >= 5 dB 22 times). It starts at 56.04 s so its groove re-entry (65.46 s) lands
+on the second stamp and its own ending lands on the closing card; stamps snap to its beat (88 BPM). The music is
+dipped 5 dB around 1-4 kHz and ducked under every word (margins are printed at render time).
 """
 from __future__ import annotations
 
@@ -29,7 +33,10 @@ OUT = ROOT / "video" / "out"
 W, H = 1920, 1080
 CAM_W, CAM_H, CAM_X0, CAM_CY = 886, 976, 0.0, 970.0   # crop of the 1080x1920 app frames
 S0 = CAM_W / 1080
-END_LEN = 6.0
+END_LEN = 5.2
+MUSIC = ROOT / "video" / "assets" / "soundsurfer-product-video-590799.mp3"
+MUSIC_START, BPM, BEAT0 = 56.04, 88.0, 0.670   # measured: tempo and first beat of the track
+MSR = 48000
 S, M, T = "Sharma ji", "Munshi ji (AI)", "Tau ji"
 
 EDL = [
@@ -108,6 +115,13 @@ class Film:
         assert self.total <= 60.0, f"film is {self.total:.1f} s: trim the EDL"
         tl = self.tl
         self.beats = {b: tl.beat_span(b) for b in STAMPS}
+        # each stamp lands on the music's nearest beat (the first is already down on frame one)
+        per = 60 / BPM
+        def snap(x):
+            k = round((x + MUSIC_START - BEAT0) / per)
+            y = BEAT0 + k * per - MUSIC_START
+            return y if abs(y - x) <= per / 2 + 1e-6 else x
+        self.stamp_at = {b: (b0 if b == 0 else snap(b0)) for b, (b0, _) in self.beats.items()}
         self.caps = []
         for beat, name, a, b, who, text in CAPTIONS:
             sc = self.scenes[name]
@@ -126,7 +140,7 @@ class Film:
         s = {"progress": min(1.0, t / self.total), "end": None}
         if t >= tl.footage:
             k = t - tl.footage
-            s["end"] = {"phase": 1 if k < 2.6 else 2, "k": k if k < 2.6 else k - 2.6, "fade": k / 0.3}
+            s["end"] = {"phase": 1 if k < 2.2 else 2, "k": k if k < 2.2 else k - 2.2, "fade": k / 0.3}
             t = tl.footage - 1 / FPS
         seg, name, src = tl.source(t)
         _, s0, s1, o = tl.segs[seg]
@@ -161,7 +175,7 @@ class Film:
         b0, b1 = self.beats[beat]
         d, e = STAMPS[beat]
         # the opening stamp has already landed on frame one (it is also the thumbnail)
-        s["stamp"] = {"d": d, "e": e, "k": t - b0 + (1.0 if beat == 0 else 0.0), "out": (t - (b1 - 0.22)) / 0.22, "tilt": TILT[beat % len(TILT)]}
+        s["stamp"] = {"d": d, "e": e, "k": t - self.stamp_at[beat] + (1.0 if beat == 0 else 0.0), "out": (t - (b1 - 0.22)) / 0.22, "tilt": TILT[beat % len(TILT)]}
         # conversation: lines of this beat that have started; the newest grows word by word
         live = [c for c in self.caps if c[0] == beat and (c[1] <= t or (beat == 0 and c[1] < 0.5))]
         live = live[-3:]
@@ -215,11 +229,49 @@ class Film:
             tt = at(self.scenes[name], anc)
             for _, o0, _ in tl.to_out(name, tt, tt + 0.01):
                 put(thud(), o0)
-        for b, (b0, _) in self.beats.items():  # a lighter stamp for each beat title
-            put(thud() * 0.35, b0 + 0.06)
+        for b, t0 in self.stamp_at.items():  # a lighter stamp for each beat title, on the beat
+            if b:
+                put(thud() * 0.35, t0 + 0.06)
         e = int(tl.footage * SR)
         a[e:] *= np.exp(-np.arange(len(a) - e) / (0.35 * SR))
         return np.clip(a[: int(self.total * SR)], -1, 1)
+
+
+def soundtrack(film: Film) -> np.ndarray:
+    """Voices + effects, with the music dipped in the speech band and ducked under every word. 48 kHz stereo."""
+    from eval.channel import resample
+    v = resample(film.voice_track(), SR, MSR)
+    n = len(v)
+    if not MUSIC.exists():
+        return np.stack([v, v], 1)
+    raw = subprocess.run(["ffmpeg", "-loglevel", "error", "-ss", str(MUSIC_START), "-t", str(film.total + 0.5),
+                          "-i", str(MUSIC), "-af", "equalizer=f=2200:t=q:w=1.3:g=-5,highpass=f=40", "-ac", "2",
+                          "-ar", str(MSR), "-f", "f32le", "-"], capture_output=True, check=True).stdout
+    m = np.frombuffer(raw, dtype=np.float32).reshape(-1, 2)[:n]
+    m = np.pad(m, ((0, n - len(m)), (0, 0)))
+    # voice activity: 20 ms RMS, held 350 ms so the music doesn't pump between words
+    hop = MSR // 50
+    env = np.array([np.sqrt(np.mean(v[i:i + hop] ** 2)) for i in range(0, n, hop)])
+    active = env > 0.012
+    hold = 18
+    held = np.array([active[max(0, i - hold):i + 3].any() for i in range(len(active))])
+    v_rms = float(np.sqrt(np.mean(v[np.repeat(active, hop)[:n]] ** 2)))
+    m_rms = float(np.sqrt(np.mean(m ** 2))) + 1e-9
+    g_open, g_duck = v_rms / m_rms * 10 ** (-9 / 20), v_rms / m_rms * 10 ** (-23 / 20)
+    target = np.where(held, g_duck, g_open)
+    g = np.empty_like(target)  # smooth: fast down (60 ms), slow up (400 ms)
+    g[0] = target[0]
+    for i in range(1, len(target)):
+        a = 1 - np.exp(-1 / (3 if target[i] < g[i - 1] else 20))
+        g[i] = g[i - 1] + (target[i] - g[i - 1]) * a
+    gain = np.interp(np.arange(n), np.arange(len(g)) * hop, g)
+    md = m * gain[:, None]
+    # report: how far the voice sits above the music while someone is speaking
+    sp = np.repeat(active, hop)[:n]
+    margin = 20 * np.log10(v_rms / (float(np.sqrt(np.mean(md[sp] ** 2))) + 1e-9))
+    print(f"  speech sits {margin:.1f} dB above the music while talking; music rises "
+          f"{20 * np.log10(g_open / g_duck):.0f} dB in the gaps")
+    return np.clip(np.stack([v, v], 1) + md, -1, 1)
 
 
 async def render(film: Film, out: Path, stills: list[float] | None = None) -> None:
@@ -242,21 +294,11 @@ async def render(film: Film, out: Path, stills: list[float] | None = None) -> No
             sheet.save(out, quality=88)
             await b.close()
             return
-        voice = OUT / "film_voice.wav"
-        sf.write(voice, film.voice_track(), SR)
-        music = next((m for m in sorted((ROOT / "video" / "assets").glob("music.*"))), None)
+        mix = OUT / "film_mix.wav"
+        sf.write(mix, soundtrack(film), MSR)
+        music = MUSIC if MUSIC.exists() else None
         cmd = ["ffmpeg", "-y", "-loglevel", "error", "-f", "image2pipe", "-c:v", "mjpeg", "-r", str(FPS), "-i", "-",
-               "-i", str(voice)]
-        if music:
-            T_ = film.total
-            cmd += ["-i", str(music), "-filter_complex",
-                    "[1:a]aresample=48000,pan=stereo|c0=c0|c1=c0,asplit=2[v][sc];"
-                    f"[2:a]aresample=48000,volume=0.30,afade=t=out:st={T_ - 1.6}:d=1.6[m];"
-                    "[m][sc]sidechaincompress=threshold=0.015:ratio=10:attack=15:release=350[duck];"
-                    "[v][duck]amix=inputs=2:normalize=0,loudnorm=I=-15:TP=-1.5:LRA=11[a]",
-                    "-map", "0:v", "-map", "[a]"]
-        else:
-            cmd += ["-af", "loudnorm=I=-15:TP=-1.5:LRA=11", "-map", "0:v", "-map", "1:a"]
+               "-i", str(mix), "-af", "loudnorm=I=-15:TP=-1.5:LRA=11", "-map", "0:v", "-map", "1:a"]
         cmd += ["-c:v", "libx264", "-preset", "medium", "-crf", "17", "-pix_fmt", "yuv420p", "-profile:v", "high",
                 "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-ac", "2", "-movflags", "+faststart",
                 "-t", str(film.total), str(out)]
