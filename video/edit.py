@@ -164,7 +164,7 @@ class Timeline:
         for beat, name, a, b in (edl or EDL):
             s0, s1 = at(scenes[name], a), at(scenes[name], b)
             assert s1 > s0, (name, a, b)
-            if self.segs and self.segs[-1][0] == name and s0 <= self.segs[-1][2]:  # no gap to cut: join
+            if self.segs and self.segs[-1][0] == name and self.segs[-1][1] <= s0 <= self.segs[-1][2]:  # no gap: join
                 n, p0, p1, o = self.segs[-1]
                 t += max(s1, p1) - p1
                 self.segs[-1] = (n, p0, max(s1, p1), o)

@@ -12,7 +12,7 @@ first two seconds; title-card opens did worst).
   uv run python -m video.film                 # -> video/out/bharatvoice_film.mp4
 Music: "Product Video" by SoundSurfer (Pixabay Content License; the file stays local, video/assets/ is gitignored).
 Chosen over a future-bass track by measurement: 18% vs 26% of its power in the 300-3400 Hz speech range and a
-steady level (the other jumped >= 5 dB 22 times). It starts at 56.04 s so its groove re-entry (65.46 s) lands
+steady level (the other jumped >= 5 dB 22 times). It is offset so its groove re-entry (65.46 s) lands
 on the second stamp and its own ending lands on the closing card; stamps snap to its beat (88 BPM). The music is
 dipped 5 dB around 1-4 kHz and ducked under every word (margins are printed at render time).
 """
@@ -33,14 +33,16 @@ OUT = ROOT / "video" / "out"
 W, H = 1920, 1080
 CAM_W, CAM_H, CAM_X0, CAM_CY = 886, 976, 0.0, 970.0   # crop of the 1080x1920 app frames
 S0 = CAM_W / 1080
-END_LEN = 5.2
+END_LEN = 4.8
+COLD = 1.3   # cold open: the finished parchi first, then the call that wrote it
 MUSIC = ROOT / "video" / "assets" / "soundsurfer-product-video-590799.mp3"
-MUSIC_START, BPM, BEAT0 = 56.04, 88.0, 0.670   # measured: tempo and first beat of the track
+REENTRY, BPM, BEAT0 = 65.46, 88.0, 0.670   # measured: groove re-entry, tempo and first beat of the track
 MSR = 48000
 S, M, T = "Sharma ji", "Munshi ji (AI)", "Tau ji"
 
 EDL = [
-    (0, "first", ("say0", -0.25), ("said0", 0.4)),
+    (-1, "first", ("end", 0.6), ("end", 0.6 + COLD)),     # cold open: the finished, stamped parchi (voice muted)
+    (0, "first", ("say0", -0.1), ("said0", 0.4)),
     (0, "first", ("resume0", 0), ("reply1", 2.3)),
     (1, "first", ("reply1", 4.73), ("reply1", 8.65)),
     (1, "first", ("say1", -0.2), ("said1", 0.4)),
@@ -52,19 +54,20 @@ EDL = [
     (3, "first", ("say4", -0.15), ("said4", 0.4)),
     (3, "first", ("resume4", 0), ("reply5", 1.25)),      # पक्का
     (4, "first_noisy", ("say0", 3.0), ("said0", 0.4)),   # the same line on a noisy street line
-    (4, "first_noisy", ("resume0", 0), ("resume0", 1.5)),
+    (4, "first_noisy", ("resume0", 0), ("resume0", 2.5)),  # hold until the lines are written
     (5, "again", ("reply0", -0.15), ("reply0", 0.98)),   # "Namaste Sharma ji!"
     (5, "again", ("say0", -0.2), ("said0", 0.4)),
     (5, "again", ("resume0", 0), ("reply1", 2.75)),      # remembered: no question
-    (6, "outbound", ("pickup", -1.9), ("pickup", 0.3)),
+    (6, "outbound", ("pickup", -1.4), ("pickup", 0.3)),
     (6, "outbound", ("reply0", -0.35), ("reply0", 1.0)),  # "Ram Ram Tau ji!"
-    (6, "outbound", ("reply0", 3.85), ("reply0", 8.75)),  # "...khatam hone aala hoga"
+    (6, "outbound", ("reply0", 3.85), ("reply0", 8.6)),  # "...khatam hone aala hoga"
     (6, "outbound", ("say0", -0.2), ("said0", 0.4)),
-    (6, "outbound", ("resume0", 0), ("reply1", 2.5)),    # उधार
+    (6, "outbound", ("resume0", 0), ("reply1", 2.2)),    # उधार
 ]
-EDL[4] = (1, "first", ("resume1", 0), ("reply2", -0.05))  # the parchi writes "Surf Excel" (reply trimmed)
+EDL[5] = (1, "first", ("resume1", 0), ("reply2", -0.05))  # the parchi writes "Surf Excel" (reply trimmed)
 
 STAMPS = {
+    -1: ("एक कॉल", "one phone call → this order"),
     0: ("AI मुंशी", "answers the kirana's phone"),
     1: ("पूछता है", "not sure which one? it asks"),
     2: ("लाल पेन", "changed your mind? corrected"),
@@ -94,16 +97,19 @@ CAPTIONS = [  # (beat, scene, start anchor, end anchor, speaker, text)
     (6, "outbound", ("reply0", 3.96), ("reply0", 8.75), M, "Thara ek litre Amul Taaza doodh, chaar packet Parle-G khatam hone aala hoga."),
     (6, "outbound", ("say0", 0), ("said0", 0.3), T, "Haan, bhej de. Khaate mein likh diyo."),
     (6, "outbound", ("reply1", 0), ("reply1", 1.3), M, "Theek se, udhaar mein likh dunga."),
-    (6, "outbound", ("reply1", 1.7), ("reply1", 2.5), M, "Order pakka!"),
+    (6, "outbound", ("reply1", 1.7), ("reply1", 2.2), M, "Order pakka!"),
 ]
 ZOOMS = [  # (scene, from anchor, zoom, centre x, centre y) in app-frame pixels
     ("first", ("reply3", -0.9), 1.18, 540, 715),
     ("first", ("end", -0.1), 1.16, 740, 980),
+    ("first", ("end", 0.6), 1.16, 740, 980),         # cold open (same framing as the stamp shot)
     ("first_noisy", ("resume0", 0.2), 1.1, 540, 760),
     ("again", ("reply1", -0.4), 1.16, 540, 640),
     ("outbound", ("end", -0.1), 1.16, 740, 980),
 ]
-RING = ("outbound", ("pickup", -1.9), ("pickup", -0.02))
+RING = ("outbound", ("pickup", -1.4), ("pickup", -0.02))
+CALLOUT = ("again", ("resume0", 0.6))   # "remembered" lands on the parchi line
+CALLOUT_LINE_Y = 690                    # app-frame y just under the first parchi line
 THUDS = [("first", ("end", 0.05)), ("outbound", ("end", 0.05))]
 
 
@@ -115,19 +121,22 @@ class Film:
         assert self.total <= 60.0, f"film is {self.total:.1f} s: trim the EDL"
         tl = self.tl
         self.beats = {b: tl.beat_span(b) for b in STAMPS}
+        self.music_start = REENTRY - self.beats[1][0]   # the groove re-enters as the second stamp lands
         # each stamp lands on the music's nearest beat (the first is already down on frame one)
         per = 60 / BPM
         def snap(x):
-            k = round((x + MUSIC_START - BEAT0) / per)
-            y = BEAT0 + k * per - MUSIC_START
+            k = round((x + self.music_start - BEAT0) / per)
+            y = BEAT0 + k * per - self.music_start
             return y if abs(y - x) <= per / 2 + 1e-6 else x
-        self.stamp_at = {b: (b0 if b == 0 else snap(b0)) for b, (b0, _) in self.beats.items()}
+        self.stamp_at = {b: (b0 if b == -1 else snap(b0)) for b, (b0, _) in self.beats.items()}
         self.caps = []
         for beat, name, a, b, who, text in CAPTIONS:
             sc = self.scenes[name]
             for _, o0, o1 in tl.to_out(name, at(sc, a), at(sc, b)):
                 self.caps.append((beat, o0, o1, who, text))
         self.caps.sort(key=lambda c: c[1])
+        name, anc = CALLOUT
+        self.callout_on = tl.to_out(name, at(self.scenes[name], anc), at(self.scenes[name], anc) + 0.01)[0][1]
         self.zooms = []
         for name, anc, z, cx, cy in ZOOMS:
             t = at(self.scenes[name], anc)
@@ -140,7 +149,7 @@ class Film:
         s = {"progress": min(1.0, t / self.total), "end": None}
         if t >= tl.footage:
             k = t - tl.footage
-            s["end"] = {"phase": 1 if k < 2.2 else 2, "k": k if k < 2.2 else k - 2.2, "fade": k / 0.3}
+            s["end"] = {"phase": 1 if k < 1.9 else 2, "k": k if k < 1.9 else k - 1.9, "fade": k / 0.3}
             t = tl.footage - 1 / FPS
         seg, name, src = tl.source(t)
         _, s0, s1, o = tl.segs[seg]
@@ -175,19 +184,24 @@ class Film:
         b0, b1 = self.beats[beat]
         d, e = STAMPS[beat]
         # the opening stamp has already landed on frame one (it is also the thumbnail)
-        s["stamp"] = {"d": d, "e": e, "k": t - self.stamp_at[beat] + (1.0 if beat == 0 else 0.0), "out": (t - (b1 - 0.22)) / 0.22, "tilt": TILT[beat % len(TILT)]}
+        s["stamp"] = {"d": d, "e": e, "k": t - self.stamp_at[beat] + (1.0 if beat == -1 else 0.0), "out": (t - (b1 - 0.22)) / 0.22, "tilt": TILT[beat % len(TILT)]}
         # conversation: lines of this beat that have started; the newest grows word by word
-        live = [c for c in self.caps if c[0] == beat and (c[1] <= t or (beat == 0 and c[1] < 0.5))]
+        live = [c for c in self.caps if c[0] == beat and c[1] <= t]
         live = live[-3:]
         lines = []
         for j, (_, c0, c1, who, text) in enumerate(live):
             newest = j == len(live) - 1
             n = len(text.split())
-            shown = n if not newest else max(2 if beat == 0 else 0,
-                                             int(np.ceil(n * min(1.0, (t - c0) / max(0.3, (c1 - c0) * 0.8)))))
+            shown = n if not newest else int(np.ceil(n * min(1.0, (t - c0) / max(0.3, (c1 - c0) * 0.8))))
             lines.append({"who": who, "cls": "shop" if who == M else "caller", "text": text, "old": not newest,
                           "shown": shown, "alpha": 1.0 if newest else (0.6 if j == len(live) - 2 else 0.32)})
         s["lines"] = lines
+        # memory callout, pinned under the remembered parchi line
+        if beat == 5 and t >= self.callout_on:
+            s["callout"] = {"x": 70 + s["left"] + 110 * sc_, "y": 52 + s["top"] + CALLOUT_LINE_Y * sc_,
+                            "k": t - self.callout_on, "out": (t - (b1 - 0.22)) / 0.22}
+        else:
+            s["callout"] = None
         s["note"] = 1.0
         return s
 
@@ -210,8 +224,10 @@ class Film:
     # ---------------------------------------------------------------- sound
     def voice_track(self) -> np.ndarray:
         tl, pieces, fade = self.tl, [], int(0.03 * SR)
-        for name, s0, s1, _ in tl.segs:
+        for i, (name, s0, s1, _) in enumerate(tl.segs):
             x = self.scenes[name].mix[int(s0 * SR):int(s1 * SR)].copy()
+            if tl.beats[i] == -1:
+                x[:] = 0  # cold open: music and the stamp only
             x[:fade] *= np.linspace(0, 1, fade)
             x[-fade:] *= np.linspace(1, 0, fade)
             pieces.append(x)
@@ -229,9 +245,8 @@ class Film:
             tt = at(self.scenes[name], anc)
             for _, o0, _ in tl.to_out(name, tt, tt + 0.01):
                 put(thud(), o0)
-        for b, t0 in self.stamp_at.items():  # a lighter stamp for each beat title, on the beat
-            if b:
-                put(thud() * 0.35, t0 + 0.06)
+        for b, t0 in self.stamp_at.items():  # a stamp sound for each beat title, on the beat
+            put(thud() * (0.8 if b == -1 else 0.35), t0 + 0.06)
         e = int(tl.footage * SR)
         a[e:] *= np.exp(-np.arange(len(a) - e) / (0.35 * SR))
         return np.clip(a[: int(self.total * SR)], -1, 1)
@@ -244,7 +259,7 @@ def soundtrack(film: Film) -> np.ndarray:
     n = len(v)
     if not MUSIC.exists():
         return np.stack([v, v], 1)
-    raw = subprocess.run(["ffmpeg", "-loglevel", "error", "-ss", str(MUSIC_START), "-t", str(film.total + 0.5),
+    raw = subprocess.run(["ffmpeg", "-loglevel", "error", "-ss", str(film.music_start), "-t", str(film.total + 0.5),
                           "-i", str(MUSIC), "-af", "equalizer=f=2200:t=q:w=1.3:g=-5,highpass=f=40", "-ac", "2",
                           "-ar", str(MSR), "-f", "f32le", "-"], capture_output=True, check=True).stdout
     m = np.frombuffer(raw, dtype=np.float32).reshape(-1, 2)[:n]
