@@ -287,3 +287,14 @@ def test_unknown_fragment_in_multi_item_order_is_asked_not_dropped():
 def test_lone_short_unknown_after_items_still_reads_back():
     s, r = talk(["do kilo Aashirvaad atta", "bas ittu sa"])
     assert "Confirm" in r[1]
+
+
+def test_bare_bhaiya_gets_go_on_not_a_complaint():
+    s, r = talk(["भैया।", "do kilo Aashirvaad atta"], cust="CUST-001")
+    assert r[0] == "Haan ji, boliye."
+    assert cart(s) == [("aashirvaad-atta", 2, "kg")]
+
+
+def test_haan_alone_is_not_an_address_word():
+    s, r = talk(["do kilo Aashirvaad atta", "bas itna hi", "haan"])
+    assert s.order

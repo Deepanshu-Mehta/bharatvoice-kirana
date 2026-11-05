@@ -108,6 +108,8 @@ class Scene:
     times: list
     files: list
     mix: np.ndarray
+    caller: np.ndarray = None
+    shop: np.ndarray = None
 
 
 def load_scene(name: str) -> Scene:
@@ -140,8 +142,9 @@ def load_scene(name: str) -> Scene:
     for e in ev["events"]:
         if e["type"] == "ws" and e["msg"].get("type") == "end":
             a["end"] = e["wall"] / 1000 - t0
-    mix = level(caller, 0.07) + level(shop, 0.08)
-    return Scene(name, a, [f["t"] - t0 for f in fr["frames"]], [f["file"] for f in fr["frames"]], mix)
+    caller, shop = level(caller, 0.07), level(shop, 0.08)
+    return Scene(name, a, [f["t"] - t0 for f in fr["frames"]], [f["file"] for f in fr["frames"]], caller + shop,
+                 caller, shop)
 
 
 def level(x: np.ndarray, rms: float) -> np.ndarray:
@@ -156,9 +159,9 @@ def at(sc: Scene, anchor) -> float:
 class Timeline:
     """Output time <-> (scene, source time) through the EDL."""
 
-    def __init__(self, scenes: dict):
+    def __init__(self, scenes: dict, edl=None):
         self.scenes, self.segs, self.beats, t = scenes, [], [], 0.0
-        for beat, name, a, b in EDL:
+        for beat, name, a, b in (edl or EDL):
             s0, s1 = at(scenes[name], a), at(scenes[name], b)
             assert s1 > s0, (name, a, b)
             if self.segs and self.segs[-1][0] == name and s0 <= self.segs[-1][2]:  # no gap to cut: join

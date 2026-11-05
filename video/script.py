@@ -8,6 +8,8 @@ ji's voice, the parchi) is the live system doing its job.
 from __future__ import annotations
 
 CHANNEL = "g711_10db"  # the noisy-phone condition the README reports results for
+# Calls are recorded with the caller's clean voice; a scene with "noisy": True plays the same lines through the
+# simulated noisy phone line instead (the film's labelled noisy-line beat uses such a take, "first_noisy").
 
 # Caller voices (Timbre v2.5). The shop's own voice is Munshi ji (Timbre v3.0 Yashraj), as in the product.
 VOICES = {

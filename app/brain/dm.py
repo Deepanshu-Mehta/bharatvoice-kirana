@@ -23,7 +23,7 @@ from app.brain.frame import Action, Frame
 from app.brain.qty import Qty, parse_qty
 from app.brain.resolver import Resolver, Resolution
 from app.brain.templates import render, speak_money, speak_qty
-from app.brain.text import key
+from app.brain.text import key, to_roman
 
 ROOT = Path(__file__).resolve().parents[2]
 UNIT_SPOKEN = {"kg": "kilo", "l": "litre", "pkt": "packet", "pc": "piece"}
@@ -36,7 +36,10 @@ def _load_ledger() -> dict[str, float]:
 
 LEDGER: dict[str, float] = _load_ledger()  # udhaar khata (synthetic), shared across calls in one server process
 import os
-PUBLIC_DEMO = os.environ.get("PUBLIC_DEMO") == "1"  # never speak a stranger's words back in the public demo
+PUBLIC_DEMO = os.environ.get("PUBLIC_DEMO") == "1"
+# words a caller says to get attention before the order ("Bhaiya…", "Suniye…"); never "haan" (that is a yes)
+ADDRESS_ONLY = {key(w) for w in ("bhaiya", "bhaiyya", "bhai", "bhaisaab", "ji", "suniye", "suno", "hello", "helo",
+                                 "namaste", "ram", "tau", "tauji", "uncle", "sir", "arre", "are", "भैया", "सुनिए")}  # never speak a stranger's words back in the public demo
 TAU_HIGH = 0.85  # hand-set; replaced by risk-coverage thresholds after calibration
 TAU_LOW = 0.40
 HIGH_VALUE_HANDOFF = 5000.0
@@ -609,6 +612,9 @@ class Session:
             reply = self.r("one_at_a_time") if self.empty_streak >= 2 else self.r("not_heard")
             return self._finish(reply, None)
         self.empty_streak = 0
+        words = key(to_roman(transcript)).split()
+        if words and all(w in ADDRESS_ONLY for w in words):  # "Bhaiya…" then a pause: the order is still coming
+            return self._finish(self.r("go_on"), None)
         ctx = Context(pending=self.pending.kind if self.pending else None, awaiting_confirm=self.awaiting_confirm,
                       cart_phrases=[l.spoken() for l in self.cart], last_agent_prompt=self.last_agent_prompt)
         frame = self.extractor(transcript, ctx)

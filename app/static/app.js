@@ -183,7 +183,7 @@ async function startMic() {
   vadObj = await vad.MicVAD.new({
     baseAssetPath: "https://cdn.jsdelivr.net/npm/@ricky0123/vad-web@0.0.31/dist/",
     onnxWASMBasePath: "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/",
-    positiveSpeechThreshold: 0.6, redemptionMs: 450, minSpeechMs: 250,
+    positiveSpeechThreshold: 0.6, redemptionMs: 650, minSpeechMs: 250,  // 650 ms: callers pause after "Bhaiya,"
     onSpeechStart: () => { if (speaking) stopAudio(); setState("listening", "Listening", "Sun rahe hain…"); },
     onSpeechEnd: (audio) => { if (ws && ws.readyState === 1) { ws.send(wav(audio)); setState("thinking", "Writing it down", ""); } },
   });

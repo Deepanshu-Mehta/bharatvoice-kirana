@@ -191,7 +191,8 @@ async def capture(browser, base: str, scene: dict) -> None:
     print(f"  [{scene['id']}] greeting done: {ok}")
     for i, _ in enumerate(scene["lines"]):
         await asyncio.sleep(0.5)
-        await page.evaluate("u => __H.say(u)", f"/__clip/{scene['id']}-{i}.wav")
+        clip = f"{scene['id']}-{i}" + ("" if scene.get("noisy") else ".clean")  # clean by default; see script.py
+        await page.evaluate("u => __H.say(u)", f"/__clip/{clip}.wav")
         await _wait(page, BUSY_OR_DONE, 15)
         ok = await _wait(page, ANSWERED, 90)
         print(f"  [{scene['id']}] line {i} answered: {ok}")

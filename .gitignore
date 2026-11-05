@@ -20,3 +20,4 @@ state/
 # demo video build outputs (raw footage, renders)
 video/out/
 video/state/
+video/assets/music*

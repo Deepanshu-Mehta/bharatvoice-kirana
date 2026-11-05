@@ -90,6 +90,11 @@ T: dict[str, dict[str, str]] = {
         "hindi": "Kshama kijiye, {phrase} samajh nahi aaya. Kripya naam phir se boliye.",
         "haryanvi": "Maaf karna, {phrase} samajh konya aaya. Ek baar fer bolo?",
     },
+    "go_on": {  # the caller only said "Bhaiya…" / "Suniye…" and paused: answer like a shopkeeper would
+        "hinglish": "Haan ji, boliye.",
+        "hindi": "Ji, boliye.",
+        "haryanvi": "Haan ji, bolo.",
+    },
     "not_heard": {
         "hinglish": "Awaaz saaf nahi aayi, ek baar phir boliye?",
         "hindi": "Awaaz saaf nahi aayi, kripya phir se boliye.",
