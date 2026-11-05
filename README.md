@@ -153,7 +153,7 @@ Changes made:
   - We considered a formal manager (sounds like a bank IVR), a young helper (customers won't trust him with prices or udhaar) and a comic seth (memorable, but a caricature).
   - Munshi ji is trusted, efficient, and honest about being AI ("dukaan ka AI munshi").
   - What makes him sound real is mostly *what* he says: he greets regulars by name ("Namaste Sharma ji!") and remembers the usual ("wahi pichhli baar jitna, paanch kilo?"). The customer memory makes that genuine.
-- **A male, conversational voice** (Timbre v3.0 *Devansh*), chosen in voice-lab round 2 from all six male v3.0 voices. It was also the clearest on the phone line (CER 8.1%).
+- **A warm male voice** (Timbre v3.0 *Yashraj*), chosen by ear in voice-lab round 2 from all six male v3.0 voices. All of them were similarly clear on the phone line (CER 8–10%).
 - **No borrowed voices.** We deliberately do not clone celebrities, TV characters or voices taken from the internet. Without consent that would be impersonation, and against the challenge's authenticity rules. A real shopkeeper's voice is supported only with their consent.
 - **`<pauses>` before the closing question**, as Gnani's docs recommend for prompts.
 - **Varied acknowledgements** instead of the same sentence every turn.

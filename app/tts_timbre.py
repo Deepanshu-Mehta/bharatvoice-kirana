@@ -8,9 +8,9 @@ from pathlib import Path
 from app.gnani_client import GnaniClient, get_client
 
 ROOT = Path(__file__).resolve().parent.parent
-# Voice lab (infra/voice_lab.py, /voices): a male, conversational v3.0 voice fits the shop's male first-person
-# replies ("bol raha hoon"), speaks all 10 languages with one persona, and supports <pauses>. Override via env.
-VOICE = os.environ.get("AGENT_VOICE", "Devansh")
+# Voice lab (infra/voice_lab.py, /voices), round 2: Munshi ji in Yashraj's voice (Timbre v3.0, male, warm), chosen
+# by ear. Matches the shop's male first-person replies, one persona across all registers, supports <pauses>.
+VOICE = os.environ.get("AGENT_VOICE", "Yashraj")
 MODEL = os.environ.get("AGENT_TTS_MODEL", "timbre-v3.0")
 LANG = os.environ.get("AGENT_TTS_LANG", "auto")  # mixed Devanagari + Latin script -> Timbre's Hinglish profile
 SPOKEN = os.environ.get("AGENT_SPOKEN_SCRIPT", "1") == "1"
