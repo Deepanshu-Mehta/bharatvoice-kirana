@@ -253,7 +253,20 @@ def speak_money(amount: float) -> str:
     return rupees_to_hindi(amount)
 
 
-def render(template: str, register: str, **kw) -> str:
-    table = T[template]
-    tmpl = table.get(register) or table["hinglish"]
+VARIANTS = {  # people don't say the identical sentence every turn
+    "added": {
+        "hinglish": ["{item}, theek hai. Aur kuch?", "Achha ji, {item}. Aur kuch?", "Haan ji, {item} likh liya. Aur kuch?"],
+        "hindi": ["{item}, likh liya. Aur kuch?", "Ji, {item}. Aur kuch?", "Theek hai, {item} likh liya. Aur kuch?"],
+        "haryanvi": ["{item}, likh liya. Aur ke chahiye?", "Haan ji, {item}. Aur ke chahiye?", "Theek se, {item} likh liya. Aur ke chahiye?"],
+    },
+}
+
+
+def render(template: str, register: str, variant: int = 0, **kw) -> str:
+    if template in VARIANTS:
+        opts = VARIANTS[template].get(register) or VARIANTS[template]["hinglish"]
+        tmpl = opts[variant % len(opts)]
+    else:
+        table = T[template]
+        tmpl = table.get(register) or table["hinglish"]
     return tmpl.format(**kw).replace("  ", " ").strip()

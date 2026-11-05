@@ -4,7 +4,7 @@ Guard rails (PUBLIC_DEMO=1, see app/server.py):
   * Gnani daily credit cap 60 (ledger on a persistent Modal Volume, so restarts don't reset it)
   * per-IP hourly limits on calls, voice notes and reminders; 25 turns / 6 minutes per call; <= 3 concurrent calls
   * rules extractor only (strangers never wake the Evon GPU); the agent never speaks a caller's words back
-  * max_containers=1 (also respects Gnani's one-active-request-per-account limit)
+  * max_containers=2 so a redeploy can start while old connections drain (429 retries cover the one-request limit)
 
   uv run modal deploy infra/modal_app.py                 # prints https://<workspace>--bharatvoice-demo-web.modal.run
   uv run modal run infra/modal_app.py::seed_cache        # copy pre-cached agent phrases into the volume (optional)
@@ -47,7 +47,7 @@ secret = modal.Secret.from_dict(_secret_values() if modal.is_local() else {})
 app = modal.App("bharatvoice-demo")
 
 
-@app.function(image=image, volumes={"/state": state}, secrets=[secret], max_containers=1, scaledown_window=10 * 60,
+@app.function(image=image, volumes={"/state": state}, secrets=[secret], max_containers=2, scaledown_window=10 * 60,
               timeout=60 * 60)
 @modal.concurrent(max_inputs=40)
 @modal.asgi_app()
@@ -67,7 +67,7 @@ def seed_cache():
     sys.path.insert(0, str(ROOT))
     from app.brain.templates import T
     from app.gnani_client import GnaniClient
-    from app.tts_timbre import LANG, MODEL, VOICE
+    from app.tts_timbre import LANG, MODEL, VOICE, spoken_text
 
     c = GnaniClient(api_key="x")
     n = 0
@@ -79,7 +79,7 @@ def seed_cache():
                     continue
                 text = tmpl.format(shop="Sharma General Store") if fields else tmpl
                 for speed in (1.0, 0.85):
-                    _, key = c._tts_body(text, VOICE, MODEL, LANG, speed, 16000, None)
+                    _, key = c._tts_body(spoken_text(text), VOICE, MODEL, LANG, speed, 16000, None)
                     local = ROOT / "eval" / "cache" / "tts" / f"{key}.wav"
                     if local.exists():
                         batch.put_file(str(local), f"/cache/tts/{key}.wav")

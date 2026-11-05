@@ -139,6 +139,21 @@ Negative result, kept honest: biasing known customers toward *only their own* br
 
 **7. Latency** (server side, end of speech to first agent audio): STT ≈ 0.2–0.5 s + agent logic ≈ 0.01–0.15 s + first TTS chunk ≈ 0.3–0.6 s ≈ **0.9 s**. Add about 0.45 s of browser end-pointing for what the caller feels.
 
+## Making the shop sound like a person
+`infra/voice_lab.py` (listen locally at `/voices`) compares Timbre setups on the same four shop lines and measures how well Prisma understands each voice after an 8&nbsp;kHz call with shop noise:
+
+| Setup | Phone-line error (CER) |
+|---|---|
+| Before: Poorvi (female), all-Roman text | 14.8% |
+| Mixed script, Devanagari Hindi + Latin brands, any voice | 8.2–8.8% |
+
+Changes made:
+- **Mixed script.** Timbre reads all-Latin text with an English profile, which sounded anglicised. The display stays Roman, while what Timbre speaks is Devanagari for Hindi and Haryanvi words with Latin brands, and money as "₹216" for Timbre's own number reading. This **nearly halves the phone-line error**.
+- **A male, conversational voice** (Timbre v3.0 *Devansh*), matching the shop's male first-person replies, with one persona across Hindi, Hinglish and Haryanvi.
+- **`<pauses>` before the closing question**, as Gnani's docs recommend for prompts.
+- **Varied acknowledgements** instead of the same sentence every turn.
+- **Optional:** the shopkeeper's own cloned voice, with consent (`infra/clone_check.py --ref … --save`).
+
 ## What we learned about Gnani's models
 - **Number normalisation:** Prisma's default ITN turned "paav kilo" (¼ kg) into "0.5 किलो". `format=codemix` keeps spoken numbers, so we parse fractions ourselves.
 - **Biasing can swallow numbers:** "do packet" became "Dove packet" and "moong do kilo" became "Moong Dal kilo". We therefore bias only on brand names of 5+ characters with no digits, and add short brands only when they are in play. Done this way, biasing is the largest gain we measured.

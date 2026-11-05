@@ -163,7 +163,8 @@ class Session:
 
     # ------------------------------------------------------------------ helpers
     def r(self, template: str, **kw) -> str:
-        return render(template, self.register, **kw)
+        self._variant = getattr(self, "_variant", -1) + 1
+        return render(template, self.register, variant=self._variant, **kw)
 
     @property
     def total(self) -> float:

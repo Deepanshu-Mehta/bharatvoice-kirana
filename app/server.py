@@ -563,3 +563,29 @@ async def memory_forget(cid: str):
     MEMORY.reset(cid)
     await broadcast({"type": "memory_updated", "customer": cid, "learned": []})
     return {"ok": True}
+
+
+# ---------------------------------------------------------------- voice lab (local only): pick the most human shop voice
+VOICELAB = ROOT / "state" / "voicelab"
+
+
+@app.get("/voices")
+def voices_page():
+    _no_public()
+    return FileResponse(STATIC / "voices.html")
+
+
+@app.get("/api/voicelab")
+def voicelab_results():
+    _no_public()
+    p = VOICELAB / "results.json"
+    return json.loads(p.read_text()) if p.exists() else []
+
+
+@app.get("/voicelab/{name}")
+def voicelab_audio(name: str):
+    _no_public()
+    p = VOICELAB / _re.sub(r"[^A-Za-z0-9_.-]", "", name)
+    if not p.exists() or p.suffix != ".wav":
+        raise HTTPException(404, "no such clip")
+    return FileResponse(p, media_type="audio/wav")

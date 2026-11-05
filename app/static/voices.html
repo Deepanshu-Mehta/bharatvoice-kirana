@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Voice lab: which shop voice sounds human?</title>
+<link href="https://fonts.googleapis.com/css2?family=Kalam&family=Mukta:wght@400;600&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/site.css">
+<style>
+  .lab { max-width: 70rem; margin: 0 auto; padding: 2rem clamp(1.25rem, 4vw, 3rem) 4rem; }
+  .lab h1 { font: 400 2.2rem var(--serif); margin: 0 0 .4rem; }
+  .lab > p { color: var(--ink-2); max-width: 40rem; }
+  table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
+  th, td { text-align: left; padding: .7rem .5rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  th { font: 600 .9rem var(--sans); color: var(--ink-2); }
+  td.id { font: 400 1.6rem var(--serif); color: var(--neel); width: 2.5rem; }
+  td.lbl b { display: block; } td.lbl small { color: var(--ink-2); }
+  td.cer { font-variant-numeric: tabular-nums; }
+  audio { width: 11rem; height: 2rem; }
+  .line { font: 400 1rem var(--hand); color: var(--ballpoint); }
+</style>
+</head>
+<body>
+<header class="top"><a class="wordmark" href="/">BharatVoice <small>voice lab</small></a></header>
+<main class="lab">
+  <h1>Which shop voice sounds like a person?</h1>
+  <p>Same four lines in each setup. Listen with headphones and pick the one that sounds most like a real kirana bhaiya on the phone. “Phone-line error” is how much Prisma mishears that voice after an 8&nbsp;kHz call with shop noise (lower is clearer).</p>
+  <table><thead><tr><th></th><th>Setup</th><th>Greeting</th><th>Question</th><th>Readback</th><th>Shop calls you</th><th>Phone-line error</th></tr></thead><tbody id="rows"></tbody></table>
+  <p class="line" id="lines"></p>
+</main>
+<script>
+fetch("/api/voicelab").then(r => r.json()).then(rows => {
+  const order = ["greet", "clarify", "readback", "outbound"];
+  document.getElementById("rows").innerHTML = rows.map(r => `<tr><td class="id">${r.id}</td>
+    <td class="lbl"><b>${r.label}</b><small>${r.model}, ${r.voice}</small></td>
+    ${order.map(n => `<td><audio controls preload="none" src="/voicelab/${r.id}-${n}.wav"></audio></td>`).join("")}
+    <td class="cer">${(r.mean_cer * 100).toFixed(1)}%</td></tr>`).join("");
+});
+</script>
+</body>
+</html>
